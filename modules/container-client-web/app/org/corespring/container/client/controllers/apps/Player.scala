@@ -42,6 +42,7 @@ class Player(mode: Mode,
     val queryParams = mkQueryParams(mapToJson)
     val encodedComputedColors = calculateColorToken(queryParams, defaults)
     val computedIconSet = calculateIconSet(queryParams, defaults)
+    val colors = calculateColors(queryParams, defaults)
 
     bundler.bundle(ids, "player", Some("player"), !prodMode, Some(encodedComputedColors)) match {
       case Some(b) => {
@@ -56,7 +57,7 @@ class Player(mode: Mode,
         }
 
         Right(
-          playerRenderer.render(sessionId, session, item, b, warnings, queryParams, prodMode, showControls, computedIconSet))
+          playerRenderer.render(sessionId, session, item, b, warnings, queryParams, prodMode, showControls, computedIconSet, colors))
       }
       case _ => Left(s"Failed to create a bundle for: $sessionId")
     }

@@ -75,6 +75,7 @@ trait BaseEditor[H <: EditorHooks]
           val serviceParams = mkQueryParams(mapToJson)
           val encodedComputedColors = calculateColorToken(serviceParams, defaults)
           val computedIconSet = calculateIconSet(serviceParams, defaults)
+          val computedColors = calculateColors(serviceParams, defaults)
 
           val bundle = bundler.bundleAll("editor", Some("editor"), !prodMode, Some(encodedComputedColors)).get
           val mainEndpoints = endpoints.main(id)
@@ -87,7 +88,8 @@ trait BaseEditor[H <: EditorHooks]
             bundle,
             queryParams,
             prodMode,
-            computedIconSet).map(Ok(_))
+            computedIconSet,
+            computedColors).map(Ok(_))
         })
     }
   }

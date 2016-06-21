@@ -52,7 +52,7 @@ block content
 
     //[if lte IE 8]> <script src="../../js/common/ie-support/Function.bind.js"></script> <![endif]
     //[if lte IE 8]> <script src="../../js/common/ie-support/Array.map.js"></script> <![endif]
-    //[if lte IE 9]> <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script> <![endif]
+    //[if lte IE 9]> <script src="../../../components/html5shiv/dist/html5shiv.min.js"></script> <![endif]
     //[if lte IE 9]> <script src="//cdnjs.cloudflare.com/ajax/libs/json3/3.2.6/json3.min.js"></script> <![endif]
 
 block before-main-script
@@ -69,5 +69,5 @@ block after-main-script
       $provide.factory('EmbeddedItemAndSession', function(){
         return !{sessionJson} || {};
       });
-      $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+      $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
     }]);

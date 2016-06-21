@@ -159,7 +159,7 @@ block after-main-script
         .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz])
         .config(['$provide',
                 function($provide) {
-                  $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+                  $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
                 }
               ]);
     })(this);

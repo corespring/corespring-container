@@ -23,7 +23,7 @@ block after-main-script
   script(type="text/javascript").
     angular.module('corespring-#{appName}').config(['$provide', function($provide) {
       $provide.constant("STATIC_PATHS", !{staticPaths} );
-      $provide.value('PlayerSkin', {iconSet: "!{iconSet}"});
+      $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
     }]);
 
 
