@@ -67,6 +67,18 @@ $(document).ready(function() {
   });
 
 
+  $('#set-mode-gather').click(function() {
+    player.setMode('gather', function(err) {
+      console.log(err);
+    });
+  });
+
+  $('#set-mode-view').click(function() {
+    player.setMode('view', function(err) {
+      console.log(err);
+    });
+  });
+
   $('#set-mode-evaluate').click(function() {
     player.setMode('evaluate', function(err) {
       console.log(err);
