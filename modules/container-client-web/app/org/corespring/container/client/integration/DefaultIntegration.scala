@@ -43,6 +43,7 @@ case class ContainerConfig(
   editorDebounceInMillis: Long,
   components: ComponentsConfig,
   player: V2PlayerConfig)
+
 trait DefaultIntegration
   extends ControllersModule
   with ComponentControllersModule
