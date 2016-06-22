@@ -72,6 +72,7 @@ describe('Main', function() {
 
   var MockDocument = [{}];
 
+  beforeEach(angular.mock.module('corespring-player.services'));
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
   beforeEach(module(function($provide) {
