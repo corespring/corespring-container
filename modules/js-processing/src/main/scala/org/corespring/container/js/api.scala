@@ -17,6 +17,13 @@ object api {
     def preProcessItem(question: JsValue): JsValue
 
     /**
+      * Get the optional stash.
+      * @param question
+      * @return
+      */
+    def prepareStash(question: JsValue, session: JsValue): Option[JsValue]
+
+    /**
      * Is this component scoreable?
      * @param question
      * @param response

@@ -6,11 +6,12 @@ import org.corespring.container.client.hooks.Hooks.StatusMessage
 import org.corespring.container.client.hooks.PlayerHooks
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.PlayerRenderer
+import org.corespring.container.components.processing.StashProcessor
 import org.corespring.container.components.services.ComponentService
 import play.api.Mode
 import play.api.Mode.Mode
 import play.api.http.ContentTypes
-import play.api.libs.json.{ JsObject, JsValue }
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import play.api.mvc._
 import play.api.templates.Html
 
@@ -20,11 +21,12 @@ class Player(mode: Mode,
   bundler: ComponentBundler,
   val containerContext: ContainerExecutionContext,
   playerRenderer: PlayerRenderer,
+  stashProcessor: StashProcessor,
   componentService: ComponentService,
   val hooks: PlayerHooks)
   extends Controller
   with GetAsset[PlayerHooks]
-  with QueryStringHelper{
+  with QueryStringHelper {
 
   private def handleSuccess[D](fn: (D) => Future[SimpleResult])(e: Either[StatusMessage, D]): Future[SimpleResult] = e match {
     case Left((code, msg)) => Future { Status(code)(msg) }
@@ -56,6 +58,21 @@ class Player(mode: Mode,
     }
   }
 
+  private def addOptionalStash(item: JsValue, session: JsValue): JsValue = {
+    stashProcessor.prepareStash(item, session) match {
+      case Some(stash) => {
+        val sessionWithStash = session.as[JsObject] ++ Json.obj("components" -> stash)
+        saveSession(sessionWithStash)
+        sessionWithStash
+      }
+      case _ => session
+    }
+  }
+
+  private def saveSession(session:JsValue) = {
+    //TODO how to save the session
+  }
+
   def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).flatMap {
       handleSuccess { (tuple) =>
@@ -69,13 +86,11 @@ class Player(mode: Mode,
     }
   }
 
-
-
   /**
-    * show a simple submit button
-    * showControls=true|false (default: false)
-    * - show simple player controls (for devs)
-    */
+   * show a simple submit button
+   * showControls=true|false (default: false)
+   * - show simple player controls (for devs)
+   */
   val showControls = "showControls"
 
   /**
@@ -88,7 +103,8 @@ class Player(mode: Mode,
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        createPlayerHtml((session \ "id").as[String], session, item) match {
+        val sessionWithStash = addOptionalStash(item, session)
+        createPlayerHtml((session \ "id").as[String], sessionWithStash, item) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map { html =>
             lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])

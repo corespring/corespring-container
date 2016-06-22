@@ -3,7 +3,7 @@ package org.corespring.container.js.rhino
 import org.corespring.container.components.model.{Component, Interaction, Library, LibrarySource}
 import org.corespring.container.components.services.DependencyResolver
 import org.corespring.container.js.api.{JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, CustomScoringJs => ApiCustomScoring}
-import org.corespring.container.js.processing.PlayerItemPreProcessor
+import org.corespring.container.js.processing.{PlayerItemPreProcessor, StashProcessor}
 import org.corespring.container.js.response.OutcomeProcessor
 import org.mozilla.javascript.{Context, Scriptable, UniqueTag, Function => RhinoFunction}
 import play.api.Logger
@@ -135,6 +135,27 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     Context.exit()
   }
 
+  override def prepareStash(question: JsValue, session: JsValue): Option[JsValue] = try {
+    val context = Context.enter()
+    val server = serverLogic(context, scope)
+    server.get("prepareStash", server) match {
+      case ut: UniqueTag => None
+      case fn: RhinoFunction => {
+        val result = callJsFunctionJson("", fn, server, Array(question, session))(context, scope)
+        result match {
+          case Left(err) => throw JavascriptProcessingException(err)
+          case Right(json) => Some(json)
+        }
+      }
+    }
+  } catch {
+    case e: Throwable => {
+      throw new RuntimeException("[prepareStash] error:", e)
+    }
+  } finally {
+    Context.exit()
+  }
+
   /**
    * Is this component scoreable?
    *
@@ -209,6 +230,10 @@ class RhinoOutcomeProcessor(val components: Seq[Component], val scope: Scriptabl
 }
 
 class RhinoPlayerItemPreProcessor(val components: Seq[Component], val scope: Scriptable) extends PlayerItemPreProcessor {
+  override def serverLogic(componentType: String): ApiComponentServerLogic = new RhinoServerLogic(componentType, scope)
+}
+
+class RhinoStashProcessor(val components: Seq[Component], val scope: Scriptable) extends StashProcessor {
   override def serverLogic(componentType: String): ApiComponentServerLogic = new RhinoServerLogic(componentType, scope)
 }
 

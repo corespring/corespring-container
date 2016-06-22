@@ -183,10 +183,12 @@ trait JsFunctionCalling {
     fn: RhinoFunction,
     parentScope: Scriptable,
     args: Array[JsValue])(implicit ctx: Context, rootScope: Scriptable): Either[JavascriptError, JsValue] = {
+
     def mkJson(o: Any): JsValue = {
       val jsonString: String = NativeJSON.stringify(ctx, rootScope, o, null, null).asInstanceOf[String]
       Json.parse(jsonString.toString)
     }
+
     callJsFunction(rawJs, fn, parentScope, args, mkJson)(ctx, rootScope)
   }
 
