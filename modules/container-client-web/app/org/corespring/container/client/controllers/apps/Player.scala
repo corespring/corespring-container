@@ -21,7 +21,6 @@ class Player(mode: Mode,
   bundler: ComponentBundler,
   val containerContext: ContainerExecutionContext,
   playerRenderer: PlayerRenderer,
-  stashProcessor: StashProcessor,
   componentService: ComponentService,
   val hooks: PlayerHooks)
   extends Controller
@@ -58,21 +57,6 @@ class Player(mode: Mode,
     }
   }
 
-  private def addOptionalStash(item: JsValue, session: JsValue): JsValue = {
-    stashProcessor.prepareStash(item, session) match {
-      case Some(stash) => {
-        val sessionWithStash = session.as[JsObject] ++ Json.obj("components" -> stash)
-        saveSession(sessionWithStash)
-        sessionWithStash
-      }
-      case _ => session
-    }
-  }
-
-  private def saveSession(session:JsValue) = {
-    //TODO how to save the session
-  }
-
   def load(sessionId: String) = Action.async { implicit request =>
     hooks.loadSessionAndItem(sessionId).flatMap {
       handleSuccess { (tuple) =>
@@ -103,8 +87,7 @@ class Player(mode: Mode,
       handleSuccess { (tuple) =>
         val (session, item) = tuple
         require((session \ "id").asOpt[String].isDefined, "The session model must specify an 'id'")
-        val sessionWithStash = addOptionalStash(item, session)
-        createPlayerHtml((session \ "id").as[String], sessionWithStash, item) match {
+        createPlayerHtml((session \ "id").as[String], session, item) match {
           case Left(e) => Future.successful(BadRequest(e))
           case Right(f) => f.map { html =>
             lazy val call = org.corespring.container.client.controllers.apps.routes.Player.load((session \ "id").as[String])

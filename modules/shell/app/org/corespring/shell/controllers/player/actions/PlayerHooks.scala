@@ -3,25 +3,30 @@ package org.corespring.shell.controllers.player.actions
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
 import org.corespring.container.client.controllers.{ AssetType, Assets }
-
-
-import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks, LoadHook }
+import org.corespring.container.client.hooks.{ LoadHook, PlayerHooks => ContainerPlayerHooks }
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.shell.services.{ItemService, SessionService}
+import org.corespring.container.components.processing.StashProcessor
+import org.corespring.shell.services.{ ItemService, SessionService }
 import play.api.libs.json._
 import play.api.mvc._
 
 import scala.concurrent.Future
 
 class PlayerHooks(
-sessionService: SessionService,
-assets: Assets,
-itemService: ItemService,
-val containerContext: ContainerExecutionContext
-                 ) extends ContainerPlayerHooks {
+  sessionService: SessionService,
+  assets: Assets,
+  itemService: ItemService,
+  stashProcessor: StashProcessor,
+  val containerContext: ContainerExecutionContext) extends ContainerPlayerHooks {
 
   import play.api.http.Status._
 
+  private def addOptionalStash(item: JsValue, session: JsObject): JsObject = {
+    stashProcessor.prepareStash(item, session) match {
+      case Some(stash) => session ++ Json.obj("components" -> stash)
+      case _ => session
+    }
+  }
 
   override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
 
@@ -34,13 +39,13 @@ val containerContext: ContainerExecutionContext
 
     val session = Json.obj("settings" -> settings, "itemId" -> itemId, "attempts" -> 0)
 
-    sessionService.create(session).map {
-      oid =>
-        itemService.load(itemId).map { item =>
-          val withId = session ++ Json.obj("id" -> oid.toString)
-          Right((withId, item))
-        }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
-    }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
+    itemService.load(itemId).map { item =>
+      val withStash = addOptionalStash(item, session)
+      sessionService.create(withStash).map { oid =>
+        val withId = withStash ++ Json.obj("id" -> oid.toString)
+        Right((withId, item))
+      }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
+    }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
   }
 
   override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
