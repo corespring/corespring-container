@@ -42,13 +42,14 @@ class Catalog(
           case Right(defaults) => {
             val encodedComputedColors = calculateColorToken(queryParams, defaults)
             val computedIconSet = calculateIconSet(queryParams, defaults)
+            val computedColors = calculateColors(queryParams, defaults)
 
             bundler.bundleAll("catalog", Some("editor"), !prodMode, Some(encodedComputedColors)) match {
               case Some(b) => {
                 val mainEndpoints = endpoints.main(id)
                 val supportingMaterialsEndpoints = endpoints.supportingMaterials(id)
                 val queryParams = mkQueryParams(m => m)
-                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, queryParams, prodMode, computedIconSet).map { html =>
+                catalogRenderer.render(b, mainEndpoints, supportingMaterialsEndpoints, queryParams, prodMode, computedIconSet, computedColors).map { html =>
                   Ok(html)
                 }
               }
