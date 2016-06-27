@@ -127,13 +127,25 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
-    if (call.method === 'GET') {
-      iframeOpen += 'src="' + url + '"';
-    }
-
     var iframeClose = '></iframe>';
 
     $(e).html(iframeOpen + iframeClose);
+    
+    $(e).find('iframe').on('load', function(){
+      try{
+        var iframeDoc = this.contentWindow.document;
+        var rootNodes = iframeDoc.getElementsByClassName('corespring-root');
+        if(rootNodes.length !== 1){
+          errorCallback(errorCodes.INITIALISATION_FAILED);
+        }
+      } catch(e){
+        errorCallback(errorCodes.INITIALISATION_FAILED);
+      }
+    });
+
+    if (call.method === 'GET') {
+       $(e).find('iframe').attr('src', url);
+     }
 
 
     if (call.method === 'POST') {
