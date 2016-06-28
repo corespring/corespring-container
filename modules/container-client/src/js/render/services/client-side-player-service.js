@@ -52,7 +52,10 @@ angular.module('corespring-player.services')
               console.warn('didn\'t find server logic for: ', question.componentType);
               return;
             }
-            if(!serverLogic.createOutcome){
+            if(serverLogic.isScorable && !serverLogic.isScorable()) {
+              return;
+            }
+            if (!serverLogic.createOutcome) {
               console.warn('didn\'t find serverLogic.createOutcome: ', question.componentType);
               return;
             }
