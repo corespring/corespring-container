@@ -46,6 +46,6 @@ angular.module('corespring-editing.services').service('FileUploadUtils', [
           };
         }
       };
-    };
+    }
   }
 ]);
