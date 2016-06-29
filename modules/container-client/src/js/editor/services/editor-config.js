@@ -72,6 +72,13 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             "corespring-select-text"
           ];
 
+          var audioComponent = componentToFeature(_.find(widgets,
+            function(c) {
+              return c.componentType === 'corespring-audio';
+            }));
+
+          audioComponent.iconclass = "fa fa-file-sound-o";
+
           var videoComponent = componentToFeature(_.find(widgets,
               function(c) {
                 return c.componentType === 'corespring-video';
@@ -128,7 +135,8 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             {
               type: 'group',
               buttons: [
-                videoComponent
+                videoComponent,
+                audioComponent
               ]
             }]
           };
