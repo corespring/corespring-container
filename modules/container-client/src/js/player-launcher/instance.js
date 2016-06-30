@@ -5,6 +5,7 @@
 var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
   launchOpts = launchOpts || {};
+  launchOpts.initTimeout = launchOpts.initTimeout || 4000;
 
   var call = launchOpts.call;
   var queryParams = launchOpts.queryParams;
@@ -131,27 +132,16 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
 
     $(e).html(iframeOpen + iframeClose);
     
-    $(e).find('iframe').on('load', function(){
-      try{
-        var iframeDoc = this.contentWindow.document;
-        var rootNodes = iframeDoc.getElementsByClassName('corespring-root');
-        if(rootNodes.length !== 1){
-          errorCallback(errorCodes.INITIALISATION_FAILED);
-        }
-      } catch(e){
-        errorCallback(errorCodes.INITIALISATION_FAILED);
-      }
-    });
-
     if (call.method === 'GET') {
        $(e).find('iframe').attr('src', url);
-     }
-
-
-    if (call.method === 'POST') {
+     } else if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
+
+    var initErrorTimeoutId = setTimeout(function(){
+      errorCallback(errorCodes.INITIALISATION_FAILED);
+    }, launchOpts.initTimeout);
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
       enableLogging: false
@@ -166,6 +156,7 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
     channel.on('rendered', function() {
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
+      clearTimeout(initErrorTimeoutId);
     });
 
     channel.on('ready', function(){
