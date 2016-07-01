@@ -12,6 +12,10 @@ jsdoc2md --template modules/container-client/grunt/docs/error-codes.hbs --src mo
  * 
  * ```js 
  * //onError will receive the errors below. 
+ * function onError(err){
+ *   console.error(err.code, err.msg);
+ * }
+ * 
  * var player = new org.corespring.players.Player('.holder', {}, onError);
  * ``` 
  * @module error-codes 
