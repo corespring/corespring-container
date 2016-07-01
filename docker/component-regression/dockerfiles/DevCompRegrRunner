@@ -16,16 +16,20 @@ RUN mkdir -p /data/regression/components
 ADD corespring-components/components /data/regression/components
 ENV CONTAINER_COMPONENTS_PATH="/data/regression/components"
 
-ADD docker/component-regression/Gruntfile.coffee /data/regression/Gruntfile.coffee
+ADD docker/component-regression/Gruntfile.coffee /data/regression/
+ADD docker/component-regression/wdio.conf-template.js /data/regression/
 
 # Settings for the regression tests
-ENV BROWSER_NAME "chrome"
+ENV BROWSER_NAME "firefox"
+ENV COMPONENT ""
 ENV GREP ""
 ENV GRUNT_DEBUG "false"
 ENV INVERT_GREP "false"
+ENV PLAY_JAVA_OPTS ""
+ENV SELENIUM_JAVA_OPTS ""
 ENV SLUG ""
 ENV TIMEOUT 30000
-ENV WAIT_BEFORE_TEST 30
+ENV WAIT_BEFORE_TEST 15
 ENV WEB_DRIVER_LOG_LEVEL "silent"
 
 CMD ["/data/regression/scripts/dev-regr-runner.sh"]

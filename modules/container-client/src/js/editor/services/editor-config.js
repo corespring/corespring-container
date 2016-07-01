@@ -72,11 +72,21 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             "corespring-select-text"
           ];
 
-          var videoComponent = componentToFeature(_.find(widgets,
+          function findWidget(name){
+            var result = _.find(widgets,
               function(c) {
-                return c.componentType === 'corespring-video';
-              }));
+                return c.componentType === name;
+              });
+            if(!result){
+              throw "Widget not found: " + name;
+            }
+            return result;
+          }
 
+          var audioComponent = componentToFeature(findWidget('corespring-audio'));
+          audioComponent.iconclass = "fa fa-file-sound-o";
+
+          var videoComponent = componentToFeature(findWidget('corespring-video'));
           videoComponent.iconclass = "fa fa-film";
 
           var calculatorFeature = widgetToFeature('corespring-calculator');
@@ -128,7 +138,8 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             {
               type: 'group',
               buttons: [
-                videoComponent
+                videoComponent,
+                audioComponent
               ]
             }]
           };
@@ -152,6 +163,9 @@ angular.module('corespring-editor.services').service('EditorConfig', [
           }
 
           function componentToFeature(component) {
+            if(!component){
+              throw "component not found";
+            }
             return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
                 component,
                 addToEditor,
