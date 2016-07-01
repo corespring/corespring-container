@@ -73,7 +73,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
     override lazy val containerContext: ContainerExecutionContext = TestContext.containerContext
 
-    override lazy val editorClientOptions: EditorClientOptions = EditorClientOptions(0, StaticPaths.staticPaths)
+    override lazy val editorClientOptions: EditorClientOptions = EditorClientOptions(0, 16384, 500, StaticPaths.staticPaths)
 
     def waitFor[A](f: Future[A]): A = Await.result(f, 1.second)
   }

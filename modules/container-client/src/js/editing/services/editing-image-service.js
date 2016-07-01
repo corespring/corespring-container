@@ -5,7 +5,8 @@ angular.module('corespring-editing.services').service('EditingImageService', [
   'FileUploadUtils',
   function(
     EditingFileUploadService,
-    FileUploadUtils
+    FileUploadUtils,
+    UPLOAD_IMAGE_MAX_SIZE_KB
   ) {
 
     var fileUploadUtils = new FileUploadUtils(
@@ -13,6 +14,6 @@ angular.module('corespring-editing.services').service('EditingImageService', [
       'Only files in .jpeg, .jpg, .png or .gif formats can be uploaded.'
     );
 
-    return new EditingFileUploadService(500, fileUploadUtils);
+    return new EditingFileUploadService(UPLOAD_IMAGE_MAX_SIZE_KB, fileUploadUtils);
   }
 ]);

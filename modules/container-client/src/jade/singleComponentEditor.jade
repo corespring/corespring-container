@@ -153,7 +153,11 @@ block after-main-script
         //TODO: STATIC_PATHS isnt relevant to the component editor
         .constant('STATIC_PATHS', editorOptions.staticPaths || {}) 
         //TODO:  DEBOUNCE_IN_MILLIS isnt relevant to the component editor
-        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 ) 
+        .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 )
+        //TODO:  UPLOAD_AUDIO_MAX_SIZE_KB isnt relevant to the component editor
+        .constant('UPLOAD_AUDIO_MAX_SIZE_KB', editorOptions.uploadAudioMaxSizeKb || 16 * 1024);
+        //TODO:  UPLOAD_IMAGE_MAX_SIZE_KB isnt relevant to the component editor
+        .constant('UPLOAD_IMAGE_MAX_SIZE_KB', editorOptions.uploadImageMaxSizeKb || 500);
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
         .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
