@@ -72,11 +72,16 @@ describe('Main', function() {
 
   var MockDocument = [{}];
 
+  var MockDebounce = function(fn){
+    return fn;
+  };
+
   beforeEach(angular.mock.module('corespring-player.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('$log', new MockLog());
     $provide.value('$document', MockDocument);
+    $provide.value('debounce', MockDebounce);
     $provide.value('ComponentRegister', new MockComponentRegister());
     $provide.value('PlayerServiceDefinition', MockPlayerServiceDefinition);
   }));
@@ -421,6 +426,18 @@ describe('Main', function() {
 
     it('should call PlayerService.loadItemAndSession', function() {
       expect(mockLoadItemAndSession).toHaveBeenCalled();
+    });
+
+  });
+
+  describe('stashSaved event', function() {
+
+    beforeEach(function() {
+      scope.$emit('stashSaved');
+    });
+
+    it('should call PlayerService.save', function() {
+      expect(mockSaveSession).toHaveBeenCalled();
     });
 
   });

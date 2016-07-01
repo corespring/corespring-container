@@ -39,8 +39,8 @@ ENV CONTAINER_FAKE_S3_ENDPOINT="http://localhost:4567"
 
 EXPOSE 9000
 
-ADD docker/scripts/main.sh /data/main.sh
-RUN chmod +x /data/main.sh
+ADD docker/scripts/ /data
+RUN chmod +x /data/*.sh
 
 RUN mkdir /opt/utils
 ADD bin /opt/utils/bin

@@ -7,6 +7,7 @@ angular.module('corespring-player.controllers')
       '$scope',
       '$timeout',
       'ComponentRegister',
+      'debounce',
       'PlayerServiceDefinition',
       function(
         $document,
@@ -15,6 +16,7 @@ angular.module('corespring-player.controllers')
         $scope,
         $timeout,
         ComponentRegister,
+        debounce,
         PlayerServiceDefinition
       ) {
 
@@ -253,6 +255,16 @@ angular.module('corespring-player.controllers')
         $scope.$on('saveResponses', function(event, data, callback) {
           $log.debug('[onSaveResponses] -> ', data, callback);
           $scope.save(data.isAttempt, data.isComplete, callback || function() {});
+        });
+
+        var debouncedSave = debounce(function(){
+          console.log('[debouncedSave]');
+          $scope.save(false, false);
+        });
+
+        $scope.$on('stashSaved', function(event, data, callback) {
+          console.log('[stashSaved]');
+          debouncedSave();
         });
 
         $scope.$on('countAttempts', function(event, data, callback) {

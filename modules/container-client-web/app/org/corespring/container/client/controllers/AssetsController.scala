@@ -37,7 +37,14 @@ trait AssetsController[H <: AssetHooks] extends GetAsset[H] with TimestampPath {
     Logger(c)
   }
 
-  def acceptableSuffixes: Seq[String] = Seq("png", "gif", "jpeg", "jpg")
+  def acceptableSuffixes: Seq[String] = Seq(
+    "gif",
+    "jpeg",
+    "jpg",
+    "mp3",
+    "ogg",
+    "png"
+  )
 
   def acceptableType(rh: RequestHeader): Option[SimpleResult] = {
     if (acceptableSuffixes.isEmpty) {
