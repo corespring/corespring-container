@@ -1,5 +1,7 @@
 /**
- * @param call: { url: '', method: '', params: {}, hash: ''}
+ * @constructor
+ * @param {node|selector} element - a jquery style selector - aka $(element) will return a jQuery wrapped node.
+ * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
 
 var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
