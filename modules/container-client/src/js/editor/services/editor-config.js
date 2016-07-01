@@ -138,8 +138,8 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             {
               type: 'group',
               buttons: [
-                videoComponent,
-                audioComponent
+                videoComponent //,
+                //audioComponent
               ]
             }]
           };
