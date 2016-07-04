@@ -3,6 +3,7 @@
 angular.module('corespring-editing.services').service('EditingImageService', [
   'EditingFileUploadService',
   'FileUploadUtils',
+  'UPLOAD_IMAGE_MAX_SIZE_KB',
   function(
     EditingFileUploadService,
     FileUploadUtils,

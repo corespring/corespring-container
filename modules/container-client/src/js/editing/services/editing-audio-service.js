@@ -2,7 +2,7 @@
 angular.module('corespring-editing.services').service('EditingAudioService', [
   'EditingFileUploadService',
   'FileUploadUtils',
-  'MAX_AUDIO_UPLOAD_SIZE',
+  'UPLOAD_AUDIO_MAX_SIZE_KB',
   function(
     EditingFileUploadService,
     FileUploadUtils,
