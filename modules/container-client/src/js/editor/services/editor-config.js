@@ -83,9 +83,6 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             return result;
           }
 
-          var audioComponent = componentToFeature(findWidget('corespring-audio'));
-          audioComponent.iconclass = "fa fa-file-sound-o";
-
           var videoComponent = componentToFeature(findWidget('corespring-video'));
           videoComponent.iconclass = "fa fa-film";
 
@@ -138,8 +135,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             {
               type: 'group',
               buttons: [
-                videoComponent,
-                audioComponent
+                videoComponent
               ]
             }]
           };
