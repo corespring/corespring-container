@@ -108,6 +108,6 @@ class ContainerClientImplementation(
     player = V2PlayerConfig(
       rootUrl = configuration.getString("rootUrl"),
       newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) }),
-    uploadAudioMaxSizeKb = configuration.getLong("editor.upload.audio.maxSizeKb").getOrElse(16 * 1024),
+    uploadAudioMaxSizeKb = configuration.getLong("editor.upload.audio.maxSizeKb").getOrElse(8 * 1024),
     uploadImageMaxSizeKb = configuration.getLong("editor.upload.image.maxSizeKb").getOrElse(500))
 }
