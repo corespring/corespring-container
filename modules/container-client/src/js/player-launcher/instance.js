@@ -158,11 +158,11 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
     channel.on('rendered', function() {
       $iframe().removeClass("player-loading");
       $iframe().addClass("player-loaded");
-      clearTimeout(initErrorTimeoutId);
     });
 
     channel.on('ready', function(){
       channel.send('initialise', data);
+      clearTimeout(initErrorTimeoutId);
     });
 
     /**
