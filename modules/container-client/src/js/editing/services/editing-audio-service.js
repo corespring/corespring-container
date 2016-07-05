@@ -10,8 +10,8 @@ angular.module('corespring-editing.services').service('EditingAudioService', [
   ) {
 
     var fileUploadUtils = new FileUploadUtils(
-      ['audio/mp3', 'audio/ogg'],
-      'Only files in .mp3 or .ogg format can be uploaded.'
+      ['audio/mp3'],
+      'Only files in .mp3 format can be uploaded.'
     );
 
     return new EditingFileUploadService(UPLOAD_AUDIO_MAX_SIZE_KB, fileUploadUtils);
