@@ -1,10 +1,13 @@
 /**
- * @param call: { url: '', method: '', params: {}, hash: ''}
+ * @constructor
+ * @param {node|selector} element - a jquery style selector - aka $(element) will return a jQuery wrapped node.
+ * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
 
 var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
   launchOpts = launchOpts || {};
+  launchOpts.initTimeout = launchOpts.initTimeout || 4000;
 
   var call = launchOpts.call;
   var queryParams = launchOpts.queryParams;
@@ -127,19 +130,20 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
       ' style="border:none;' + (autosizeEnabled ? ' width:100%;' : '') + '" '
     ].join('');
 
-    if (call.method === 'GET') {
-      iframeOpen += 'src="' + url + '"';
-    }
-
     var iframeClose = '></iframe>';
 
     $(e).html(iframeOpen + iframeClose);
-
-
-    if (call.method === 'POST') {
+    
+    if (call.method === 'GET') {
+       $(e).find('iframe').attr('src', url);
+     } else if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
+
+    var initErrorTimeoutId = setTimeout(function(){
+      errorCallback(errorCodes.INITIALISATION_FAILED);
+    }, launchOpts.initTimeout);
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
       enableLogging: false
@@ -158,6 +162,7 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
 
     channel.on('ready', function(){
       channel.send('initialise', data);
+      clearTimeout(initErrorTimeoutId);
     });
 
     /**
