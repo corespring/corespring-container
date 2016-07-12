@@ -31,7 +31,7 @@ angular.module('corespring-editing.services').service('EditingFileUploadService'
 
         if (typeError) {
           $timeout(function() {
-            onComplete(typeError.message + ":" + typeError.fileType);
+            onComplete(typeError.message + " Actual file type: " + typeError.fileType);
           });
           return;
         }
@@ -59,7 +59,7 @@ angular.module('corespring-editing.services').service('EditingFileUploadService'
           }.bind(this)
         };
 
-        //seems to be a global class
+        //a global class
         new com.ee.v2.RawFileUploader(file, url, file.name, opts);
       };
     }
