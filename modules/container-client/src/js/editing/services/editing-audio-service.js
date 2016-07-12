@@ -10,7 +10,7 @@ angular.module('corespring-editing.services').service('EditingAudioService', [
   ) {
 
     var fileUploadUtils = new FileUploadUtils(
-      ['audio/mp3'],
+      ['audio/mp3', 'audio/mpeg'],
       'Only files in .mp3 format can be uploaded.'
     );
 
