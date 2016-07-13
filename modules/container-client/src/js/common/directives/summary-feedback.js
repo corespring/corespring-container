@@ -31,7 +31,7 @@ angular.module('corespring-common.directives').directive('summaryFeedback', [
         '  <path class="st1" d="M-130.4,142.1c0-2.1,1.7-3.9,3.9-3.9c0.3,0,0.5,0,0.8,0.1c-0.6-0.8-1.5-1.3-2.6-1.3c-1.8,0-3.3,1.5-3.3,3.3c0,1.1,0.5,2,1.3,2.6C-130.4,142.6-130.4,142.4-130.4,142.1z"/>',
         '</svg>'
       ].join('')
-    }
+    };
 
     return {
       link: function($scope) {
