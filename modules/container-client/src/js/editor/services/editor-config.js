@@ -40,14 +40,14 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
         //--------------------------------------------------------------
 
+        function onComponentsLoadError(error) {
+          throw new Error("Error loading components");
+        }
+
         function onComponentsLoaded(uiComponents) {
           interactions = uiComponents.interactions;
           widgets = uiComponents.widgets;
           initComponents.bind(this)();
-        }
-
-        function onComponentsLoadError(error) {
-          throw new Error("Error loading components");
         }
 
         function initComponents() {
@@ -72,18 +72,10 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             "corespring-select-text"
           ];
 
-          function findWidget(name){
-            var result = _.find(widgets,
-              function(c) {
-                return c.componentType === name;
-              });
-            if(!result){
-              throw "Widget not found: " + name;
-            }
-            return result;
-          }
+          var audioComponent = widgetToFeature('corespring-audio');
+          audioComponent.iconclass = "fa fa-music";
 
-          var videoComponent = componentToFeature(findWidget('corespring-video'));
+          var videoComponent = widgetToFeature('corespring-video');
           videoComponent.iconclass = "fa fa-film";
 
           var calculatorFeature = widgetToFeature('corespring-calculator');
@@ -135,12 +127,13 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             {
               type: 'group',
               buttons: [
-                videoComponent
+                videoComponent,
+                audioComponent
               ]
             }]
           };
 
-          //------------------------------------
+          //-------------------------------------------------------
 
           function storeDefaultData(comp){
             ComponentDefaultData.setDefaultData(comp.componentType, comp.defaultData);
@@ -160,7 +153,7 @@ angular.module('corespring-editor.services').service('EditorConfig', [
 
           function componentToFeature(component) {
             if(!component){
-              throw "component not found";
+              throw new Error("component not found");
             }
             return ComponentToWiggiwizFeatureAdapter.componentToWiggiwizFeature(
                 component,
@@ -174,6 +167,9 @@ angular.module('corespring-editor.services').service('EditorConfig', [
             var target = _.find(widgets, function(w) {
               return w.componentType === t;
             });
+            if(!target){
+              throw new Error("Widget not found: " + t);
+            }
             return componentToFeature(target);
           }
 

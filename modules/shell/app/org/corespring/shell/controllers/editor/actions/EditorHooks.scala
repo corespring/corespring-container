@@ -8,7 +8,7 @@ import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.controllers.editor.ItemDraftAssets
-import org.corespring.shell.services.{ItemService, ItemDraftService}
+import org.corespring.shell.services.{ ItemService, ItemDraftService }
 import play.api.Logger
 import play.api.libs.json.{ Json, JsValue }
 import play.api.mvc._
@@ -47,13 +47,11 @@ object DraftId {
 }
 
 class ItemEditorHooks(
- itemService: ItemService,
- assets: Assets,
-                       val containerContext: ContainerExecutionContext
-                     ) extends ContainerItemEditorHooks {
+  itemService: ItemService,
+  assets: Assets,
+  val containerContext: ContainerExecutionContext) extends ContainerItemEditorHooks {
 
   lazy val logger = ContainerLogger.getLogger("EditorHooks")
-
 
   import play.api.http.Status._
 
@@ -91,14 +89,12 @@ class ItemEditorHooks(
 }
 
 class DraftEditorHooks(
-draftItemService: ItemDraftService,
-itemService: ItemService,
-assets: Assets with ItemDraftAssets,
-                        val containerContext: ContainerExecutionContext
-                      ) extends ContainerDraftEditorHooks {
+  draftItemService: ItemDraftService,
+  itemService: ItemService,
+  assets: Assets with ItemDraftAssets,
+  val containerContext: ContainerExecutionContext) extends ContainerDraftEditorHooks {
 
   lazy val logger = Logger(this.getClass)
-
 
   import play.api.http.Status._
 
