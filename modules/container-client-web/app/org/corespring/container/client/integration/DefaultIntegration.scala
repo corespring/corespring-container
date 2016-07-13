@@ -42,7 +42,10 @@ case class ContainerConfig(
   showNonReleasedComponents: Boolean,
   editorDebounceInMillis: Long,
   components: ComponentsConfig,
-  player: V2PlayerConfig)
+  player: V2PlayerConfig,
+  uploadAudioMaxSizeKb: Long,
+  uploadImageMaxSizeKb: Long)
+
 trait DefaultIntegration
   extends ControllersModule
   with ComponentControllersModule
@@ -62,7 +65,7 @@ trait DefaultIntegration
   override final lazy val editorConfig = EditorConfig(containerConfig.mode, containerConfig.showNonReleasedComponents)
 
   override lazy val editorClientOptions = {
-    EditorClientOptions(containerConfig.editorDebounceInMillis, StaticPaths.staticPaths)
+    EditorClientOptions(containerConfig.editorDebounceInMillis, containerConfig.uploadAudioMaxSizeKb, containerConfig.uploadImageMaxSizeKb, StaticPaths.staticPaths)
   }
 
   def jadeEngineConfig: JadeEngineConfig = JadeEngineConfig("container-client/jade", containerConfig.mode, resourceLoader.loadPath(_), resourceLoader.lastModified(_))
