@@ -24,8 +24,11 @@ trait TemplateParams {
   }
 }
 
-
-case class EditorClientOptions(debounceInMillis: Long, staticPaths: JsObject) {
+case class EditorClientOptions(
+  debounceInMillis: Long,
+  uploadAudioMaxSizeKb: Long,
+  uploadImageMaxSizeKb: Long,
+  staticPaths: JsObject) {
   def toJson = Json.format[EditorClientOptions].writes(this)
 }
 
@@ -57,7 +60,6 @@ case class TabComponentEditorOptions(activePane: Option[String],
 object ComponentEditorOptions {
   def default = TabComponentEditorOptions(None, None, None, None)
 }
-
 
 case class PlayerTemplateParams(
   appName: String,

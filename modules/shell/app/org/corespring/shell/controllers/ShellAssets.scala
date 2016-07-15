@@ -24,13 +24,23 @@ import scalaz.{ Failure, Success, Validation }
 
 case class S3Config(bucket: String, key: String, secret: String)
 
+trait ShellAssetsUtils {
+  def contentType(s: String) = {
+    val regexp = """\.(\w+?)$""".r
+    regexp.findFirstMatchIn(s.toLowerCase) match {
+      case Some(res) => MimeTypes.forExtension(res.group(1)).getOrElse("image/png")
+      case _ => "image/png"
+    }
+  }
+}
+
 class ShellAssets(
   s3: S3Config,
   val containerContext: ContainerExecutionContext,
   playS3: S3Service,
   s3Client: AmazonS3,
   assetUtils: AssetUtils,
-  itemService: ItemService) extends Assets with ItemDraftAssets with ItemAssets {
+  itemService: ItemService) extends Assets with ShellAssetsUtils with ItemDraftAssets with ItemAssets {
 
   private lazy val logger = Logger(this.getClass)
 
@@ -75,15 +85,6 @@ class ShellAssets(
   }
 
   override def upload(t: AssetType, id: String, path: String)(predicate: (RequestHeader) => Option[SimpleResult]): BodyParser[Future[UploadResult]] = {
-
-    def contentType(s: String) = {
-      val regexp = """\.(\w+?)$""".r
-      regexp.findFirstMatchIn(s.toLowerCase) match {
-        case Some(res) => MimeTypes.forExtension(res.group(0)).getOrElse("image/png")
-        case _ => "image/png"
-      }
-    }
-
     playS3.s3ObjectAndData[Unit](s3.bucket, _ => mkPath(t, id, path))((rh) => {
       predicate(rh).map { err =>
         Left(err)

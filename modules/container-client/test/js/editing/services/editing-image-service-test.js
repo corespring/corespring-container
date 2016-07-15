@@ -18,6 +18,7 @@ describe('editing-image-service', function() {
 
     module(function($provide) {
       $provide.value('QueryParamUtils', queryParamUtils);
+      $provide.value('UPLOAD_IMAGE_MAX_SIZE_KB', 500);
     });
   });
 
