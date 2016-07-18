@@ -19,7 +19,7 @@ editorSrcs = [
   'bower_components/select2/select2(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
-  'bower_components/mathquill/build/mathquill.js'
+  'bower_components/mathquill-build/build/mathquill.js'
   'bower_components/corespring-math-input/dist/corespring-math-input.js',
   'js/common/**/*.js',
   'js/component-editor/**/*.js',
