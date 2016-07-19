@@ -11,7 +11,13 @@ describe('ScoringPopupController', function() {
   var DesignerService = {
     loadAvailableUiComponents: jasmine.createSpy('loadAvailableUiComponents')
   };
-  var components = {'these': 'are', 'some': 'components'};
+  var components = {
+    'these': 'are',
+    'some': 'components'
+  };
+  var itemConfig = {
+    scoringType: 'allOrNothing'
+  };
   var xhtml = "<div>this is some <strong>markup!</strong></div>";
 
 
@@ -26,6 +32,7 @@ describe('ScoringPopupController', function() {
     $provide.value('$modalInstance', $modalInstance);
     $provide.value('LogFactory', LogFactory);
     $provide.value('DesignerService', DesignerService);
+    $provide.value('itemConfig', itemConfig);
     $provide.value('components', components);
     $provide.value('xhtml', xhtml);
   }));
@@ -85,8 +92,14 @@ describe('ScoringPopupController', function() {
 
   describe('onComponentsLoaded', function() {
     var uiComponents = {
-      interactions: {'these': 'are', 'some': 'interactions'},
-      widgets: {'and': 'these', 'are': 'widgets'}
+      interactions: {
+        'these': 'are',
+        'some': 'interactions'
+      },
+      widgets: {
+        'and': 'these',
+        'are': 'widgets'
+      }
     };
 
     beforeEach(function() {

@@ -65,41 +65,47 @@ class CoreItemTest extends Specification with Mockito {
     }
   }
 
-  "saveXhtmlAndComponents" should {
+  "saveConfigXhtmlAndComponents" should {
+
+    "return an error if 'config' is missing" in new scope {
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj()))
+      status(result) must_== BAD_REQUEST
+    }
 
     "return an error if 'xhtml' is missing" in new scope {
-      val result = saveXhtmlAndComponents("id")(req(Json.obj()))
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj("config" -> Json.obj())))
       status(result) must_== BAD_REQUEST
     }
 
     "return an error if 'components' is missing" in new scope {
-      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>")))
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj("config" -> Json.obj(), "xhtml" -> "<div></div>")))
       status(result) must_== BAD_REQUEST
     }
 
     "return an error if 'components' isn't an object" in new scope {
-      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> "HI")))
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj("config" -> Json.obj(), "xhtml" -> "<div></div>", "components" -> "HI")))
       status(result) must_== BAD_REQUEST
     }
 
-    "return hooks.saveXhtmlAndComponents error" in new scope {
-      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Left(500, "Hook err"))
-      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
+    "return hooks.saveConfigXhtmlAndComponents error" in new scope {
+      hooks.saveConfigXhtmlAndComponents(any[String], any[JsValue], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Left(500, "Hook err"))
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj("config" -> Json.obj(), "xhtml" -> "<div></div>", "components" -> Json.obj())))
       contentAsJson(result) must_== Json.obj("error" -> "Hook err")
     }
 
-    "return hooks.saveXhtmlAndComponents result" in new scope {
-      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
-      val result = saveXhtmlAndComponents("id")(req(Json.obj("xhtml" -> "<div></div>", "components" -> Json.obj())))
+    "return hooks.saveConfigXhtmlAndComponents result" in new scope {
+      hooks.saveConfigXhtmlAndComponents(any[String], any[JsValue], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
+      val result = saveConfigXhtmlAndComponents("id")(req(Json.obj("config" -> Json.obj(), "xhtml" -> "<div></div>", "components" -> Json.obj())))
       contentAsJson(result) must_== Json.obj("success" -> true)
     }
 
     "calls hook with superfluous component 2 removed" in new scope {
-      hooks.saveXhtmlAndComponents(any[String], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
-      val request = req(Json.obj("xhtml" -> "<div id=\"1\"></div>", "components" -> Json.obj("1" -> Json.obj(), "2" -> Json.obj())))
-      saveXhtmlAndComponents("id")(request)
-      there was one(hooks).saveXhtmlAndComponents(
+      hooks.saveConfigXhtmlAndComponents(any[String], any[JsValue], any[String], any[JsValue])(any[RequestHeader]) returns Future.successful(Right(Json.obj("success" -> true)))
+      val request = req(Json.obj("config" -> Json.obj(), "xhtml" -> "<div id=\"1\"></div>", "components" -> Json.obj("1" -> Json.obj(), "2" -> Json.obj())))
+      saveConfigXhtmlAndComponents("id")(request)
+      there was one(hooks).saveConfigXhtmlAndComponents(
         "id",
+        Json.obj(),
         "<div id=\"1\"></div>",
         Json.obj("1" -> Json.obj()))(request)
     }

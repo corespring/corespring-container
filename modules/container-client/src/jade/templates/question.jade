@@ -2,17 +2,22 @@ include ../mixins/modal
 
 //Scoring popup..
 script( type="text/ng-template", id="/templates/popups/scoring")
-  +modal('Scoring', null, false)
+  +modal('Weighting', null, false)
     
     .alert.title
-        | An item with only one question will receive full weight. In an item with more than one question, you can assign specific weights to each part. This feature is optional; if you don't adjust weights, weight will be evenly divided across each question.
+        | If an item contains more than one interaction, you may assign weights to each interaction or use the 'all or nothing' feature.
 
     .container-fluid
+      radio(ng-model="itemConfig.scoringType", value="weighted") Distribute the weight across parts of the question
       component-weights(
+        ng-show="itemConfig.scoringType == SCORING_TYPE.WEIGHTED",
         ng-disabled="{{componentSize != 'many'}}",
         ng-model="components",
         markup="xhtml",
         component-set="interactions")
+      radio(ng-model="itemConfig.scoringType", value="allOrNothing") Apply the 'All Or Nothing' rule
+      div(ng-show="itemConfig.scoringType == SCORING_TYPE.ALL_OR_NOTHING")
+        | All parts of the question must be correct, in order to grant any credit
 
 script(type="text/ng-template", id="/templates/question")
   .question(ng-controller="QuestionController")
@@ -23,7 +28,7 @@ script(type="text/ng-template", id="/templates/question")
           ng-class="{'btn-warning': !previewOn}")  
           | {{previewOn ? 'Close Preview' : 'Preview Question'}} 
           i.fa(ng-class="{'fa-toggle-left': previewOn, 'fa-toggle-right' : !previewOn}")
-        button.pull-right.btn.btn-default(ng-click="scoring()") Scoring
+        button.pull-right.btn.btn-default(ng-click="showWeightingDialog()") Weighting
 
       hr/
 

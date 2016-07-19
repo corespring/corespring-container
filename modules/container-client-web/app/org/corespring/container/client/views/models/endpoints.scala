@@ -13,7 +13,7 @@ case class MainEndpoints(
   load: Call,
   save: Option[Call],
   saveSubset: Call,
-  saveXhtmlAndComponents: Call) {
+  saveConfigXhtmlAndComponents: Call) {
 
   val json = Json.writes[MainEndpoints].writes(this)
   val jsonString = Json.stringify(json)

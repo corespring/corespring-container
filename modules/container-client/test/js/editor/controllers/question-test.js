@@ -5,7 +5,7 @@ describe('QuestionController', function() {
   var ItemService = {
     load: jasmine.createSpy('load'),
     saveComponents: jasmine.createSpy('saveComponents'),
-    saveXhtmlAndComponents: jasmine.createSpy('saveXhtmlAndComponents'),
+    saveConfigXhtmlAndComponents: jasmine.createSpy('saveConfigXhtmlAndComponents'),
     saveXhtml: jasmine.createSpy('saveXhtml'),
     saveSummaryFeedback: jasmine.createSpy('saveSummaryFeedback')
   };
@@ -245,17 +245,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {xhtml:"abc"};
       scope.$digest();
-      ItemService.saveXhtmlAndComponents.calls.reset();
+      ItemService.saveConfigXhtmlAndComponents.calls.reset();
     });
     it('should save a change to xhtml', function(){
       scope.item.xhtml = "def";
       scope.$digest();
-      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
+      expect(ItemService.saveConfigXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change', function(){
       scope.item.xhtml = "abc";
       scope.$digest();
-      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
+      expect(ItemService.saveConfigXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 
@@ -282,17 +282,17 @@ describe('QuestionController', function() {
     beforeEach(function(){
       scope.item = {components:[{'a' : 'component'}]};
       scope.$digest();
-      ItemService.saveXhtmlAndComponents.calls.reset();
+      ItemService.saveConfigXhtmlAndComponents.calls.reset();
     });
     it('should save a change to components', function(){
       scope.item.components = [{'b' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveXhtmlAndComponents).toHaveBeenCalled();
+      expect(ItemService.saveConfigXhtmlAndComponents).toHaveBeenCalled();
     });
     it('should not save when there was no change ', function(){
       scope.item.components = [{'a' : 'component'}];
       scope.$digest();
-      expect(ItemService.saveXhtmlAndComponents).not.toHaveBeenCalled();
+      expect(ItemService.saveConfigXhtmlAndComponents).not.toHaveBeenCalled();
     });
   });
 

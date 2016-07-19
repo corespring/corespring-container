@@ -137,6 +137,10 @@ class ItemHooks(
     itemFineGrainedSave(id, Json.obj("collection" -> Json.obj("id" -> collectionId)))
   }
 
+  override def saveConfig(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    itemFineGrainedSave(id, Json.obj("config" -> json))
+  }
+
   override def saveSupportingMaterials(id: String, json: JsValue)(implicit h: RequestHeader): R[JsValue] = {
     itemFineGrainedSave(id, Json.obj("supportingMaterials" -> addSupportingMaterialIds(json)))
   }
@@ -149,18 +153,21 @@ class ItemHooks(
     itemFineGrainedSave(id, Json.obj("components" -> json))
   }
 
-  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+  override def saveConfigXhtmlAndComponents(id: String, config: JsValue, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val configResult = saveConfig(id, config)(h)
     val xhtmlResult = saveXhtml(id, markup)(h)
     val componentResult = saveComponents(id, components)(h)
     for {
+      co <- configResult
       x <- xhtmlResult
       c <- componentResult
     } yield {
-      (x, c) match {
-        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
-        case (Left((err, msg)), _) => Left(err, msg)
-        case (_, Left((err, msg))) => Left(err, msg)
-        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      (co, x, c) match {
+        case (Left((coErr, coMsg)), Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _, _) => Left(err, msg)
+        case (_, Left((err, msg)), _ ) => Left(err, msg)
+        case (_, _, Left((err, msg)) ) => Left(err, msg)
+        case (Right(coJson), Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(coJson.as[JsObject]).deepMerge(cJson.as[JsObject]))
       }
     }
   }
@@ -176,6 +183,7 @@ class ItemHooks(
   override def createItem(collectionId: Option[String])(implicit header: RequestHeader): R[String] = Future {
     val newItem = Json.obj(
       "components" -> Json.obj(),
+      "config" -> Json.obj("scoringType" -> "weighted"),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
       "xhtml" -> "<div></div>")
@@ -190,6 +198,7 @@ class ItemHooks(
 
     val newItem = Json.obj(
       "components" -> Json.obj(key -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
+      "config" -> Json.obj("scoringType" -> "weighted"),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
       "xhtml" -> s"<div><div $componentType='' id='$key'></div></div>")

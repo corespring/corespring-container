@@ -160,6 +160,9 @@ class ItemDraftHooks(
   override def saveComponents(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
     draftFineGrainedSave(draftId, Json.obj("item.components" -> json))
 
+  override def saveConfig(draftId: String, json: JsValue)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] =
+    draftFineGrainedSave(draftId, Json.obj("item.config" -> json))
+
   override def saveCustomScoring(draftId: String, customScoring: String)(implicit header: RequestHeader): R[JsValue] = {
     draftFineGrainedSave(draftId, Json.obj("item.customScoring" -> customScoring))
   }
@@ -302,18 +305,21 @@ class ItemDraftHooks(
     }
   }
 
-  override def saveXhtmlAndComponents(id: String, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+  override def saveConfigXhtmlAndComponents(id: String, config: JsValue, markup: String, components: JsValue)(implicit h: RequestHeader): R[JsValue] = {
+    val configResult = saveConfig(id, config)(h)
     val xhtmlResult = saveXhtml(id, markup)(h)
     val componentResult = saveComponents(id, components)(h)
     for {
+      co <- configResult
       x <- xhtmlResult
       c <- componentResult
     } yield {
-      (x, c) match {
-        case (Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
-        case (Left((err, msg)), _) => Left(err, msg)
-        case (_, Left((err, msg))) => Left(err, msg)
-        case (Right(xJson), Right(cJson)) => Right(xJson.as[JsObject].deepMerge(cJson.as[JsObject]))
+      (co, x, c) match {
+        case (Left((coErr, coMsg)), Left((xErr, xMsg)), Left((cErr, cMsg))) => Left(xErr, xMsg)
+        case (Left((err, msg)), _, _) => Left(err, msg)
+        case (_, Left((err, msg)), _) => Left(err, msg)
+        case (_, _, Left((err, msg))) => Left(err, msg)
+        case (Right(coJson), Right(xJson), Right(cJson)) => Right(coJson.as[JsObject].deepMerge(xJson.as[JsObject]).deepMerge(cJson.as[JsObject]))
       }
     }
   }
