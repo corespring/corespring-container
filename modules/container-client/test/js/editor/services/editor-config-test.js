@@ -11,6 +11,7 @@ describe('editor config', function() {
     this.loadAvailableUiComponentsResult = {
       interactions: [],
       widgets: [
+        {componentType:'corespring-audio', defaultData:'corespring-audio default data'},
         {componentType:'corespring-video', defaultData:'corespring-video default data'},
         {componentType:'corespring-calculator', defaultData:'corespring-calculator default data'},
         {componentType:'corespring-protractor', defaultData:'corespring-protractor default data'},

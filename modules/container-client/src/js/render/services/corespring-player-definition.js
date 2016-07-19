@@ -110,12 +110,15 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
           setDataAndSession();
         });
 
-        /**        
+        /**
           TODO: is this a core player function? or is it only for the editor?
           stash the component data (TODO: persist it?)
+          ANSWER: yes, it is
+          Some components like multiple-choice save data to the stash to be
+          able to restore the component state the next time the session is
+          loaded.
         */
         $scope.$on('saveStash', function(event, id, stash) {
-
           if (!$scope.session) {
             return;
           }
@@ -126,7 +129,7 @@ angular.module('corespring-player.services').factory('CorespringPlayerDefinition
             stash: stash
           };
           $scope.session = _.merge($scope.session, extension);
-
+          $scope.$emit('stashSaved');
         });
 
         $scope.$watch('xhtml', function(xhtml) {

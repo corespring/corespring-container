@@ -159,7 +159,7 @@ class ItemDevEditor(
   val componentService: ComponentService,
   val containerContext: ContainerExecutionContext) extends BaseItemEditor {
   override val editorClientOptions: EditorClientOptions = {
-    EditorClientOptions(0, StaticPaths.staticPaths)
+    EditorClientOptions(0, 8 * 1024, 500, StaticPaths.staticPaths)
   }
 }
 
@@ -184,7 +184,7 @@ class DraftDevEditor(
   val componentService: ComponentService,
   val containerContext: ContainerExecutionContext) extends BaseDraftEditor {
   override val editorClientOptions: EditorClientOptions = {
-    EditorClientOptions(0, StaticPaths.staticPaths)
+    EditorClientOptions(0, 8 * 1024, 500, StaticPaths.staticPaths)
   }
 
 }

@@ -37,7 +37,7 @@ class EditorRendererTest extends Specification with Mockito with NoTimeConversio
     lazy val mainEndpoints = ItemEditorEndpoints.main("itemId")
     lazy val supportingMaterialEndpoints = ItemEditorEndpoints.supportingMaterials("itemId")
     lazy val componentsAndWidgets = ComponentsAndWidgets(Json.obj(), Json.obj())
-    lazy val clientOptions = EditorClientOptions(0, StaticPaths.staticPaths)
+    lazy val clientOptions = EditorClientOptions(0, 8 * 1024, 500, StaticPaths.staticPaths)
     lazy val bundle = ComponentsScriptBundle(Nil, Seq("comp.js"), Seq("comp.css"), Seq("comp.ng.module"))
     def prodMode = true
     lazy val html = renderer.render(mainEndpoints, supportingMaterialEndpoints, componentsAndWidgets, clientOptions, bundle, Map("apple" -> "apple"), prodMode, "check")

@@ -10,7 +10,7 @@ import org.corespring.container.logging.ContainerLogger
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.DefaultPlayerSkin
 import org.corespring.shell.controllers.editor.ItemDraftAssets
-import org.corespring.shell.services.{ ItemDraftService, ItemService }
+import org.corespring.shell.services.{ ItemService, ItemDraftService }
 import play.api.Logger
 import play.api.libs.json.{ JsValue, Json }
 import play.api.mvc._

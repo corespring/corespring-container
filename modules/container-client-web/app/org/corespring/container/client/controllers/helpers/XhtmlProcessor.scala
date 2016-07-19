@@ -57,6 +57,7 @@ object XhtmlProcessor extends XhtmlProcessor {
     cleaner.getProperties.setUseEmptyElementTags(false)
     cleaner.getProperties.setOmitXmlDeclaration(true)
     cleaner.getProperties.setOmitHtmlEnvelope(true)
+    cleaner.getProperties.setNamespacesAware(false)
     cleaner
   }
 
