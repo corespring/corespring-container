@@ -52,6 +52,10 @@ describe('ScoringPopupController', function() {
       expect(scope.componentSize).toEqual(scope.sizeToString(_.keys(components).length));
     });
 
+    it('should set itemConfig', function() {
+      expect(scope.itemConfig).toEqual(itemConfig);
+    });
+
     it('should set xhtml', function() {
       expect(scope.xhtml).toEqual(xhtml);
     });
