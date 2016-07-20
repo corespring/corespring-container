@@ -2,10 +2,11 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.{ R, StatusMessage }
+import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
-import org.corespring.container.client.{ hooks => containerHooks }
+import org.corespring.container.client.{hooks => containerHooks}
+import org.corespring.container.components.score.ScoringType
 import org.corespring.shell.services.ItemService
 import play.api.http.Status._
 import play.api.libs.json._
@@ -183,7 +184,7 @@ class ItemHooks(
   override def createItem(collectionId: Option[String])(implicit header: RequestHeader): R[String] = Future {
     val newItem = Json.obj(
       "components" -> Json.obj(),
-      "config" -> Json.obj("scoringType" -> "weighted"),
+      "config" -> Json.obj("scoringType" -> ScoringType.WEIGHTED),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
       "xhtml" -> "<div></div>")
@@ -198,7 +199,7 @@ class ItemHooks(
 
     val newItem = Json.obj(
       "components" -> Json.obj(key -> Json.obj("componentType" -> componentType).deepMerge(defaultData)),
-      "config" -> Json.obj("scoringType" -> "weighted"),
+      "config" -> Json.obj("scoringType" -> ScoringType.WEIGHTED),
       "profile" -> Json.obj("taskInfo" -> Json.obj("title" -> "Untitled")),
       "metadata" -> Json.obj(),
       "xhtml" -> s"<div><div $componentType='' id='$key'></div></div>")

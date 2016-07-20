@@ -8,14 +8,14 @@ script( type="text/ng-template", id="/templates/popups/scoring")
         | If an item contains more than one interaction, you may assign weights to each interaction or use the 'all or nothing' feature.
 
     .container-fluid
-      radio(ng-model="itemConfig.scoringType", value="weighted") Distribute the weight across parts of the question
+      radio(ng-model="itemConfig.scoringType", value="{{SCORING_TYPE.WEIGHTED}}") Distribute the weight across parts of the question
       component-weights(
         ng-show="itemConfig.scoringType == SCORING_TYPE.WEIGHTED",
         ng-disabled="{{componentSize != 'many'}}",
         ng-model="components",
         markup="xhtml",
         component-set="interactions")
-      radio(ng-model="itemConfig.scoringType", value="allOrNothing") Apply the 'All Or Nothing' rule
+      radio(ng-model="itemConfig.scoringType", value="{{SCORING_TYPE.ALL_OR_NOTHING}}") Apply the 'All Or Nothing' rule
       div(ng-show="itemConfig.scoringType == SCORING_TYPE.ALL_OR_NOTHING")
         | All parts of the question must be correct, in order to grant any credit
 

@@ -26,6 +26,7 @@ describe('ScoringPopupController', function() {
     DesignerService.loadAvailableUiComponents.calls.reset();
   });
 
+  beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
@@ -37,7 +38,8 @@ describe('ScoringPopupController', function() {
     $provide.value('xhtml', xhtml);
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $compile, SCORING_TYPE) {
+    itemConfig.scoringType = SCORING_TYPE.ALL_OR_NOTHING;
     scope = $rootScope.$new();
     element = $compile('<div ng-controller="ScoringPopupController"></div>')(scope);
     scope = element.scope();
