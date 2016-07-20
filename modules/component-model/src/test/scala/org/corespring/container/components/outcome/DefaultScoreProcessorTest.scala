@@ -129,7 +129,10 @@ class DefaultScoreProcessorTest extends Specification {
       "return 100% when all scores are 1" in {
 
         val item =
-          """{
+          s"""{
+             "config" : {
+               "scoringType": "allOrNothing"
+             },
              "components": {
                "1" : {"weight":1, "componentType" : "a"},
                "2" : {"weight":1, "componentType" : "b" }
@@ -144,7 +147,7 @@ class DefaultScoreProcessorTest extends Specification {
 
           """
          {
-           "summary" : { "maxPoints" : 2, "points" : 2.0, "percentage" : 100.0 },
+           "summary" : { "maxPoints" : 2, "points" : 2, "percentage" : 100.0 },
            "components" : {
              "1" : { "weight" : 1, "score" : 1.0, "weightedScore" : 1.0},
              "2" : { "weight" : 1, "score" : 1.0, "weightedScore" : 1.0}

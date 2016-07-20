@@ -77,10 +77,10 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     }
 
     val summary = if(scoringType == ScoringType.ALL_OR_NOTHING){
-      if(maxPoints == points){
-        mkSummary(maxPoints, maxPoints, 100.0)
-      } else {
+      if(percentage < 100) {
         mkSummary(maxPoints, 0.0, 0.0)
+      } else {
+        mkSummary(maxPoints, maxPoints, 100.0)
       }
     } else {
       mkSummary(maxPoints, points, percentage)
