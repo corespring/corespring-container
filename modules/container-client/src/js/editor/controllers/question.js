@@ -169,6 +169,11 @@ angular.module('corespring-editor.controllers')
         true);
 
       $scope.$watch(
+        'item.config',
+        makeWatcher('config', saveConfigXhtmlAndComponents, $scope),
+        true);
+
+      $scope.$watch(
         'item.xhtml', 
         makeWatcher('xhtml', saveConfigXhtmlAndComponents, $scope));
 
