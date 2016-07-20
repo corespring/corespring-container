@@ -1,7 +1,8 @@
 package org.corespring.container.components.outcome
 
+import org.corespring.container.components.score.ScoringType
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsValue, JsObject, JsNumber, Json }
+import play.api.libs.json.{ JsNumber, JsObject, JsValue, Json }
 
 trait DefaultScoreProcessor extends ScoreProcessor {
 
@@ -16,6 +17,9 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     logger.trace(s"[score] item: ${Json.stringify(item)}")
     logger.trace(s"[score] session: ${Json.stringify(session)}")
     logger.trace(s"[score] outcomes: ${Json.stringify(outcomes)}")
+
+    val scoringType: String = (item \ "config" \ "scoringType").asOpt[String].getOrElse(ScoringType.WEIGHTED)
+    logger.trace(s"scoringType: $scoringType")
 
     lazy val scoreableComponents: Seq[(String, JsValue)] = (item \ "components").asOpt[JsObject].map { c =>
 
@@ -45,8 +49,6 @@ trait DefaultScoreProcessor extends ScoreProcessor {
         (key, (json \ "weight").asOpt[Int].getOrElse(1))
     }.toSeq
 
-    val maxPoints = weights.map(_._2).fold(0)(_ + _)
-
     val componentScores = scoreableComponents.foldRight[JsObject](Json.obj()) {
       (tuple: (String, JsValue), acc: JsObject) =>
         val (key, _) = tuple
@@ -62,14 +64,27 @@ trait DefaultScoreProcessor extends ScoreProcessor {
           "weightedScore" -> JsNumber(weightedScore)))
     }
 
+    val maxPoints = weights.map(_._2).fold(0)(_ + _)
     val points = getSumOfWeightedScores(componentScores)
     val rawPercentage: BigDecimal = if (maxPoints == 0) 0 else (points / maxPoints) * 100
     val percentage = decimalize(rawPercentage, 1)
 
-    val summary = Json.obj(
-      "maxPoints" -> JsNumber(maxPoints),
-      "points" -> JsNumber(points),
-      "percentage" -> JsNumber(percentage))
+    def mkSummary(maxPoints:BigDecimal, points:BigDecimal, percentage:BigDecimal) = {
+      Json.obj(
+        "maxPoints" -> JsNumber(maxPoints),
+        "points" -> JsNumber(points),
+        "percentage" -> JsNumber(percentage))
+    }
+
+    val summary = if(scoringType == ScoringType.ALL_OR_NOTHING){
+      if(maxPoints == points){
+        mkSummary(maxPoints, maxPoints, 100.0)
+      } else {
+        mkSummary(maxPoints, 0.0, 0.0)
+      }
+    } else {
+      mkSummary(maxPoints, points, percentage)
+    }
 
     logger.trace(s"[score] summary: ${Json.stringify(summary)}")
 
@@ -78,5 +93,9 @@ trait DefaultScoreProcessor extends ScoreProcessor {
 
   def getSumOfWeightedScores(componentScores: JsObject) = {
     componentScores.fields.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
+  }
+
+  def getNumberOfFullScores(componentScores: JsObject) = {
+    componentScores.fields.map(fs => (fs._2 \ "score").as[Int]).filter(_ == 1).foldRight[Int](0)(_ + _)
   }
 }
