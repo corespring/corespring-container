@@ -14,6 +14,7 @@ angular.module('corespring-editor.controllers')
     'LogFactory',
     'MathJaxService',
     'ScoringHandler',
+    'SCORING_TYPE',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
     function(
@@ -31,6 +32,7 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       MathJaxService,
       ScoringHandler,
+      SCORING_TYPE,
       WiggiLinkFeatureDef,
       WiggiMathJaxFeatureDef
     ) {
@@ -152,10 +154,9 @@ angular.module('corespring-editor.controllers')
       };
 
       function addItemConfig(item){
-        console.warn('addItemConfig can be removed once the backend has changed');
         if(!item.config){
           item.config = {
-            scoringType: 'weighted'
+            scoringType: SCORING_TYPE.WEIGHTED
           };
         }
         return item;

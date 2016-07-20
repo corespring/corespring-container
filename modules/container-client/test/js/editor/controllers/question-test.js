@@ -48,6 +48,7 @@ describe('QuestionController', function() {
     debounce: jasmine.createSpy('debounce')
   };
 
+  beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editing.controllers'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
