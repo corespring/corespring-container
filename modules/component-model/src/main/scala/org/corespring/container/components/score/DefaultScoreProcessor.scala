@@ -95,7 +95,4 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     componentScores.fields.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
   }
 
-  def getNumberOfFullScores(componentScores: JsObject) = {
-    componentScores.fields.map(fs => (fs._2 \ "score").as[Int]).filter(_ == 1).foldRight[Int](0)(_ + _)
-  }
 }

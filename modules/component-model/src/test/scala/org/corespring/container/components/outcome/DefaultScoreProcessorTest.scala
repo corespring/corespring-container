@@ -203,18 +203,6 @@ class DefaultScoreProcessorTest extends Specification {
           "2" -> Json.obj("weightedScore" -> 1.0))) must be equalTo 2.0
 
     }
-
-    "calculate the number of full scores" in {
-      new DefaultScoreProcessor {
-        override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue,
-          outcome: JsValue): Boolean = true
-      }.getNumberOfFullScores(
-        Json.obj(
-          "1" -> Json.obj("score" -> 1.0),
-          "2" -> Json.obj("score" -> 0.0),
-          "3" -> Json.obj("score" -> 1.0))) must be equalTo 2
-
-    }
   }
 
   def allScoreable(compType: String, comp: JsValue, session: JsValue, outcome: JsValue): Boolean = true
