@@ -25,6 +25,14 @@
       }, 0);
 
       var percentage = Math.round(points / maxPoints * 1000) / 10;
+      
+      var scoringType = getScoringType(item);
+      if(scoringType === 'allOrNothing'){
+        if(percentage < 100){
+          percentage = 0;
+          points = 0;
+        }
+      }
 
       return {
         summary: {
@@ -35,6 +43,13 @@
         components: componentScores
       };
     };
+    
+    function getScoringType(item){
+      switch(item.config ? item.config.scoringType : ''){
+        case 'allOrNothing' : return 'allOrNothing';
+        default: return 'weighted';
+      }        
+    }
 
     function weightForComponent(component) {
       var weight = 1;
