@@ -155,9 +155,9 @@ block after-main-script
         //TODO:  DEBOUNCE_IN_MILLIS isnt relevant to the component editor
         .constant('DEBOUNCE_IN_MILLIS', editorOptions.debounceInMillis || 0 )
         //TODO:  UPLOAD_AUDIO_MAX_SIZE_KB isnt relevant to the component editor
-        .constant('UPLOAD_AUDIO_MAX_SIZE_KB', editorOptions.uploadAudioMaxSizeKb || 8 * 1024);
+        .constant('UPLOAD_AUDIO_MAX_SIZE_KB', editorOptions.uploadAudioMaxSizeKb || 8 * 1024)
         //TODO:  UPLOAD_IMAGE_MAX_SIZE_KB isnt relevant to the component editor
-        .constant('UPLOAD_IMAGE_MAX_SIZE_KB', editorOptions.uploadImageMaxSizeKb || 500);
+        .constant('UPLOAD_IMAGE_MAX_SIZE_KB', editorOptions.uploadImageMaxSizeKb || 500)
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
         .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz])
@@ -167,3 +167,4 @@ block after-main-script
                 }
               ]);
     })(this);
+
