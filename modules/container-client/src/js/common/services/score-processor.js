@@ -6,6 +6,12 @@
 
   var _ = root.corespring.require("lodash");
 
+  var SCORING_TYPE = {
+    ALL_OR_NOTHING: 'allOrNothing',
+    WEIGHTED: 'weighted'
+  };
+
+
   var ScoreProcessor = function() {
 
     this.score = function(item, session, responses) {
@@ -27,7 +33,7 @@
       var percentage = Math.round(points / maxPoints * 1000) / 10;
       
       var scoringType = getScoringType(item);
-      if(scoringType === 'allOrNothing'){
+      if(scoringType === SCORING_TYPE.ALL_OR_NOTHING){
         if(percentage < 100){
           percentage = 0;
           points = 0;
@@ -45,9 +51,9 @@
     };
     
     function getScoringType(item){
-      switch(item.config ? item.config.scoringType : ''){
-        case 'allOrNothing' : return 'allOrNothing';
-        default: return 'weighted';
+      switch(item.config ? item.config.scoringType : SCORING_TYPE.WEIGHTED){
+        case SCORING_TYPE.ALL_OR_NOTHING : return SCORING_TYPE.ALL_OR_NOTHING;
+        default: return SCORING_TYPE.WEIGHTED;
       }        
     }
 
