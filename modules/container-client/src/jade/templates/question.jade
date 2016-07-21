@@ -2,13 +2,14 @@ include ../mixins/modal
 
 //Scoring popup..
 script( type="text/ng-template", id="/templates/popups/scoring")
-  +modal('Weighting', null, false)
+  +modal('Weighting', null, false, 'weighting')
     
     .alert.title
         | If an item contains more than one interaction, you may assign weights to each interaction or use the 'all or nothing' feature.
 
     .container-fluid
       radio(ng-model="itemConfig.scoringType", value="{{SCORING_TYPE.WEIGHTED}}") Distribute the weight across parts of the question
+      .instructional(ng-show="itemConfig.scoringType == SCORING_TYPE.WEIGHTED") Weight is automatically divided across each interaction in the question. Adjust the weights below using points.
       component-weights(
         ng-show="itemConfig.scoringType == SCORING_TYPE.WEIGHTED",
         ng-disabled="{{componentSize != 'many'}}",
@@ -16,8 +17,7 @@ script( type="text/ng-template", id="/templates/popups/scoring")
         markup="xhtml",
         component-set="interactions")
       radio(ng-model="itemConfig.scoringType", value="{{SCORING_TYPE.ALL_OR_NOTHING}}") Apply the 'All Or Nothing' rule
-      div(ng-show="itemConfig.scoringType == SCORING_TYPE.ALL_OR_NOTHING")
-        | All parts of the question must be correct, in order to grant any credit
+      .instructional(ng-show="itemConfig.scoringType == SCORING_TYPE.ALL_OR_NOTHING") All parts of the question must be correct in order to grant any credit.
 
 script(type="text/ng-template", id="/templates/question")
   .question(ng-controller="QuestionController")
