@@ -9,7 +9,7 @@ import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.models.{ MainEndpoints, SupportingMaterialsEndpoints }
 import org.corespring.container.client.views.txt.js.CatalogServices
 import org.corespring.container.components.services.ComponentService
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.templates.Html
 
 import scala.concurrent.Future
@@ -32,8 +32,10 @@ class CatalogRenderer(
   def render(bundle: ComponentsScriptBundle,
     mainEndpoints: MainEndpoints,
     supportingMaterialsEndpoints: SupportingMaterialsEndpoints,
-    queryParams: Map[String, String],
-    prodMode: Boolean): Future[Html] = Future {
+    queryParams : Map[String,String],
+    prodMode: Boolean,
+    iconSet: String,
+    colors: JsObject): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
@@ -48,6 +50,8 @@ class CatalogRenderer(
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
+      "colors" -> colors,
       "ngModules" -> jsArrayString(Some(s"$name-injected") ++ sources.js.ngModules ++ bundle.ngModules),
       "ngServiceLogic" -> ngServiceLogic,
       "staticPaths" -> Json.stringify(StaticPaths.staticPaths),

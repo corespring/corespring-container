@@ -25,6 +25,7 @@ describe('corespring-player', function(){
 
       mockRegister = new MockRegister();
 
+      $provide.value('PlayerSkin', {});
       $provide.value('ComponentRegister', mockRegister);
       $provide.value('MathJaxService', new MockMathService());
     });

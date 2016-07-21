@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg preserveAspectRatio="xMinYMin meet" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 44 40" style="enable-background:new 0 0 44 40;" xml:space="preserve">
+	<g>
+		<circle class="partially-correct-background" cx="21.6" cy="20.4" r="16"/>
+		<rect x="24" y="14" class="partially-correct-foreground" width="3.7" height="4.6"/>
+		<rect x="15.6" y="14" class="partially-correct-foreground" width="3.7" height="4.6"/>
+		<g>
+			<g>
+				<g>
+					<g>
+						<g>
+								<rect x="15" y="24.1" transform="matrix(0.9794 -0.2019 0.2019 0.9794 -4.7645 4.9018)" class="partially-correct-foreground" width="13.3" height="3.4"/>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

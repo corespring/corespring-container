@@ -2,11 +2,10 @@ package org.corespring.shell.controllers.player.actions
 
 import com.mongodb.casbah.commons.MongoDBObject
 import org.bson.types.ObjectId
-import org.corespring.container.client.controllers.{ AssetType, Assets }
-
-
-import org.corespring.container.client.hooks.{ PlayerHooks => ContainerPlayerHooks, LoadHook }
+import org.corespring.container.client.controllers.{AssetType, Assets}
+import org.corespring.container.client.hooks.{LoadHook, PlayerHooks => ContainerPlayerHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.shell.DefaultPlayerSkin
 import org.corespring.shell.services.{ItemService, SessionService}
 import play.api.libs.json._
 import play.api.mvc._
@@ -14,16 +13,14 @@ import play.api.mvc._
 import scala.concurrent.Future
 
 class PlayerHooks(
-sessionService: SessionService,
-assets: Assets,
-itemService: ItemService,
-val containerContext: ContainerExecutionContext
-                 ) extends ContainerPlayerHooks {
+  sessionService: SessionService,
+  assets: Assets,
+  itemService: ItemService,
+  val containerContext: ContainerExecutionContext) extends ContainerPlayerHooks {
 
   import play.api.http.Status._
 
-
-  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
+  override def createSessionForItem(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = Future {
 
     val settings = Json.obj(
       "maxNoOfAttempts" -> JsNumber(2),
@@ -38,20 +35,19 @@ val containerContext: ContainerExecutionContext
       oid =>
         itemService.load(itemId).map { item =>
           val withId = session ++ Json.obj("id" -> oid.toString)
-          Right((withId, item))
+          Right((withId, item, DefaultPlayerSkin.defaultPlayerSkin))
         }.getOrElse(Left(NOT_FOUND -> s"Can't find item with id $itemId"))
     }.getOrElse(Left(BAD_REQUEST -> "Error creating session"))
   }
 
-  override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue)]] = Future {
+  override def loadSessionAndItem(sessionId: String)(implicit header: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = Future {
     val out = for {
       session <- sessionService.load(sessionId)
       itemId <- (session \ "itemId").asOpt[String]
       item <- itemService.load(itemId)
     } yield {
-      (session.as[JsObject] ++ Json.obj("id" -> sessionId), item)
+      (session.as[JsObject] ++ Json.obj("id" -> sessionId), item, DefaultPlayerSkin.defaultPlayerSkin)
     }
-
     out.map(Right(_)).getOrElse(Left(NOT_FOUND -> "Can't find item or session"))
   }
 

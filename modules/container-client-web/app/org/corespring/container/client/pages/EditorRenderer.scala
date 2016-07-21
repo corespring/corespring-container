@@ -9,7 +9,7 @@ import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.models.{ ComponentsAndWidgets, MainEndpoints, SupportingMaterialsEndpoints }
 import org.corespring.container.client.views.txt.js.EditorServices
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.templates.Html
 
 import scala.concurrent.Future
@@ -32,7 +32,9 @@ trait EditorRenderer extends CoreRenderer {
     clientOptions: EditorClientOptions,
     bundle: ComponentsScriptBundle,
     queryParams : Map[String,String],
-    prodMode: Boolean): Future[Html] = Future {
+    prodMode: Boolean,
+    iconSet: String,
+    colors: JsObject): Future[Html] = Future {
 
     val (js, css) = prepareJsCss(prodMode, bundle)
 
@@ -54,6 +56,8 @@ trait EditorRenderer extends CoreRenderer {
       "appName" -> name,
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
+      "colors" -> Json.stringify(colors),
       "ngModules" -> ngModules,
       "ngServiceLogic" -> servicesJs,
       "versionInfo" -> Json.stringify(versionInfo.json),

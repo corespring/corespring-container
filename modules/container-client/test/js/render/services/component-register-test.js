@@ -65,8 +65,16 @@ describe('component-register', function(){
     };
   };
 
-  it('should setOutcomes', setValue("setOutcomes", "response") );
-
+  describe('setOutcomes', function(){
+    it('should setOutcomes', function(){
+      register.setOutcomes(defaultData);
+      expect(bridge.response).toEqual(defaultData[1]);
+    });
+    it('should clone the outcome data', function(){
+      register.setOutcomes(defaultData);
+      expect(bridge.response).not.toBe(defaultData[1]);
+    });
+  });
 
   it('should set editable', function(){
     register.setEditable(true);

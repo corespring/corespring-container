@@ -2,23 +2,22 @@ package org.corespring.container.client.pages
 
 import org.corespring.container.client.VersionInfo
 import org.corespring.container.client.component.ComponentsScriptBundle
-import org.corespring.container.client.controllers.apps.{EditorClientOptions, ItemEditorEndpoints, StaticPaths}
+import org.corespring.container.client.controllers.apps.{ EditorClientOptions, ItemEditorEndpoints, StaticPaths }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.views.models.ComponentsAndWidgets
 import org.corespring.container.client.views.txt.js.EditorServices
-import org.mockito.Matchers.{eq => m_eq}
+import org.mockito.Matchers.{ eq => m_eq }
 import org.specs2.execute.Result
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import org.specs2.specification.{Fragments, Scope}
+import org.specs2.specification.{ Fragments, Scope }
 import org.specs2.time.NoTimeConversions
 import play.api.libs.json.Json
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import play.api.test.{DefaultAwaitTimeout, Helpers}
+import play.api.test.{ DefaultAwaitTimeout, Helpers }
 
 class EditorRendererTest extends Specification with Mockito with NoTimeConversions with DefaultAwaitTimeout {
-
 
   trait scope extends Scope {
 
@@ -41,7 +40,7 @@ class EditorRendererTest extends Specification with Mockito with NoTimeConversio
     lazy val clientOptions = EditorClientOptions(0, 8 * 1024, 500, StaticPaths.staticPaths)
     lazy val bundle = ComponentsScriptBundle(Nil, Seq("comp.js"), Seq("comp.css"), Seq("comp.ng.module"))
     def prodMode = true
-    lazy val html = renderer.render(mainEndpoints, supportingMaterialEndpoints, componentsAndWidgets, clientOptions, bundle, Map("apple" -> "apple"), prodMode)
+    lazy val html = renderer.render(mainEndpoints, supportingMaterialEndpoints, componentsAndWidgets, clientOptions, bundle, Map("apple" -> "apple"), prodMode, "check")
     Helpers.await(html)
 
     lazy val captor = {

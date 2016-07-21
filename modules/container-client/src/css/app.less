@@ -41,20 +41,85 @@
 .summary-feedback {
   margin: 10px 0 10px 0;
 
-  a{
+  .summary-feedback-toggle {
+    display: table;
+    margin: 0 auto;
     cursor: pointer;
-    .user-select(none);
 
-    *{
-      .user-select(none);
+    @icon-width: 32px;
+    @icon-height: 40px;
+
+    .summary-feedback-toggle-icon-holder {
+      display: table-cell;
+      width: @icon-width;  
+      height: @icon-height;
+      vertical-align: middle;
+      position: relative;
+
+      .summary-feedback-toggle-icon {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: @icon-width;  
+        height: @icon-height;
+
+        svg {
+          width: @icon-width;  
+          height: @icon-height;
+        }
+      }
+
+      .hide-state.ng-leave-active {
+        opacity: 0;
+        -webkit-transform: translateX(-20px);
+      }
+
+      .hide-state.ng-leave {
+        transition:0.5s linear all;
+      }
+
+      .hide-state.ng-enter {
+        opacity: 0;
+        -webkit-transform: translateX(-20px);
+        transition:0.5s linear all;
+      }
+
+      .hide-state.ng-enter.ng-enter-active {
+        opacity: 1;
+        -webkit-transform: translateX(0);
+      }
+
+      .show-state.ng-leave {
+        opacity: 1;
+        -webkit-transform: translateX(0);
+        transition:0.5s linear all;
+      }
+
+      .show-state.ng-leave.ng-leave-active {
+        opacity: 0;
+        -webkit-transform: translateX(-20px);
+      }
+
+      .show-state.ng-enter {
+        opacity: 0;
+        -webkit-transform: translateX(-20px);
+        transition:0.5s linear all;
+      }
+
+      .show-state.ng-enter.ng-enter-active {
+        opacity: 1;
+        -webkit-transform: translateX(0);
+      }
+  
+    }
+
+
+    .summary-feedback-toggle-label {
+      display: table-cell;
+      vertical-align: middle;
     }
   }
 
-  .feedback-text {
-    border: none;
-    padding: 3px;
-    margin: 10px;
-  }
 }
 
 //created by the wiggi hr feature

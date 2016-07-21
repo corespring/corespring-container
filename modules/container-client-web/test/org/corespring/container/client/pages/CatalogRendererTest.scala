@@ -2,22 +2,22 @@ package org.corespring.container.client.pages
 
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.component.ComponentsScriptBundle
-import org.corespring.container.client.controllers.apps.{ItemEditorEndpoints, StaticPaths}
+import org.corespring.container.client.controllers.apps.{ ItemEditorEndpoints, StaticPaths }
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.views.txt.js.CatalogServices
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.services.ComponentService
-import org.mockito.Matchers.{eq => m_eq}
+import org.mockito.Matchers.{ eq => m_eq }
 import org.specs2.execute.Result
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
-import org.specs2.specification.{Fragments, Scope}
+import org.specs2.specification.{ Fragments, Scope }
 import org.specs2.time.NoTimeConversions
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.{ JsArray, Json }
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ Await, Future }
 
 class CatalogRendererTest extends Specification with Mockito with NoTimeConversions {
 
@@ -44,7 +44,7 @@ class CatalogRendererTest extends Specification with Mockito with NoTimeConversi
     lazy val supportingMaterialsEndpoints = ItemEditorEndpoints.supportingMaterials("itemId")
     lazy val prodMode = false
 
-    lazy val html = renderer.render(bundle, mainEndpoints, supportingMaterialsEndpoints, Map("queryParamOne" -> "1"), prodMode)
+    lazy val html = renderer.render(bundle, mainEndpoints, supportingMaterialsEndpoints, Map("queryParamOne" -> "1"), prodMode, "check")
     waitFor(html)
 
     lazy val captor = {
