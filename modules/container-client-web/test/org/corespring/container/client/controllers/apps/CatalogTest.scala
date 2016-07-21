@@ -9,7 +9,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import play.api.Mode
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.FakeRequest
@@ -32,7 +32,7 @@ class CatalogTest extends Specification with Mockito {
 
     lazy val catalogRenderer = {
       val m = mock[CatalogRenderer]
-      m.render(any[ComponentsScriptBundle], any[MainEndpoints], any[SupportingMaterialsEndpoints], any[Map[String, String]], any[Boolean], any[String]) returns {
+      m.render(any[ComponentsScriptBundle], any[MainEndpoints], any[SupportingMaterialsEndpoints], any[Map[String, String]], any[Boolean], any[String], any[JsObject]) returns {
         Future.successful(Html("<catalog/>"))
       }
       m

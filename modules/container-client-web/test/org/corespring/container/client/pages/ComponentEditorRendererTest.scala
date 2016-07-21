@@ -80,7 +80,7 @@ class ComponentEditorRendererTest
       val bundle = SingleComponentScriptBundle(component, Seq.empty, Seq("comp.css"), Seq("component-ng-module"))
       val clientOptions = ComponentEditorOptions.default
       lazy val captor = {
-        waitFor(renderer.render(bundle, "tabs", clientOptions, Map("a" -> "b"), prodMode, "check"))
+        waitFor(renderer.render(bundle, "tabs", clientOptions, Map("a" -> "b"), prodMode, "check", Json.obj()))
         capture[Map[String, Any]]
       }
       there was one(jade).renderJade(meq("singleComponentEditor"), captor)
@@ -94,7 +94,7 @@ class ComponentEditorRendererTest
       s"it calls $key ${if (prodMode) "- prod" else ""}" in new scope {
         val bundle = SingleComponentScriptBundle(component, Seq("comp.js"), Seq("comp.css"), Seq("component-ng-module"))
         val clientOptions = ComponentEditorOptions.default
-        waitFor(renderer.render(bundle, "tabs", clientOptions, Map("a" -> "b"), prodMode, "check"))
+        waitFor(renderer.render(bundle, "tabs", clientOptions, Map("a" -> "b"), prodMode, "check", Json.obj()))
         lazy val captor = capture[Map[String, Any]]
         there was one(jade).renderJade(meq("singleComponentEditor"), captor)
         assertFn(captor.value.get(key))

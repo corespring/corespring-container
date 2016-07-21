@@ -44,7 +44,7 @@ class CatalogRendererTest extends Specification with Mockito with NoTimeConversi
     lazy val supportingMaterialsEndpoints = ItemEditorEndpoints.supportingMaterials("itemId")
     lazy val prodMode = false
 
-    lazy val html = renderer.render(bundle, mainEndpoints, supportingMaterialsEndpoints, Map("queryParamOne" -> "1"), prodMode, "check")
+    lazy val html = renderer.render(bundle, mainEndpoints, supportingMaterialsEndpoints, Map("queryParamOne" -> "1"), prodMode, "check", Json.obj())
     waitFor(html)
 
     lazy val captor = {

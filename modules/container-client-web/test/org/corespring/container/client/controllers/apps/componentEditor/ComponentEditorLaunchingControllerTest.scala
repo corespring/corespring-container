@@ -14,7 +14,7 @@ import play.api.Mode.Mode
 import play.api.templates.Html
 import play.api.test.FakeRequest
 import org.mockito.Matchers.{ eq => m_eq }
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, ExecutionContext, Future }
@@ -40,7 +40,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     val renderer = {
       val m = mock[ComponentEditorRenderer]
-      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Map[String, String]], any[Boolean], any[String]) returns {
+      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Map[String, String]], any[Boolean], any[String], any[JsObject]) returns {
         Future.successful(Html("<html></html>"))
       }
       m
@@ -67,7 +67,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
       "call renderer.render" in new scope {
         wait(controller.componentEditorResult("type", req, Json.obj()))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String])
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String], any[JsObject])
       }
     }
 
@@ -84,7 +84,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
       "call renderer.render" in new prodScope {
         wait(controller.componentEditorResult("type", req, Json.obj()))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(true), any[String])
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(true), any[String], any[JsObject])
       }
     }
 
@@ -96,7 +96,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     "call renderer.render - dev mode" in new scope {
       val result = wait(controller.componentEditorResult("type", req, Json.obj()))
-      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String])
+      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String], any[JsObject])
     }
 
   }

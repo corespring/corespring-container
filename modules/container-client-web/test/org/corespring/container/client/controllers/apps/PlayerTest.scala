@@ -11,7 +11,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
 import play.api.http.{ ContentTypes, HeaderNames }
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.{ FakeRequest, PlaySpecification }
@@ -47,7 +47,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
     val playerRenderer = {
       val m = mock[PlayerRenderer]
-      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Map[String, String]], any[Boolean], any[Boolean], any[String]) returns {
+      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Map[String, String]], any[Boolean], any[Boolean], any[String], any[JsObject]) returns {
         Future.successful(Html("<html></html>"))
       }
       m

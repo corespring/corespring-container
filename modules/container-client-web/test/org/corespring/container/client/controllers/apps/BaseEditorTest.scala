@@ -15,7 +15,7 @@ import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
 import play.api.Mode
 import play.api.Mode.Mode
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc._
 import play.api.templates.Html
 import play.api.test.FakeRequest
@@ -49,7 +49,8 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
         any[ComponentsScriptBundle],
         any[Map[String, String]],
         any[Boolean],
-        any[String]) returns Future.successful(Html("<html></html>"))
+        any[String],
+        any[JsObject]) returns Future.successful(Html("<html></html>"))
     }
 
     override val bundler: ComponentBundler = {
@@ -111,7 +112,7 @@ class BaseEditorTest extends Specification with Mockito with ComponentMaker with
 
       waitFor(load("id")(r))
       lazy val captor = capture[ComponentsAndWidgets]
-      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Map[String, String]], any[Boolean], any[String])
+      there was one(renderer).render(any[MainEndpoints], any[SupportingMaterialsEndpoints], captor, any[EditorClientOptions], any[ComponentsScriptBundle], any[Map[String, String]], any[Boolean], any[String], any[JsObject])
     }
 
     "call renderer.renderJade with all components" in new componentsAndWidgets {
