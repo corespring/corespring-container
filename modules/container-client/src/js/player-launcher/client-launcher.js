@@ -1,3 +1,11 @@
+/**
+ *
+ * @param {Object} options - {
+ *   launchInitTimeout - how long to wait for the underlying instance to be ready before invoking the `errorCallback` with INITIALISATION_FAILED.
+ *      If not defined it'll use `launchConfig.initTimeout` as the default.
+ * }
+ *
+ */
 function ClientLauncher(element, options, errorCallback){
   
   var launchConfig = require('launch-config');
@@ -155,8 +163,16 @@ function ClientLauncher(element, options, errorCallback){
       queryParams.colors = window.btoa(JSON.stringify({colors: customVariables.colors}));
       queryParams.iconSet = customVariables.iconSet;
     }
-    
-    var launchOpts = {call: call, queryParams: queryParams, data: initialData};
+
+    var initTimeout = isNaN(options.launchInitTimeout) ?
+      (isNaN(launchConfig.initTimeout) ? 0 : launchConfig.initTimeout) :
+      options.launchInitTimeout;
+
+    var launchOpts = {
+      initTimeout: initTimeout,
+      call: call,
+      queryParams: queryParams, 
+      data: initialData};
     
     var instance = new InstanceDef(launchOpts, element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
 
