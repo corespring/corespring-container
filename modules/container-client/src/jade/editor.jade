@@ -72,11 +72,12 @@ block after-main-script
       angular.module('corespring-#{appName}')
 
         .config([
-          'wiggiWizConfigProvider',
-          function(wiggiWizConfigProvider){
+          '$provide','wiggiWizConfigProvider',
+          function($provide, wiggiWizConfigProvider){
             wiggiWizConfigProvider.add({
               imageService: 'EditingImageService'
             });
+            $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
           }
         ]);
     })(this);

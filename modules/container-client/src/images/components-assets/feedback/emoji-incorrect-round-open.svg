@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg preserveAspectRatio="xMinYMin meet" version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 44 40"
+	 style="enable-background:new 0 0 44 40;" xml:space="preserve">
+	<g>
+		<g>
+			<g>
+				<g>
+					<g>
+						<rect x="21" y="12.9" class="incorrect-background" width="3.7" height="4.7"/>
+						<rect x="12.7" y="12.9" class="incorrect-background" width="3.7" height="4.7"/>
+						<rect x="12.2" y="22.5" class="incorrect-background" width="13" height="3.3"/>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

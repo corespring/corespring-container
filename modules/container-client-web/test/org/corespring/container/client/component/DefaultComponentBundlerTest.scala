@@ -1,12 +1,13 @@
 package org.corespring.container.client.component
 
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
-import org.corespring.container.components.model.{Component, Id}
+import org.corespring.container.components.model.{ Component, Id }
 import org.corespring.container.components.model.dependencies.ComponentMaker
-import org.corespring.container.components.services.{ComponentService, DependencyResolver}
+import org.corespring.container.components.services.{ ComponentService, DependencyResolver }
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
+import org.mockito.Matchers.{ eq => m_eq }
 
 class DefaultComponentBundlerTest extends Specification with Mockito with ComponentMaker {
 
@@ -36,8 +37,8 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       m.jsUrl(any[String], any[Seq[Component]], any[Boolean]).returns {
         Seq("jsUrl")
       }
-      m.cssUrl(any[String], any[Seq[Component]], any[Boolean]).returns {
-        Seq("cssUrl")
+      m.lessUrl(any[String], any[Seq[Component]], any[Boolean], any[Option[String]]).returns {
+        Seq("lessUrl")
       }
       m
     }
@@ -59,7 +60,7 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
   "singleBundle" should {
 
     trait singleBundle extends scope {
-      val bundle = bundler.singleBundle(interaction.componentType, "editor", false)
+      val bundle = bundler.singleBundle(interaction.componentType, "editor", false, Some("encodedColors"))
     }
 
     "build a SingleScriptBundler" in new singleBundle {
@@ -67,7 +68,7 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
         SingleComponentScriptBundle(
           interaction,
           Seq("jsUrl"),
-          Seq("cssUrl"),
+          Seq("lessUrl"),
           Seq("org.type")))
     }
 
@@ -75,8 +76,8 @@ class DefaultComponentBundlerTest extends Specification with Mockito with Compon
       there was one(urls).jsUrl("editor", Seq(interaction), false)
     }
 
-    "call urls.cssUrl" in new singleBundle {
-      there was one(urls).cssUrl("editor", Seq(interaction), false)
+    "call urls.lessUrl with the encoded color token" in new singleBundle {
+      there was one(urls).lessUrl("editor", Seq(interaction), false, Some("encodedColors"))
     }
 
     "call dependencyResolver.resolveComponents" in new singleBundle {

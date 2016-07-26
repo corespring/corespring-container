@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<span class="feedback">
+<svg preserveAspectRatio="xMinYMin meet" version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 44 40"
+	 style="enable-background:new 0 0 44 40;" xml:space="preserve">
+	<g>
+		<g>
+			<g>
+				<polygon class="partially-correct-background" points="34.1,28.6 34.1,2.2 2,2.2 2,34.3 40.1,34.3"/>
+				<g>
+					<rect x="20.6" y="11.8" class="partially-correct-foreground" width="4" height="5"/>
+					<rect x="11.5" y="11.8" class="partially-correct-foreground" width="4" height="5"/>
+					<g>
+						<g>
+							<g>
+								<g>
+									<g>
+											<rect x="10.9" y="22.9" transform="matrix(0.9794 -0.2019 0.2019 0.9794 -4.6237 4.1559)" class="partially-correct-foreground" width="14.3" height="3.7"/>
+									</g>
+								</g>
+							</g>
+						</g>
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>
+</span>

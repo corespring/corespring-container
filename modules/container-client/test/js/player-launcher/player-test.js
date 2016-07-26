@@ -91,7 +91,7 @@ describe('player launcher', function() {
 
     it('calls loadInstance with mode \'gather\' if it\'s not defined', function(){
       var player = create({ itemId: '1', gather: {} });
-      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}});
+      expect(mockLauncher.loadInstance).toHaveBeenCalledWith(jasmine.any(Object), undefined, {mode: 'gather', gather: {}}, undefined, undefined);
     });
 
     it('creates new session if itemId is passed in and sessionId is not', function(){

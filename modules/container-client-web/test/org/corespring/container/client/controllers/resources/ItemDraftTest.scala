@@ -80,7 +80,7 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         "_id" -> Json.obj("$oid" -> "1"),
         "xhtml" -> "<div></div>")
 
-      class load(loadResult: JsValue = json) extends scope {
+      class load(loadResult: (JsValue, JsValue) = (json, Json.obj())) extends scope {
         hooks.load(any[String])(any[RequestHeader]).returns(Future.successful(Right(loadResult)))
       }
 
@@ -97,7 +97,7 @@ class ItemDraftTest extends Specification with Mockito with NoTimeConversions wi
         Json.obj("$oid" -> "1"),
         "xhtml" -> "<p>a</p>")
 
-      "prep the json" in new load(loadResult = badJson) {
+      "prep the json" in new load(loadResult = (badJson, Json.obj())) {
         val json = contentAsJson(draft.load("x")(req))
         (json \ "itemId").as[String] === "1"
         (json \ "xhtml").as[String] === """<p>a</p>"""

@@ -38,7 +38,7 @@
                 a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
-    .player-container(ng-if="activeTab == 'teacher'")
+    .player-container.teacher-view(ng-if="activeTab == 'teacher'")
       corespring-demo-player(
         data-jade-template='question-information',
         player-mode="instructor",

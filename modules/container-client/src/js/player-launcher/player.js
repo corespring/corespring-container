@@ -116,7 +116,7 @@ exports.define = function(isSecure) {
       var params = options.queryParams;
       var initialData = buildModeData(options.mode);
 
-      instance = launcher.loadInstance(call, params, initialData);
+      instance = launcher.loadInstance(call, params, initialData, undefined, options.customVariables);
 
       if (options.width) {
         instance.width(options.width);

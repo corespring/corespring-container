@@ -160,5 +160,11 @@ block after-main-script
         .constant('UPLOAD_IMAGE_MAX_SIZE_KB', editorOptions.uploadImageMaxSizeKb || 500)
         .constant('UPLOAD_ENDPOINT', uploadEndpoint)
         .constant('SINGLE_COMPONENT_KEY', editorOptions.singleComponentKey)
-        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz]);
+        .config(['wiggiWizConfigProvider', 'UPLOAD_ENDPOINT', setUpWiggiWiz])
+        .config(['$provide',
+                function($provide) {
+                  $provide.value('PlayerSkin', {iconSet: "!{iconSet}", colors: !{colors}});
+                }
+              ]);
     })(this);
+

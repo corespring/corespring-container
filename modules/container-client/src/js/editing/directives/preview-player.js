@@ -26,10 +26,7 @@
           var debouncedUpdateComponents = debounce(updateRenderedComponents);
 
           function debounce(fn) {
-            return _.debounce(function() {
-              fn();
-              $scope.$digest();
-            }, 200, {leading: false, trailing: true});
+            return _.debounce(fn, 400);
           }
 
           function updateRenderedComponents() {

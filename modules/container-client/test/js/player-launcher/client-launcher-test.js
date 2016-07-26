@@ -112,13 +112,19 @@ describe('client-launcher', function(){
     });
 
     it('adds launch-config params', function(){
-      corespring.mock.modules['launch-config'] = { queryParams: { a : 'a'}};
+      corespring.mock.modules['launch-config'] = { initTimeout: 101, queryParams: { a : 'a'}};
       launcher = new ClientLauncher('e', {}, onError);
       instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});
-      expect(instance.constructorArgs[0]).toEqual( { call: {url: 'url'}, queryParams: {a: 'a'}, data: {}});
+      expect(instance.constructorArgs[0]).toEqual( { initTimeout: 101, call: {url: 'url'}, queryParams: {a: 'a'}, data: {}});
       expect(instance.constructorArgs[1]).toEqual('e');
     });
-    
+
+    it('adds the user defined launchInitTimeout', function(){
+      launcher = new ClientLauncher('e', {launchInitTimeout: 102});
+      instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});
+      expect(instance.constructorArgs[0].initTimeout).toEqual(102);
+    });
+
     it('calls the errorCallback if ready before loadInstance is called', function(){
       launcher = new ClientLauncher('e', {}, onError);
       instance = launcher.loadInstance({url: 'url'}, {}, {}, function(){});

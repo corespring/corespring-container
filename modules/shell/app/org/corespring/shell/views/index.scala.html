@@ -30,7 +30,8 @@
     @links.map{ s =>
       <li>
         <span>@s.id</span>
-        @link("run", s.run, "btn-xs")
+        @link("gather", s.gather, "btn-xs")
+        @link("view", s.view, "btn-xs")
         @link("delete", s.delete, "btn-xs")
       </li>
     }

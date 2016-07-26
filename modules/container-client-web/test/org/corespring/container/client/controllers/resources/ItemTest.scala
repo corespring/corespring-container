@@ -49,7 +49,7 @@ class ItemTest extends Specification with Mockito with ComponentMaker with NoTim
         }
       }
       m.load(any[String])(any[RequestHeader]).returns {
-        Future.successful(Right(loadResult))
+        Future.successful(Right((loadResult, Json.obj())))
       }
       m
     }

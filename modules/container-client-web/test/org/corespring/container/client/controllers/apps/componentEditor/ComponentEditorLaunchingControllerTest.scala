@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers.apps.componentEditor
 
-import org.corespring.container.client.component.{ SingleComponentScriptBundle, ComponentBundler }
+import org.corespring.container.client.component.{ ComponentBundler, SingleComponentScriptBundle }
 import org.corespring.container.client.controllers.apps.ComponentEditorOptions
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.ComponentEditorRenderer
@@ -14,6 +14,7 @@ import play.api.Mode.Mode
 import play.api.templates.Html
 import play.api.test.FakeRequest
 import org.mockito.Matchers.{ eq => m_eq }
+import play.api.libs.json.{JsObject, Json}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ Await, ExecutionContext, Future }
@@ -28,7 +29,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     val bundler = {
       val m = mock[ComponentBundler]
-      m.singleBundle(any[String], any[String], any[Boolean]) returns Some(
+      m.singleBundle(any[String], any[String], any[Boolean], any[Option[String]]) returns Some(
         SingleComponentScriptBundle(
           uiComp("type", Nil),
           Nil,
@@ -39,7 +40,7 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     val renderer = {
       val m = mock[ComponentEditorRenderer]
-      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Map[String,String]],any[Boolean]) returns {
+      m.render(any[SingleComponentScriptBundle], any[String], any[ComponentEditorOptions], any[Map[String, String]], any[Boolean], any[String], any[JsObject]) returns {
         Future.successful(Html("<html></html>"))
       }
       m
@@ -60,13 +61,13 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
 
     "in devMode" should {
       "call bundler.singleBundle" in new scope {
-        wait(controller.componentEditorResult("type", req))
-        there was one(bundler).singleBundle("type", "editor", true)
+        wait(controller.componentEditorResult("type", req, Json.obj()))
+        there was one(bundler).singleBundle(m_eq("type"), m_eq("editor"), m_eq(true), any[Option[String]])
       }
 
       "call renderer.render" in new scope {
-        wait(controller.componentEditorResult("type", req))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]],m_eq(false))
+        wait(controller.componentEditorResult("type", req, Json.obj()))
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String], any[JsObject])
       }
     }
 
@@ -77,25 +78,25 @@ class ComponentEditorLaunchingControllerTest extends Specification with Mockito 
       }
 
       "call bundler.singleBundle" in new prodScope {
-        wait(controller.componentEditorResult("type", req))
-        there was one(bundler).singleBundle("type", "editor", false)
+        wait(controller.componentEditorResult("type", req, Json.obj()))
+        there was one(bundler).singleBundle(m_eq("type"), m_eq("editor"), m_eq(false), any[Option[String]])
       }
 
       "call renderer.render" in new prodScope {
-        wait(controller.componentEditorResult("type", req))
-        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]], m_eq(true))
+        wait(controller.componentEditorResult("type", req, Json.obj()))
+        there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(true), any[String], any[JsObject])
       }
     }
 
     "call bundler.singleBundle - prod mode" in new scope {
       override val mode = Mode.Prod
-      val result = wait(controller.componentEditorResult("type", req))
-      there was one(bundler).singleBundle("type", "editor", false)
+      val result = wait(controller.componentEditorResult("type", req, Json.obj()))
+      there was one(bundler).singleBundle(m_eq("type"), m_eq("editor"), m_eq(false), any[Option[String]])
     }
 
     "call renderer.render - dev mode" in new scope {
-      val result = wait(controller.componentEditorResult("type", req))
-      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String,String]], m_eq(false))
+      val result = wait(controller.componentEditorResult("type", req, Json.obj()))
+      there was one(renderer).render(any[SingleComponentScriptBundle], m_eq("tabs"), any[ComponentEditorOptions], any[Map[String, String]], m_eq(false), any[String], any[JsObject])
     }
 
   }

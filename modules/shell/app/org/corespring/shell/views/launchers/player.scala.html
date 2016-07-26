@@ -1,88 +1,75 @@
-@(js:String, opts : play.api.libs.json.JsValue)
+@(js: String, opts: play.api.libs.json.JsValue)
 <html>
-<head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge;" />
 
-  <style>
+    <style>
+    .colors-holder {
+      border: 1px dashed grey;
+      overflow: scroll;
+      display: inline-block;
+      vertical-align: top;
+    }
+
     .holder {
       border: 1px dashed grey;
       overflow: scroll;
+      display: inline-block;
+      vertical-align: top;
     }
+
     .corespring-player-body {
       border: 1px dashed red;
     }
-  </style>
-</head>
-<body>
 
-<!-- while we support ie8 we must use jquery 1.x -->
-<script type="text/javascript" src="/client/components/console-polyfill/index.js"></script>
-<!-- [if lte IE 9]> -->
-<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-<!-- [endif] -->
+    .colors {
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
 
-<script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
-<script type="text/javascript" src="@js"></script>
-<script>
+      <!-- while we support ie8 we must use jquery 1.x -->
+    <script type="text/javascript" src="/client/components/console-polyfill/index.js"></script>
+      <!-- [if lte IE 9]> -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <!-- [endif] -->
 
-     $(document).ready(function(){
-       var playerHolderWidth = 600;
-       var holder = $('.holder');
-       var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
 
-       console.log('opts: ', opts);
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/spectrum/1.7.1/spectrum.min.js"></script>
 
-       opts.onPlayerRendered = function(){
-         console.log('onPlayerRendered', arguments);
-       };
+    <script type="text/javascript" src="@js"></script>
 
-       var player;
-
-       function addPlayer() {
-         if (player) {
-           player.remove();
-         }
-         var playerWidth = $('#player-width-input').val();
-         opts.width = playerWidth.length > 0 ? playerWidth+'px' : undefined;
-         player = new org.corespring.players.ItemPlayer(holder, opts, function(err){
-            console.warn(err);
-         });
-       }
-
-       addPlayer();
-
-       $('#set-mode-evaluate').click(function(){
-        player.setMode('evaluate', function(err){
-          console.log(err);
-        });
-       });
-
-       $('#set-mode-instructor').click(function(){
-        player.setMode('instructor', function(err){
-          console.log(err);
-        });
-       });
-
-       $('#player-container-width-input').change(function(){
-         $('.holder').css('width', $('#player-container-width-input').val()+"px");
-       });
-
-       $('#player-width-input').change(function(){
-         addPlayer();
-       });
-
-       $('#player-container-width-input').val(playerHolderWidth);
-       $('.holder').css('width', playerHolderWidth+"px");
-
-     });
+    <script>
+      var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
     </script>
+    <script type="text/javascript" src="/assets/js/shell/PlayerRoot.js"></script>
 
-  <button class="button" id="set-mode-evaluate">evaluate</button>
-  <button class="button" id="set-mode-instructor">instructor</button>
-  Container width: <input type="text" id="player-container-width-input" style="width:100px;"/>
-  Player width: <input type="text" id="player-width-input" style="width:100px;"/>
 
-  <div class="holder"></div>
-</body>
+    <button class="button" id="set-mode-gather">gather</button>
+    <button class="button" id="set-mode-view">view</button>
+    <button class="button" id="set-mode-evaluate">evaluate</button>
+    <button class="button" id="set-mode-instructor">instructor</button>
+    Container width: <input type="text" id="player-container-width-input" style="width : 100px ;"/>
+    Player width: <input type="text" id="player-width-input" style="width : 100px ;"/>
+    <button class="button" id="colors-toggle">colors</button>
+    <label>
+      <input value="check" name="iconset" type="radio" checked>Check
+    </label>
+    <label>
+      <input value="emoji" name="iconset" type="radio">Emoji
+    </label>
+    <button class="button reload">reload</button>
+
+    <br/>
+    <div class="colors-holder">
+      <button class="button reload">reload</button>
+    </div>
+
+
+    <div class="holder"></div>
+  </body>
 </html>

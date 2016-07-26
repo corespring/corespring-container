@@ -11,7 +11,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
 import play.api.http.{ ContentTypes, HeaderNames }
-import play.api.libs.json.{ JsValue, Json }
+import play.api.libs.json.{JsObject, JsValue, Json}
 import play.api.mvc.RequestHeader
 import play.api.templates.Html
 import play.api.test.{ FakeRequest, PlaySpecification }
@@ -27,7 +27,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
   object MockGlobal extends GlobalSettings
 
-  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj()))
+  class playerScope(sessionAndItem: Either[(Int, String), (JsValue, JsValue, JsValue)] = Right(Json.obj("id" -> sessionId), Json.obj(), Json.obj()))
     extends Scope
     with TestContext {
     lazy val hooks = {
@@ -39,7 +39,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
     val bundler = {
       val m = mock[ComponentBundler]
-      m.bundle(any[Seq[Id]], any[String], any[Option[String]], any[Boolean]) returns {
+      m.bundle(any[Seq[Id]], any[String], any[Option[String]], any[Boolean], any[Option[String]]) returns {
         Some(ComponentsScriptBundle(Nil, Nil, Nil, Nil))
       }
       m
@@ -47,7 +47,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
     val playerRenderer = {
       val m = mock[PlayerRenderer]
-      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Map[String, String]], any[Boolean], any[Boolean]) returns {
+      m.render(any[String], any[JsValue], any[JsValue], any[ComponentsScriptBundle], any[Seq[String]], any[Map[String, String]], any[Boolean], any[Boolean], any[String], any[JsObject]) returns {
         Future.successful(Html("<html></html>"))
       }
       m
@@ -74,7 +74,7 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
 
   "load" should {
 
-    "throw an error if the session id isn't defined" in new playerScope(Right(Json.obj(), Json.obj())) {
+    "throw an error if the session id isn't defined" in new playerScope(Right(Json.obj(), Json.obj(), Json.obj())) {
       player.load(sessionId)(req) must throwA[IllegalArgumentException].await
     }
 
