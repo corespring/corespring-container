@@ -65,6 +65,14 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
 
     }
 
+    "compiles component less" in new generatorScope() {
+      val comp = uiComp("one", Seq.empty)
+      val comps = Seq(comp)
+
+      generator.less(comps).contains("@correct-background") === true
+      generator.less(comps, Json.obj("correct-background" -> "#abcdef")).contains("@correct-background: #abcdef") === true
+    }
+
     "only loads libs and dependencies once - if the paths are the same" in new generatorScope() {
 
       val comp = uiComp("one", Seq.empty)

@@ -40,6 +40,7 @@ describe('corespringDemoPlayer', function() {
 
   beforeEach(module(function($provide) {
     $provide.value('$log', new MockLog());
+    $provide.value('PlayerSkin', {});
     $provide.value('DemoComponentRegister', new MockComponentRegister());
     $provide.value('ClientSidePlayerService', MockPlayerService);
     $provide.value('MathJaxService', MockMathJaxService);

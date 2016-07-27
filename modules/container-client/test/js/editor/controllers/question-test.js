@@ -52,6 +52,7 @@ describe('QuestionController', function() {
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
+    $provide.value('PlayerSkin', {});
     $provide.value('ItemService', ItemService);
     $provide.value('EditorConfig', EditorConfig);
     $provide.value('LogFactory', LogFactory);

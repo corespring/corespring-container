@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.helpers
 import org.corespring.container.components.model.LayoutComponent
 
 @deprecated("use ItemTypeReader", "")
-trait LayoutComponentReading { self: Helpers =>
+trait LayoutComponentReading { self: NameHelper =>
 
   def layoutTypesInXml(xmlString: String, components: Seq[LayoutComponent]): Seq[String] = {
 

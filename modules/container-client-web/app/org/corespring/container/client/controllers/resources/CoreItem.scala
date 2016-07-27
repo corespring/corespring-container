@@ -68,9 +68,9 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
       either =>
         either match {
           case Left(sm) => sm
-          case Right(rawItem) => {
-            checkTheItemAndLog(itemId, rawItem)
-            Ok(ItemJson(playerXhtml, rawItem))
+          case Right(itemAndDefaults) => {
+            checkTheItemAndLog(itemId, itemAndDefaults._1)
+            Ok(ItemJson(playerXhtml, itemAndDefaults._1))
               .withHeaders(
                 "Cache-Control" -> noCacheHeader,
                 "Expires" -> "0")

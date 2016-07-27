@@ -7,7 +7,6 @@
 var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
 
   launchOpts = launchOpts || {};
-  launchOpts.initTimeout = launchOpts.initTimeout || 4000;
 
   var call = launchOpts.call;
   var queryParams = launchOpts.queryParams;
@@ -141,9 +140,13 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
       post.load();
     }
 
-    var initErrorTimeoutId = setTimeout(function(){
-      errorCallback(errorCodes.INITIALISATION_FAILED);
-    }, launchOpts.initTimeout);
+    var initErrorTimeoutId = -1;
+    
+    if(!isNaN(launchOpts.initTimeout) && launchOpts.initTimeout > 0){
+      initErrorTimeoutId = setTimeout(function(){
+        errorCallback(errorCodes.INITIALISATION_FAILED);
+      }, launchOpts.initTimeout);
+    }
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
       enableLogging: false
@@ -162,7 +165,9 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
 
     channel.on('ready', function(){
       channel.send('initialise', data);
-      clearTimeout(initErrorTimeoutId);
+      if(initErrorTimeoutId !== -1){
+        clearTimeout(initErrorTimeoutId);
+      }
     });
 
     /**
