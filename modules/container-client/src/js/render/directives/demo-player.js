@@ -146,7 +146,7 @@
             '    player-session="session">',
             '  </corespring-isolate-player>',
             '    <div class="btn-submit-holder" ng-hide="playerMode == \'instructor\'">',
-            '      <div class="score">',
+            '      <div ng-show="{{score}}" class="score">',
             '        <span>{{scoreToString(score)}}</span>',
             '      </div>',
             '      <span>',
