@@ -19,6 +19,7 @@ describe('instance', function() {
   var mockChannel;
   var ID = 'instance-test-element-id';
   var call = { url: '/url'};
+  var mockTimeoutError;
 
   beforeEach(function() {
     onError.calls.reset();
@@ -29,6 +30,13 @@ describe('instance', function() {
     window.msgr.Channel = function(){
       return mockChannel;
     };
+
+    mockTimeoutError = {
+      arm: jasmine.createSpy('arm'),
+      disarm: jasmine.createSpy('arm'),
+      reset: jasmine.createSpy('arm'),
+    };
+
     InstanceDef = new corespring.require("instance");
   });
 
@@ -99,6 +107,25 @@ describe('instance', function() {
   it('should register a handler for getScrollPosition', function(){
     var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError);
     expect(mockChannel.on).toHaveBeenCalledWith('getScrollPosition', jasmine.any(Function));
+  });
+
+  it('should call timeoutError.arm', function(){
+    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError, null, false, false, mockTimeoutError);
+    expect(mockTimeoutError.arm).toHaveBeenCalled();
+  });
+  
+  it('should call timeoutError.disarm', function(){
+
+    var readyHandler;
+    mockChannel.on.and.callFake(function(n, handler){
+      if(n === 'ready'){
+        readyHandler = handler;
+      }
+    });
+
+    var instance = new InstanceDef({call: {url: '/url'}}, '#' + ID, onError, null, false, false, mockTimeoutError);
+    readyHandler();
+    expect(mockTimeoutError.disarm).toHaveBeenCalled();
   });
 
   describe('send', function(){
