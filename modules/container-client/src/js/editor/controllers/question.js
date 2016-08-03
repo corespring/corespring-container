@@ -13,11 +13,12 @@ angular.module('corespring-editor.controllers')
     'ItemService',
     'LogFactory',
     'MathJaxService',
+    'PlayerSkin',
     'ScoringHandler',
     'SCORING_TYPE',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    function(
+    function($scope,
       $element,
       $scope,
       $timeout,
@@ -31,6 +32,7 @@ angular.module('corespring-editor.controllers')
       ItemService,
       LogFactory,
       MathJaxService,
+      PlayerSkin,
       ScoringHandler,
       SCORING_TYPE,
       WiggiLinkFeatureDef,
@@ -56,7 +58,6 @@ angular.module('corespring-editor.controllers')
       $scope.showWeightingDialog = function() {
         ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, $scope.item.config,
           function() {
-            console.log("saving ", $scope.item.config);
             saveConfigXhtmlAndComponents();
           });
       };
@@ -98,6 +99,9 @@ angular.module('corespring-editor.controllers')
         componentElement) {
         logger.debug('registerComponent ', id);
         ComponentData.registerComponent(id, componentBridge, componentElement);
+        if (componentBridge.setPlayerSkin) {
+          componentBridge.setPlayerSkin(PlayerSkin);
+        }
       });
 
       $scope.$on('registerPlaceholder', function(event, id, placeholder) {

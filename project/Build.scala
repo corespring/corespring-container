@@ -43,8 +43,9 @@ object Build extends sbt.Build {
     val macWireMacro = "com.softwaremill.macwire" %% "macros" % "0.7.3"
     val macWireRuntime = "com.softwaremill.macwire" %% "runtime" % "0.7.3"
     val mockito = "org.mockito" % "mockito-all" % "1.9.5" % "test"
-    val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
+    val lessCss = "org.lesscss" % "lesscss" % "1.7.0.1.1"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
+    val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
@@ -207,6 +208,7 @@ object Build extends sbt.Build {
         mockito,
         grizzled,
         htmlCleaner,
+        lessCss,
         scalaz,
         jade4j,
         closureCompiler,

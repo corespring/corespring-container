@@ -1,13 +1,55 @@
+
+/**
+ * A class that handles triggering the timeout error.
+ * Uses a global array so that it can clear timeouts across player instances.
+ */
+function TimeoutError(errorCallback, timeout){
+  var errorCodes = require('error-codes');
+
+  window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
+
+  this.arm = function(){
+
+    this.reset();
+
+    if(!isNaN(timeout) && timeout > 0){
+      var id = setTimeout(function(){
+        errorCallback(errorCodes.INITIALISATION_FAILED);
+      });
+      window._playerTimeoutErrorIds.push(id);
+    }
+  };
+
+  this.disarm = function(){
+    this.reset();
+  };
+
+  this.reset = function(){
+    window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
+    window._playerTimeoutErrorIds.forEach(function(id){
+      clearTimeout(id);
+    });
+    window._playerTimeoutErrorIds = [];
+  };
+}
+
 /**
  * @constructor
  * @param {node|selector} element - a jquery style selector - aka $(element) will return a jQuery wrapped node.
  * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
-
-var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled, iframeScrollingEnabled) {
+var Instance = function(launchOpts, 
+element, 
+errorCallback, 
+log, 
+autosizeEnabled, 
+iframeScrollingEnabled,
+timeoutError) {
 
   launchOpts = launchOpts || {};
-  launchOpts.initTimeout = launchOpts.initTimeout || 4000;
+  
+  timeoutError = timeoutError || new TimeoutError(errorCallback, launchOpts.initTimeout);
+  timeoutError.reset();
 
   var call = launchOpts.call;
   var queryParams = launchOpts.queryParams;
@@ -140,10 +182,8 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
       var post = new PostForm(url);
       post.load();
     }
-
-    var initErrorTimeoutId = setTimeout(function(){
-      errorCallback(errorCodes.INITIALISATION_FAILED);
-    }, launchOpts.initTimeout);
+    
+    timeoutError.arm();
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
       enableLogging: false
@@ -161,8 +201,8 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
     });
 
     channel.on('ready', function(){
+      timeoutError.disarm(); 
       channel.send('initialise', data);
-      clearTimeout(initErrorTimeoutId);
     });
 
     /**
@@ -213,11 +253,13 @@ var Instance = function(launchOpts, element, errorCallback, log, autosizeEnabled
   };
 
   this.remove = function() {
+    timeoutError.reset();
     channel.remove();
     $iframe().remove();
   };
 
   this.removeChannel = function() {
+    timeout.reset();
     channel.remove();
   };
 

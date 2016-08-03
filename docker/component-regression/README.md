@@ -17,7 +17,7 @@ For development it is much faster to use a selenium docker image, which runs sel
       #Start container
       play run
        
-      #Start selenium docker
+      #Start selenium docker (use docker ps and docker kill to stop it)
       docker run -d -p 4444:4444 selenium/standalone-firefox:2.53.0
        
       #Run your tests
@@ -25,7 +25,15 @@ For development it is much faster to use a selenium docker image, which runs sel
  
 + Note: Because selenium runs inside the docker container, it needs to know the ip address 
  of your computer. Localhost or 127.0.0.1 doesn't work, you have to use the real address like 
- 192.168.1.8 
+ 192.168.1.8
+ 
++ Note: This runs the tests in headless mode. If you want to see the browser, you can either
+ try the debug dockers, eg. selenium/standalone-firefox-debug. There is some documentation
+ on the download page. They allow you to view the browser via VNC (Couldn't get that to work 
+ though)   
+ Another option is to launch the [Selenium Standalone Server](http://docs.seleniumhq.org/download/) as a java process on your machine.    
+ That would use the browser that is installed locally on your machine.   
+  
         
    
 

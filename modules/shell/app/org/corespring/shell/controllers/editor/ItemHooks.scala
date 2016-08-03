@@ -2,9 +2,11 @@ package org.corespring.shell.controllers.editor
 
 import com.mongodb.casbah.Imports._
 import org.bson.types.ObjectId
-import org.corespring.container.client.hooks.Hooks.{R, StatusMessage}
+import org.corespring.container.client.hooks.Hooks.{ ItemAndDefaults, R, StatusMessage }
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.ContainerExecutionContext
+import org.corespring.container.client.{ hooks => containerHooks }
+import org.corespring.shell.DefaultPlayerSkin
 import org.corespring.container.client.{hooks => containerHooks}
 import org.corespring.container.components.score.ScoringType
 import org.corespring.shell.services.ItemService
@@ -116,9 +118,9 @@ class ItemHooks(
   //with CoreItemHooks
   with ItemHooksHelper {
 
-  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[(Int, String), JsValue]] = Future {
+  override def load(itemId: String)(implicit header: RequestHeader): Future[Either[StatusMessage, ItemAndDefaults]] = Future {
     itemService.load(itemId).map { i =>
-      Right(i)
+      Right((i, DefaultPlayerSkin.defaultPlayerSkin))
     }.getOrElse(Left((NOT_FOUND, s"Can't find item with id: $itemId")))
   }
 

@@ -38,7 +38,7 @@
                 a(ng-click="selectSupportingMaterial(sm)") {{sm.name}}
 
   .col-sm-8
-    .player-container(ng-if="activeTab == 'teacher'")
+    .player-container.teacher-view(ng-if="activeTab == 'teacher'")
       corespring-demo-player(
         data-jade-template='question-information',
         player-mode="instructor",
@@ -58,7 +58,7 @@
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
       h3 {{selectedMaterial.name}}
       div(style="height: 400px;", ng-if="mainFile.contentType != 'text/html'")
-        iframe(ng-src="{{binaryUrl}}")
+        iframe.supporting-material(ng-src="{{binaryUrl}}")
       div(ng-if="mainFile.contentType == 'text/html'")
         div(ng-bind-html-unsafe='mainFile.content')
 

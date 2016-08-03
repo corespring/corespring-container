@@ -2,13 +2,15 @@
 
 (function(root) {
 
-  var ComponentDefinition = function(angular, compName, moduleName) {
+  var ComponentDefinition = function(angular, compName, moduleName, assetsPath) {
 
     var loadAngularModule = function(moduleName) {
       try {
         return angular.module(moduleName);
       } catch (e) {
-        return angular.module(moduleName, []);
+        var module = angular.module(moduleName, []);
+        module.constant("ASSETS_PATH", assetsPath);
+        return module;
       }
     };
 
@@ -72,9 +74,9 @@
   var Client = function(angular) {
     var definitions = {};
 
-    this.component = function(directiveName, moduleName) {
+    this.component = function(directiveName, moduleName, assetsPath) {
       var fullyQualifiedName = moduleName + "-" + directiveName;
-      definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName);
+      definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName, assetsPath);
       return definitions[fullyQualifiedName];
     };
   };
