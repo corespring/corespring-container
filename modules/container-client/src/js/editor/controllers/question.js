@@ -14,11 +14,11 @@ angular.module('corespring-editor.controllers')
     'LogFactory',
     'MathJaxService',
     'PlayerSkin',
-    'ScoringHandler',
     'SCORING_TYPE',
+    'ScoringHandler',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    function($scope,
+    function(
       $element,
       $scope,
       $timeout,
@@ -33,8 +33,8 @@ angular.module('corespring-editor.controllers')
       LogFactory,
       MathJaxService,
       PlayerSkin,
-      ScoringHandler,
       SCORING_TYPE,
+      ScoringHandler,
       WiggiLinkFeatureDef,
       WiggiMathJaxFeatureDef
     ) {
