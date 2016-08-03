@@ -94,7 +94,6 @@
       })(corespring.server.logic(compType), corespring.require)
      */
     this.logic = function(componentType) {
-
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
     };

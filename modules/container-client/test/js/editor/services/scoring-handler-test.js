@@ -48,10 +48,11 @@ describe('scoring-handler', function() {
   });
 
   it('should resolve components', function(){
-
     var comps = { 1: { componentType: 'a', weight: 1, data: {}}};
+    var itemConfig = {};
     var xhtml = '<h1>Helo</h1>';
-    scoringHandler.scoring(comps, xhtml, function(){
+
+    scoringHandler.scoring(comps, xhtml, itemConfig, function(){
     });
 
     var resolvedComps = modalOpts.resolve.components();
@@ -80,9 +81,10 @@ describe('scoring-handler', function() {
 
     var isCalled = changeWeight;
     var comps = { 1: { componentType: 'a', weight: 1, data: {}}};
-    var xhtml = '<h1>Helo</h1>';
+    var itemConfig = {};
+    var xhtml = '<h1>Hello</h1>';
     var saveCalled = false;
-    scoringHandler.scoring(comps, xhtml, function(){
+    scoringHandler.scoring(comps, xhtml, itemConfig, function(){
       saveCalled = true;
     });
 

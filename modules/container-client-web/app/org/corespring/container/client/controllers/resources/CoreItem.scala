@@ -81,19 +81,20 @@ trait CoreItem extends CoreSupportingMaterials with Controller with HasContainer
 
   private def errorResult(err: String, status: Int = BAD_REQUEST) = Future.successful(Status(status)(Json.obj("error" -> err)))
 
-  def saveXhtmlAndComponents(id: String) = Action.async { implicit request: Request[AnyContent] =>
+  def saveConfigXhtmlAndComponents(id: String) = Action.async { implicit request: Request[AnyContent] =>
 
     val validation = for {
       json <- request.body.asJson.toSuccess(ItemDraft.Errors.noJson)
+      config <- (json \ "config").asOpt[JsObject].toSuccess("Missing required field 'config' of type 'object'.")
       markup <- (json \ "xhtml").asOpt[String].toSuccess("Missing required field 'xhtml' of type 'string'.")
       components <- (json \ "components").asOpt[JsObject].toSuccess("Missing required field 'components' of type 'object'")
       cleanComponents <- Success(ItemCleaner.cleanComponents(markup, components))
-    } yield (markup -> cleanComponents)
+    } yield (config, markup, cleanComponents)
 
     validation match {
       case Failure(s) => errorResult(s)
-      case Success((markup, components)) => {
-        hooks.saveXhtmlAndComponents(id, markup, components).flatMap {
+      case Success((config, markup, components)) => {
+        hooks.saveConfigXhtmlAndComponents(id, config, markup, components).flatMap {
           case Left((code, msg)) => errorResult(msg, code)
           case Right(json) => Future.successful(Ok(json))
         }

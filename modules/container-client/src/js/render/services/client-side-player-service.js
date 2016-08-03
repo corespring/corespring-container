@@ -26,9 +26,11 @@ angular.module('corespring-player.services')
           };
           out.session.isComplete = true;
           out.session.attempts = 1;
+
           var outcomes = getOutcomes(session.components, settings);
           out.outcome = outcomes;
           out.score = corespring.scoreProcessor.score(angular.copy(getItem()), {}, outcomes);
+
           if (customScoringJs) {
             var exports = {};
             try {
