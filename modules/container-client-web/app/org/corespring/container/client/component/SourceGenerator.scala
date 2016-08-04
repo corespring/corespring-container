@@ -1,11 +1,11 @@
 package org.corespring.container.client.component
 
-import org.corespring.container.client.controllers.helpers.{LoadClientSideDependencies, NameHelper}
-import org.corespring.container.client.views.txt.js.{ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper}
+import org.corespring.container.client.controllers.helpers.{ LoadClientSideDependencies, NameHelper }
+import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, ComponentWrapper, ServerLibraryWrapper }
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.{JsObject, JsValue, Json}
+import play.api.libs.json.{ JsObject, JsValue, Json }
 import org.apache.commons.io.IOUtils
 import org.corespring.container.client.controllers.apps.StaticPaths
 
@@ -24,7 +24,7 @@ trait SourceGenerator
   extends ComponentTypeFilter
   with NameHelper {
 
-  def componentsConfig: ComponentsConfig
+  def assetPath: String
 
   def js(components: Seq[Component]): String
 
@@ -35,7 +35,7 @@ trait SourceGenerator
   }
 
   protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
-    ComponentWrapper(moduleName, directiveName, src, componentsConfig.assetPath).toString
+    ComponentWrapper(moduleName, directiveName, src, assetPath).toString
   }
 
   protected def libraryToJs(l: Library): String
@@ -62,7 +62,7 @@ trait SourceGenerator
   protected def wrapClientLibraryJs(moduleName: String)(src: LibrarySource) = {
     s"""
       // ----------------- ${src.name} ---------------------
-      ${ComponentWrapper(moduleName, src.name, src.source, componentsConfig.assetPath)}
+      ${ComponentWrapper(moduleName, src.name, src.source, assetPath)}
       """
   }
 

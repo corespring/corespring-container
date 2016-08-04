@@ -13,7 +13,7 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
 
     val generator = new BaseGenerator with JsStringBuilder {
 
-      val componentsConfig = ComponentsConfig("", "", "", false, false)
+      override def assetPath: String = ""
       override protected def libraryToJs(l: Library): String = libJs
 
       override def resource(path: String): Option[String] = {
