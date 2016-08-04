@@ -102,7 +102,7 @@ trait DefaultComponentSets extends ComponentSets
   with LibrarySourceLoading {
 
   val editorGenerator: SourceGenerator = new EditorGenerator() {
-    override def componentsConfig:ComponentsConfig = DefaultComponentSets.this.componentsConfig
+    override def assetPath: String = componentsConfig.assetPath
 
     override def resource(p: String) = DefaultComponentSets.this.resource(p)
 
@@ -110,13 +110,13 @@ trait DefaultComponentSets extends ComponentSets
   }
 
   val playerGenerator: SourceGenerator = new PlayerGenerator() {
-    override def componentsConfig:ComponentsConfig = DefaultComponentSets.this.componentsConfig
+    override def assetPath: String = componentsConfig.assetPath
     override def resource(p: String) = DefaultComponentSets.this.resource(p)
     override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
   }
 
   val catalogGenerator: SourceGenerator = new CatalogGenerator() {
-    override def componentsConfig:ComponentsConfig = DefaultComponentSets.this.componentsConfig
+    override def assetPath: String = componentsConfig.assetPath
     override def resource(p: String) = DefaultComponentSets.this.resource(p)
     override def loadLibrarySource(path: String): Option[String] = DefaultComponentSets.this.loadLibrarySource(path)
   }
