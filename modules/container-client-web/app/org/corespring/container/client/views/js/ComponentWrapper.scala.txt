@@ -1,7 +1,6 @@
 @(moduleName: String, directiveName : String, jsBody : String, assetsPath : String)
 
 (function(){
-  console.log("pacimaci @assetsPath");
   var definition = (function(exports, require){
       @jsBody;
       return exports;
