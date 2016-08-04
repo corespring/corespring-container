@@ -58,7 +58,7 @@
     .supporting-material(ng-show="activeTab == 'supportingMaterial'")
       h3 {{selectedMaterial.name}}
       div(style="height: 400px;", ng-if="mainFile.contentType != 'text/html'")
-        iframe(ng-src="{{binaryUrl}}")
+        iframe.supporting-material(ng-src="{{binaryUrl}}")
       div(ng-if="mainFile.contentType == 'text/html'")
         div(ng-bind-html-unsafe='mainFile.content')
 

@@ -77,7 +77,7 @@ module.exports = (grunt) ->
   ###
   gruntLogWriteln = grunt.log.writeln
   grunt.log.writeln = (s) ->
-    if(!(s && s.indexOf('  at ') >= 0 && s.indexOf('grunt-contrib-jasmine') >= 0))
+    if(!(s && s.indexOf('jasmine.js') >= 0))
       gruntLogWriteln(s || '')
 
   prepend = (pre, s) -> "#{pre}#{s}"

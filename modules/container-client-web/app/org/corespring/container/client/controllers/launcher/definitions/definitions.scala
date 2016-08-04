@@ -178,7 +178,7 @@ private[launcher] case class ComponentEditor(initTimeout: Int, builder: JsBuilde
           "loadEditor" -> r.itemEditor.componentEditor(":itemId"),
           "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
           "saveComponents" -> r.item.saveSubset(":itemId", "components"),
-          "saveXhtmlAndComponents" -> r.item.saveXhtmlAndComponents(":itemId"))),
+          "saveConfigXhtmlAndComponents" -> r.item.saveConfigXhtmlAndComponents(":itemId"))),
       "draftEditor" -> obj(
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
@@ -187,6 +187,6 @@ private[launcher] case class ComponentEditor(initTimeout: Int, builder: JsBuilde
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
           "saveComponents" -> r.draft.saveSubset(":draftId", "components"),
-          "saveXhtmlAndComponents" -> r.draft.saveXhtmlAndComponents(":draftId")))))
+          "saveConfigXhtmlAndComponents" -> r.draft.saveConfigXhtmlAndComponents(":draftId")))))
 
 }

@@ -1,39 +1,43 @@
 angular.module('corespring-editor.controllers')
   .controller('QuestionController', [
-    '$scope',
     '$element',
+    '$scope',
     '$timeout',
-    'EditorChangeWatcher',
-    'ItemService',
-    'EditorConfig',
-    'LogFactory',
-    'EditingImageService',
+    'AppState',
     'ComponentData',
     'ComponentPopups',
-    'AppState',
-    'ScoringHandler',
+    'EditingImageService',
+    'EDITOR_EVENTS',
+    'EditorChangeWatcher',
+    'EditorConfig',
+    'ItemService',
+    'LogFactory',
     'MathJaxService',
+    'PlayerSkin',
+    'SCORING_TYPE',
+    'ScoringHandler',
     'WiggiLinkFeatureDef',
     'WiggiMathJaxFeatureDef',
-    'PlayerSkin',
-    'EDITOR_EVENTS',
-    function($scope,
+    function(
       $element,
+      $scope,
       $timeout,
-      EditorChangeWatcher,
-      ItemService,
-      EditorConfig,
-      LogFactory,
-      EditingImageService,
+      AppState,
       ComponentData,
       ComponentPopups,
-      AppState,
-      ScoringHandler,
+      EditingImageService,
+      EDITOR_EVENTS,
+      EditorChangeWatcher,
+      EditorConfig,
+      ItemService,
+      LogFactory,
       MathJaxService,
-      WiggiLinkFeatureDef,
-      WiggiMathJaxFeatureDef,
       PlayerSkin,
-      EDITOR_EVENTS) {
+      SCORING_TYPE,
+      ScoringHandler,
+      WiggiLinkFeatureDef,
+      WiggiMathJaxFeatureDef
+    ) {
 
       var configPanels = {};
 
@@ -51,10 +55,10 @@ angular.module('corespring-editor.controllers')
         $scope.previewOn = !$scope.previewOn;
       };
 
-      $scope.scoring = function() {
-        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml,
+      $scope.showWeightingDialog = function() {
+        ScoringHandler.scoring($scope.item.components, $scope.item.xhtml, $scope.item.config,
           function() {
-            saveXhtmlAndComponents();
+            saveConfigXhtmlAndComponents();
           });
       };
 
@@ -117,8 +121,9 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemSaved = function() {};
 
-      var saveXhtmlAndComponents = EditorChangeWatcher.debounce(function(){
-        ItemService.saveXhtmlAndComponents(
+      var saveConfigXhtmlAndComponents = EditorChangeWatcher.debounce(function(){
+        ItemService.saveConfigXhtmlAndComponents(
+          $scope.item.config,
           $scope.item.xhtml,
           $scope.serialize($scope.item.components),
           $scope.onItemSaved,
@@ -152,16 +157,30 @@ angular.module('corespring-editor.controllers')
         return newModel;
       };
 
+      function addItemConfig(item){
+        if(!item.config){
+          item.config = {
+            scoringType: SCORING_TYPE.WEIGHTED
+          };
+        }
+        return item;
+      }
+
       var makeWatcher = EditorChangeWatcher.makeWatcher;
 
       $scope.$watch(
         'item.components', 
-        makeWatcher('components', saveXhtmlAndComponents, $scope),
+        makeWatcher('components', saveConfigXhtmlAndComponents, $scope),
+        true);
+
+      $scope.$watch(
+        'item.config',
+        makeWatcher('config', saveConfigXhtmlAndComponents, $scope),
         true);
 
       $scope.$watch(
         'item.xhtml', 
-        makeWatcher('xhtml', saveXhtmlAndComponents, $scope));
+        makeWatcher('xhtml', saveConfigXhtmlAndComponents, $scope));
 
       $scope.$watch(
         'item.summaryFeedback', 
@@ -170,7 +189,7 @@ angular.module('corespring-editor.controllers')
         }, $scope));
 
       ItemService.load(function(item) {
-        $scope.item = item;
+        $scope.item = addItemConfig(item);
         ComponentData.setModel(item.components);
         MathJaxService.parseDomForMath(100);
       });

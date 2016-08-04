@@ -1,11 +1,26 @@
 angular.module('corespring-editor.controllers').controller('ScoringPopupController', [
-  '$scope',
   '$modalInstance',
-  'LogFactory',
+  '$scope',
   'DesignerService',
+  'LogFactory',
   'components',
+  'itemConfig',
+  'SCORING_TYPE',
   'xhtml',
-  function($scope, $modalInstance, LogFactory, DesignerService, components, xhtml) {
+  function(
+    $modalInstance,
+    $scope,
+    DesignerService,
+    LogFactory,
+    components,
+    itemConfig,
+    SCORING_TYPE,
+    xhtml
+  ) {
+
+    var logger = LogFactory.getLogger('ScoringPopupController');
+
+    $scope.SCORING_TYPE = SCORING_TYPE;
 
     $scope.sizeToString = function(size) {
       if (size > 1) {
@@ -17,10 +32,9 @@ angular.module('corespring-editor.controllers').controller('ScoringPopupControll
       }
     };
 
-    var logger = LogFactory.getLogger('ScoringPopupController');
-
     $scope.components = components;
     $scope.componentSize = $scope.sizeToString(_.keys(components).length);
+    $scope.itemConfig = _.defaults(itemConfig, {scoringType: SCORING_TYPE.WEIGHTED});
     $scope.xhtml = xhtml;
 
     $scope.onComponentsLoadError = function(error) {
