@@ -30,6 +30,8 @@ class CompressedAndMinifiedComponentSets(componentSetExecutionContext: Component
 
   private val gzipEnabled = config.gzip
 
+  val componentsConfig = config
+
   private def acceptsGzip(implicit rh: RequestHeader): Boolean = {
     rh.headers.get(ACCEPT_ENCODING).map(_.split(',').exists(_.trim == "gzip")).getOrElse(false)
   }

@@ -12,6 +12,8 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
   class generatorScope(libJs: String = "libJs") extends Scope {
 
     val generator = new BaseGenerator with JsStringBuilder {
+
+      val componentsConfig = ComponentsConfig("", "", "", false, false)
       override protected def libraryToJs(l: Library): String = libJs
 
       override def resource(path: String): Option[String] = {
