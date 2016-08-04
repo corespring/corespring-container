@@ -37,7 +37,7 @@ object ItemEditorEndpoints extends Endpoints {
     load = resourceRoutes.Item.load(itemId),
     save = None,
     saveSubset = resourceRoutes.Item.saveSubset(itemId, ":subset"),
-    saveXhtmlAndComponents = resourceRoutes.Item.saveXhtmlAndComponents(itemId))
+    saveConfigXhtmlAndComponents = resourceRoutes.Item.saveConfigXhtmlAndComponents(itemId))
 }
 
 object DraftEditorEndpoints extends Endpoints {
@@ -55,6 +55,6 @@ object DraftEditorEndpoints extends Endpoints {
     load = resourceRoutes.ItemDraft.load(id),
     save = Some(resourceRoutes.ItemDraft.save(id)),
     saveSubset = resourceRoutes.ItemDraft.saveSubset(id, ":subset"),
-    saveXhtmlAndComponents = resourceRoutes.ItemDraft.saveXhtmlAndComponents(id))
+    saveConfigXhtmlAndComponents = resourceRoutes.ItemDraft.saveConfigXhtmlAndComponents(id))
 }
 

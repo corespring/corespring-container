@@ -125,6 +125,74 @@ class DefaultScoreProcessorTest extends Specification {
 
     }
 
+    "with scoringType allOrNothing" should {
+      "return 100% when all scores are 1" in {
+
+        val item =
+          s"""{
+             "config" : {
+               "scoringType": "allOrNothing"
+             },
+             "components": {
+               "1" : {"weight":1, "componentType" : "a"},
+               "2" : {"weight":1, "componentType" : "b" }
+             }
+           }"""
+        val responses =
+          """{
+             "1" : {"score":1.0},
+             "2" : {"score":1.0}
+            }"""
+        val expected =
+
+          """
+         {
+           "summary" : { "maxPoints" : 2, "points" : 2, "percentage" : 100.0 },
+           "components" : {
+             "1" : { "weight" : 1, "score" : 1.0, "weightedScore" : 1.0},
+             "2" : { "weight" : 1, "score" : 1.0, "weightedScore" : 1.0}
+           }
+         }
+                     """
+
+        (item, responses) must GenerateOutcome(
+          expected)
+      }
+
+      "return 0% when one score is not 1" in {
+
+        val item =
+          """{
+             "config" : {
+              "scoringType": "allOrNothing"
+             },
+             "components": {
+               "1" : {"weight":1, "componentType" : "a"},
+               "2" : {"weight":1, "componentType" : "b" }
+             }
+           }"""
+        val responses =
+          """{
+             "1" : {"score":1.0},
+             "2" : {"score":0.5}
+            }"""
+        val expected =
+
+          """
+         {
+           "summary" : { "maxPoints" : 2, "points" : 0.0, "percentage" : 0.0 },
+           "components" : {
+             "1" : { "weight" : 1, "score" : 1.0, "weightedScore" : 1.0},
+             "2" : { "weight" : 1, "score" : 0.5, "weightedScore" : 0.5}
+           }
+         }
+          """
+
+        (item, responses) must GenerateOutcome(
+          expected)
+      }
+    }
+
     "calculate the proper sum" in {
       new DefaultScoreProcessor {
         override def isComponentScoreable(compType: String, comp: JsValue, session: JsValue,
