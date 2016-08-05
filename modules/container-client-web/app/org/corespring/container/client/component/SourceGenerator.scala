@@ -24,16 +24,18 @@ trait SourceGenerator
   extends ComponentTypeFilter
   with NameHelper {
 
+  def assetPath: String
+
   def js(components: Seq[Component]): String
 
   def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
-  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
-    ComponentWrapper(moduleName, directiveName, src, StaticPaths.assetUrl).toString
-  }
-
   def layoutToJs(layout: LayoutComponent): String = {
     layout.client.map(wrapClientLibraryJs(moduleName(layout.org, layout.name))).mkString("\n")
+  }
+
+  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
+    ComponentWrapper(moduleName, directiveName, src, assetPath).toString
   }
 
   protected def libraryToJs(l: Library): String
@@ -60,7 +62,7 @@ trait SourceGenerator
   protected def wrapClientLibraryJs(moduleName: String)(src: LibrarySource) = {
     s"""
       // ----------------- ${src.name} ---------------------
-      ${ComponentWrapper(moduleName, src.name, src.source, StaticPaths.assetUrl)}
+      ${ComponentWrapper(moduleName, src.name, src.source, assetPath)}
       """
   }
 

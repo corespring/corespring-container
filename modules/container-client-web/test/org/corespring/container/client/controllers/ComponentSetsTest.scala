@@ -1,6 +1,6 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.SourceGenerator
+import org.corespring.container.client.component.{ ComponentsConfig, SourceGenerator }
 import org.corespring.container.components.model.{ Component, Id, Library }
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.DependencyResolver
@@ -19,6 +19,8 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
   sequential
 
   class MockSourceGenerator(name: String) extends SourceGenerator {
+    override def assetPath: String = ""
+
     override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = s"@a:3; .something { color: @a; }"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
@@ -27,6 +29,8 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
   }
 
   val sets = new ComponentSets {
+
+    val componentsConfig = ComponentsConfig("", "", "", false, false)
 
     override def playerGenerator: SourceGenerator = new MockSourceGenerator("player")
 
