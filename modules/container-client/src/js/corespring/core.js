@@ -9,7 +9,14 @@
         return angular.module(moduleName);
       } catch (e) {
         var module = angular.module(moduleName, []);
+        var cdnVersion = "";
+        var versionMatch = assetsPath.match(/version=(\w+)/);
+        if (versionMatch) {
+          cdnVersion = versionMatch[1];
+          assetsPath = assetsPath.replace(/[?&]version=(\w+)/, '');
+        }
         module.constant("ASSETS_PATH", assetsPath);
+        module.constant("ASSETS_PATH_VERSION", cdnVersion);
         return module;
       }
     };
@@ -94,7 +101,6 @@
       })(corespring.server.logic(compType), corespring.require)
      */
     this.logic = function(componentType) {
-
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
     };

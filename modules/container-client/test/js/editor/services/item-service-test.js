@@ -12,9 +12,9 @@ describe('ItemService', function(){
         method: 'PUT',
         url: 'saveSubset'
       },
-      saveXhtmlAndComponents: {
+      saveConfigXhtmlAndComponents: {
         method: 'PUT',
-        url: 'saveXhtmlAndComponents'
+        url: 'saveConfigXhtmlAndComponents'
       }
     };
 
@@ -98,16 +98,16 @@ describe('ItemService', function(){
   describeSave('saveXhtml', '<div/>', {xhtml: '<div/>'});
   describeSave('saveCollectionId', 'collectionId', {collectionId: 'collectionId'});
   
-  describe('saveXhtmlAndComponents', function(){
+  describe('saveConfigXhtmlAndComponents', function(){
 
     beforeEach(function(){
       onSuccess = jasmine.createSpy('onSuccess');
       onFailure = jasmine.createSpy('onFailure');
-      service.saveXhtmlAndComponents('<div/>', {}, onSuccess, onFailure);
+      service.saveConfigXhtmlAndComponents({}, '<div/>', {}, onSuccess, onFailure);
     });
 
     it('call $http', function(){
-      expect(http).toHaveBeenCalledWith({ method: 'PUT', url: 'saveXhtmlAndComponents', data: {xhtml: '<div/>', components: {}}});
+      expect(http).toHaveBeenCalledWith({ method: 'PUT', url: 'saveConfigXhtmlAndComponents', data: {config: {}, xhtml: '<div/>', components: {}}});
     });
     
     it('calls onSuccess', function(){

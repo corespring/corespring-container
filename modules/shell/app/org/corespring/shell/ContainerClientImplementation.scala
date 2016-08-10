@@ -5,21 +5,22 @@ import java.net.URL
 import com.amazonaws.services.s3.AmazonS3
 import com.softwaremill.macwire.MacwireMacros.wire
 import org.bson.types.ObjectId
-import org.corespring.amazon.s3.{ ConcreteS3Service, S3Service }
+import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
 import org.corespring.container.client._
-import org.corespring.container.client.component.{ ComponentSetExecutionContext, ComponentsConfig }
+import org.corespring.container.client.component.{ComponentSetExecutionContext, ComponentsConfig}
+import org.corespring.container.client.controllers.apps.StaticPaths
 import org.corespring.container.client.hooks._
-import org.corespring.container.client.integration.{ ContainerConfig, ContainerExecutionContext, DefaultIntegration }
+import org.corespring.container.client.integration.{ContainerConfig, ContainerExecutionContext, DefaultIntegration}
 import org.corespring.container.components.model.Component
-import org.corespring.shell.controllers.catalog.actions.{ CatalogHooks => ShellCatalogHooks }
+import org.corespring.shell.controllers.catalog.actions.{CatalogHooks => ShellCatalogHooks}
 import org.corespring.shell.controllers.editor.ContainerSupportingMaterialAssets
-import org.corespring.shell.controllers.editor.actions.{ DraftId, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks, ComponentEditorHooks => ShellComponentEditorHooks }
-import org.corespring.shell.controllers.player.actions.{ PlayerHooks => ShellPlayerHooks }
-import org.corespring.shell.controllers.player.{ SessionHooks => ShellSessionHooks }
-import org.corespring.shell.controllers.{ S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor }
-import org.corespring.shell.services.{ ItemDraftService, ItemService, SessionService }
+import org.corespring.shell.controllers.editor.actions.{DraftId, ComponentEditorHooks => ShellComponentEditorHooks, DraftEditorHooks => ShellDraftEditorHooks, ItemEditorHooks => ShellItemEditorHooks}
+import org.corespring.shell.controllers.player.actions.{PlayerHooks => ShellPlayerHooks}
+import org.corespring.shell.controllers.player.{SessionHooks => ShellSessionHooks}
+import org.corespring.shell.controllers.{S3Config, ShellAssets, ShellDataQueryHooks, editor => shellEditor}
+import org.corespring.shell.services.{ItemDraftService, ItemService, SessionService}
 import play.api.Mode.Mode
-import play.api.{ Configuration, Logger, Mode, Play }
+import play.api.{Configuration, Logger, Mode, Play}
 
 import scala.concurrent.ExecutionContext
 
@@ -105,7 +106,7 @@ class ContainerClientImplementation(
     mode,
     showNonReleasedComponents = configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev),
     editorDebounceInMillis = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000),
-    components = ComponentsConfig.fromConfig(mode, configuration.getConfig("components").getOrElse(Configuration.empty)),
+    components = ComponentsConfig.fromConfig(mode, resolveDomain(StaticPaths.assetUrl), configuration.getConfig("components").getOrElse(Configuration.empty)),
     player = V2PlayerConfig(
       rootUrl = configuration.getString("rootUrl"),
       newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) }),
