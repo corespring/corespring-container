@@ -18,7 +18,7 @@ class ComponentsFileControllerTest extends Specification {
       withGlobal = Some(new GlobalSettings {}))) {
       val controller = new ComponentsFileController(
         TestContext.containerContext,
-        ComponentsConfig(s"$rootPath/one", "", false, false))
+        ComponentsConfig(s"$rootPath/one", "", "", false, false))
       val result = controller.at("org", "component", "hello.txt")(FakeRequest("", "", FakeHeaders(), AnyContentAsEmpty))
       status(result) === OK
       contentAsString(result) === "hello"
