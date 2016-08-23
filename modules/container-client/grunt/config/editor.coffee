@@ -52,7 +52,7 @@ exports.css =
     'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700',
     'bower_components/corespring-math-input/dist/corespring-math-input.css',
-    'bower_components/mathquill/build/mathquill.css'
+    'bower_components/mathquill-build/build/mathquill.css'
   ])
   report: 'editor-css-report.json'
 
