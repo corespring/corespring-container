@@ -11,7 +11,13 @@ describe('ScoringPopupController', function() {
   var DesignerService = {
     loadAvailableUiComponents: jasmine.createSpy('loadAvailableUiComponents')
   };
-  var components = {'these': 'are', 'some': 'components'};
+  var components = {
+    'these': 'are',
+    'some': 'components'
+  };
+  var itemConfig = {
+    scoringType: 'allOrNothing'
+  };
   var xhtml = "<div>this is some <strong>markup!</strong></div>";
 
 
@@ -20,17 +26,20 @@ describe('ScoringPopupController', function() {
     DesignerService.loadAvailableUiComponents.calls.reset();
   });
 
+  beforeEach(angular.mock.module('corespring-common.services'));
   beforeEach(angular.mock.module('corespring-editor.controllers'));
 
   beforeEach(module(function($provide) {
     $provide.value('$modalInstance', $modalInstance);
     $provide.value('LogFactory', LogFactory);
     $provide.value('DesignerService', DesignerService);
+    $provide.value('itemConfig', itemConfig);
     $provide.value('components', components);
     $provide.value('xhtml', xhtml);
   }));
 
-  beforeEach(inject(function($rootScope, $compile) {
+  beforeEach(inject(function($rootScope, $compile, SCORING_TYPE) {
+    itemConfig.scoringType = SCORING_TYPE.ALL_OR_NOTHING;
     scope = $rootScope.$new();
     element = $compile('<div ng-controller="ScoringPopupController"></div>')(scope);
     scope = element.scope();
@@ -43,6 +52,10 @@ describe('ScoringPopupController', function() {
 
     it('should set componentSize to number of components', function() {
       expect(scope.componentSize).toEqual(scope.sizeToString(_.keys(components).length));
+    });
+
+    it('should set itemConfig', function() {
+      expect(scope.itemConfig).toEqual(itemConfig);
     });
 
     it('should set xhtml', function() {
@@ -85,8 +98,14 @@ describe('ScoringPopupController', function() {
 
   describe('onComponentsLoaded', function() {
     var uiComponents = {
-      interactions: {'these': 'are', 'some': 'interactions'},
-      widgets: {'and': 'these', 'are': 'widgets'}
+      interactions: {
+        'these': 'are',
+        'some': 'interactions'
+      },
+      widgets: {
+        'and': 'these',
+        'are': 'widgets'
+      }
     };
 
     beforeEach(function() {

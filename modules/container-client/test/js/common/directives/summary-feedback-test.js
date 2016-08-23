@@ -46,7 +46,7 @@ describe('summaryFeedback', function() {
 
   it('should initialize with feedback panel closed', function() {
     compile({ feedback: "I've got feedback!" });
-    expect($('.panel-body', element).hasClass('ng-hide')).toBe(true);
+    expect($('.panel-body', element).length).toBe(0);
   });
 
   it('should show feedback panel when panel heading is clicked', function() {

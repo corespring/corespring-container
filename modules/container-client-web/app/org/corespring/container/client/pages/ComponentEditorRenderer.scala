@@ -8,7 +8,7 @@ import org.corespring.container.client.pages.engine.JadeEngine
 import org.corespring.container.client.pages.processing.AssetPathProcessor
 import org.corespring.container.client.views.txt.js.ComponentEditorServices
 import play.api.Logger
-import play.api.libs.json.{ JsArray, Json }
+import play.api.libs.json.{JsObject, JsArray, Json}
 import play.api.templates.Html
 
 import scala.concurrent.Future
@@ -34,7 +34,7 @@ class ComponentEditorRenderer(
 
   implicit def ec = containerExecutionContext.context
 
-  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, queryParams: Map[String,String], prodMode: Boolean): Future[Html] = Future {
+  def render(componentBundle: SingleComponentScriptBundle, previewMode: String, clientOptions: ComponentEditorOptions, queryParams: Map[String,String], prodMode: Boolean, iconSet: String, colors: JsObject): Future[Html] = Future {
 
     logger.info(s"function=render, componentBundle=$componentBundle")
 
@@ -54,6 +54,8 @@ class ComponentEditorRenderer(
       "previewWidth" -> previewWidth.getOrElse(null),
       "js" -> js.toArray,
       "css" -> css.toArray,
+      "iconSet" -> iconSet,
+      "colors" -> Json.stringify(colors),
       "ngModules" -> jsArrayString(sources.js.ngModules ++ componentBundle.ngModules),
       "ngServiceLogic" -> inlineJs,
       "componentNgModules" -> "",

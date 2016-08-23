@@ -6,25 +6,18 @@
 
   var _ = root.corespring.require("lodash");
 
+  var SCORING_TYPE = {
+    ALL_OR_NOTHING: 'allOrNothing',
+    WEIGHTED: 'weighted'
+  };
+
+
   var ScoreProcessor = function() {
-
-    var weightForComponent = function(component) {
-      var weight = _.isUndefined(component.weight) ? 1 : component.weight;
-      var serverLogic = corespring.server.logic(component.componentType);
-      if (_.isFunction(serverLogic.isScoreable)) {
-        weight = serverLogic.isScoreable(component) ? weight : 0;
-      }
-
-      return weight;
-    };
 
     this.score = function(item, session, responses) {
 
       var maxPoints = _.reduce(item.components, function(result, component, key) {
         var weight = weightForComponent(component);
-        if (_.isUndefined(component.weight)) {
-          console.warn("no weight specified for component", component);
-        }
         var total = result + weight;
         return total;
       }, 0);
@@ -33,15 +26,19 @@
         return [key, scoreForComponent(value, responses[key])];
       }).zipObject().value();
 
-      function isNumber(x){
-        return !_.isNaN(x) && _.isNumber(x);
-      }
-
       var points = _.reduce(componentScores, function(result, value, key) {
         return result + (isNumber(value.weightedScore) ? value.weightedScore : 0 );
       }, 0);
 
       var percentage = Math.round(points / maxPoints * 1000) / 10;
+      
+      var scoringType = getScoringType(item);
+      if(scoringType === SCORING_TYPE.ALL_OR_NOTHING){
+        if(percentage < 100){
+          percentage = 0;
+          points = 0;
+        }
+      }
 
       return {
         summary: {
@@ -52,8 +49,29 @@
         components: componentScores
       };
     };
+    
+    function getScoringType(item){
+      switch(item.config ? item.config.scoringType : SCORING_TYPE.WEIGHTED){
+        case SCORING_TYPE.ALL_OR_NOTHING : return SCORING_TYPE.ALL_OR_NOTHING;
+        default: return SCORING_TYPE.WEIGHTED;
+      }        
+    }
 
-    var scoreForComponent = function(comp, response) {
+    function weightForComponent(component) {
+      var weight = 1;
+      if (_.isUndefined(component.weight) || isNaN(component.weight)) {
+        console.warn("no weight specified for component", component);
+      } else {
+        weight = component.weight;
+      }
+      var serverLogic = corespring.server.logic(component.componentType);
+      if (_.isFunction(serverLogic.isScoreable) && !serverLogic.isScoreable(component)) {
+        weight = 0;
+      }
+      return weight;
+    }
+
+    function scoreForComponent(comp, response) {
       if (!response) {
         return {
           weight: 0,
@@ -73,7 +91,13 @@
         score: response.score,
         weightedScore: weight * response.score
       };
-    };
+    }
+
+    function isNumber(x){
+      return !_.isNaN(x) && _.isNumber(x);
+    }
+
+
   };
 
   root.corespring.scoreProcessor = new ScoreProcessor();

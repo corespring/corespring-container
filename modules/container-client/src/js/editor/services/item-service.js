@@ -68,10 +68,11 @@ angular.module('corespring-editor.services').service('ItemService', [
         }
       };
 
-       this.saveXhtmlAndComponents = function(xhtml, components, onSuccess, onFailure){
-         var call = ItemUrls.saveXhtmlAndComponents;
+       this.saveConfigXhtmlAndComponents = function(config, xhtml, components, onSuccess, onFailure){
+         var call = ItemUrls.saveConfigXhtmlAndComponents;
 
          var data = {
+           config: config,
            xhtml: xhtml,
            components: components
          };

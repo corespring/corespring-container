@@ -8,7 +8,7 @@ import org.corespring.container.client.component._
 import org.corespring.container.client.controllers._
 import org.corespring.container.client.controllers.apps._
 import org.corespring.container.client.controllers.helpers.LoadClientSideDependencies
-import org.corespring.container.client.controllers.launcher.LauncherModules
+import org.corespring.container.client.controllers.launcher.{ LauncherModules }
 import org.corespring.container.client.controllers.resources._
 import org.corespring.container.client.integration.validation.Validator
 import org.corespring.container.client.io.ResourcePath

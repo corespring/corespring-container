@@ -12,6 +12,8 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
   class generatorScope(libJs: String = "libJs") extends Scope {
 
     val generator = new BaseGenerator with JsStringBuilder {
+
+      override def assetPath: String = ""
       override protected def libraryToJs(l: Library): String = libJs
 
       override def resource(path: String): Option[String] = {
@@ -63,6 +65,14 @@ class BaseGeneratorTest extends Specification with ComponentMaker {
         Widgets -> "",
         Layout -> "")
 
+    }
+
+    "compiles component less" in new generatorScope() {
+      val comp = uiComp("one", Seq.empty)
+      val comps = Seq(comp)
+
+      generator.less(comps).contains("@correct-background") === true
+      generator.less(comps, Json.obj("correct-background" -> "#abcdef")).contains("@correct-background: #abcdef") === true
     }
 
     "only loads libs and dependencies once - if the paths are the same" in new generatorScope() {

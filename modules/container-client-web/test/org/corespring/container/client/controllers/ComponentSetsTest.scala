@@ -1,24 +1,27 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.SourceGenerator
-import org.corespring.container.components.model.{Component, Id, Library}
+import org.corespring.container.client.component.{ ComponentsConfig, SourceGenerator }
+import org.corespring.container.components.model.{ Component, Id, Library }
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.DependencyResolver
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
-import play.api.mvc.{Action, EssentialAction, SimpleResult}
+import play.api.libs.json.{ JsObject, Json }
+import play.api.mvc.{ Action, EssentialAction, SimpleResult }
 import play.api.test.Helpers._
-import play.api.test.{FakeApplication, FakeRequest}
+import play.api.test.{ FakeApplication, FakeRequest }
 
 import scala.concurrent.Future
 
-class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
+class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
 
   sequential
 
   class MockSourceGenerator(name: String) extends SourceGenerator {
-    override def css(components: Seq[Component]): String = s"$name - css - ${components.map(_.componentType).mkString(",")}"
+    override def assetPath: String = ""
+
+    override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = s"@a:3; .something { color: @a; }"
 
     override def js(components: Seq[Component]): String = s"$name - js - ${components.map(_.componentType).mkString(",")}"
 
@@ -26,6 +29,8 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
   }
 
   val sets = new ComponentSets {
+
+    val componentsConfig = ComponentsConfig("", "", "", false, false)
 
     override def playerGenerator: SourceGenerator = new MockSourceGenerator("player")
 
@@ -72,6 +77,11 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
       contentAsString(result) === "player - js - org-name"
     }
 
+    "compile less resources" in running(FakeApplication(withGlobal = Some(mockGlobal))) {
+      val result: Future[SimpleResult] = sets.resource("player", "org[all]", "less")(FakeRequest("", "")).run
+      contentAsString(result) must contain("color: 3")
+    }
+
     "return js urls" in {
       sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
@@ -84,8 +94,8 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
       sets.jsUrl("editor", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("editor", "org[all]", "js").url)
     }
 
-    "return css urls" in {
-      sets.cssUrl("player", Seq(uiComp("name", Seq.empty)), false) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "css").url)
+    "return less urls" in {
+      sets.lessUrl("player", Seq(uiComp("name", Seq.empty)), false, Some("encodedColors")) === Seq(org.corespring.container.client.controllers.routes.ComponentSets.resource("player", "org[all]", "less").url + "?resourceToken=encodedColors")
     }
 
     "returns no url if no comps" in {
@@ -93,8 +103,9 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito{
     }
 
     "returns no url if no comps" in {
-      sets.cssUrl("editor", Seq.empty, false) === Seq.empty
+      sets.lessUrl("editor", Seq.empty, false, None) === Seq.empty
     }
+
   }
 
 }

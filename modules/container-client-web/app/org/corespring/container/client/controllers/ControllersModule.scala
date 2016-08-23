@@ -27,6 +27,7 @@ trait ControllersModule {
   def itemEditorHooks: ItemEditorHooks
   def draftEditorHooks: DraftEditorHooks
   def catalogHooks: CatalogHooks
+  def componentEditorHooks: ComponentEditorHooks
   def playerHooks: PlayerHooks
   def componentBundler: ComponentBundler
   def containerContext: ContainerExecutionContext

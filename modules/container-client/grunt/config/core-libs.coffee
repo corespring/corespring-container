@@ -13,6 +13,7 @@ exports.js = [
   'bower_components/jquery/dist/jquery(.min).js',
   'bower_components/jquery-ui/jquery-ui(.min).js',
   'bower_components/angular/angular(.min).js',
+  'bower_components/angular-animate/angular-animate(.min).js',
   'bower_components/lodash/dist/lodash(.min).js',
   'bower_components/angular-ui-sortable/sortable(.min).js',
   'bower_components/mathjs/dist/math(.min).js',

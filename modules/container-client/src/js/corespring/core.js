@@ -2,13 +2,22 @@
 
 (function(root) {
 
-  var ComponentDefinition = function(angular, compName, moduleName) {
+  var ComponentDefinition = function(angular, compName, moduleName, assetsPath) {
 
     var loadAngularModule = function(moduleName) {
       try {
         return angular.module(moduleName);
       } catch (e) {
-        return angular.module(moduleName, []);
+        var module = angular.module(moduleName, []);
+        var cdnVersion = "";
+        var versionMatch = assetsPath.match(/version=(\w+)/);
+        if (versionMatch) {
+          cdnVersion = versionMatch[1];
+          assetsPath = assetsPath.replace(/[?&]version=(\w+)/, '');
+        }
+        module.constant("ASSETS_PATH", assetsPath);
+        module.constant("ASSETS_PATH_VERSION", cdnVersion);
+        return module;
       }
     };
 
@@ -72,9 +81,9 @@
   var Client = function(angular) {
     var definitions = {};
 
-    this.component = function(directiveName, moduleName) {
+    this.component = function(directiveName, moduleName, assetsPath) {
       var fullyQualifiedName = moduleName + "-" + directiveName;
-      definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName);
+      definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName, assetsPath);
       return definitions[fullyQualifiedName];
     };
   };
@@ -92,7 +101,6 @@
       })(corespring.server.logic(compType), corespring.require)
      */
     this.logic = function(componentType) {
-
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
     };

@@ -1,13 +1,14 @@
-mixin modal(title, okLabel, showFooter)
+mixin modal(title, okLabel, showFooter, bodyClass)
   - okLabel = okLabel ? okLabel : 'Yes'
   - showFooter = showFooter == false ? false : true
+  - bodyClass = bodyClass ? bodyClass : 'modal-mixin-default'
   .modal-header
     button.close(type='button', ng-click="close ? close() : $dismiss()")
       span &times;
       span.sr-only Close
-    h4.modal-title= title 
-  .modal-body
-    block      
+    h4.modal-title= title
+  .modal-body(class="#{bodyClass}")
+    block
   if showFooter
     .modal-footer
       button.btn.btn-primary(type='button', ng-click="ok()", ng-disabled="okDisabled")= okLabel

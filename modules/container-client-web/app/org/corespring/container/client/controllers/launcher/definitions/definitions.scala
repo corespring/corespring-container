@@ -3,7 +3,7 @@ package org.corespring.container.client.controllers.launcher
 import org.corespring.container.client.V2PlayerConfig
 import org.corespring.container.client.hooks.PlayerJs
 import play.api.http.ContentTypes
-import play.api.libs.json.JsObject
+import play.api.libs.json.{ JsObject }
 import play.api.libs.json.Json._
 import play.api.mvc.{ Call, RequestHeader, Session, SimpleResult }
 
@@ -19,6 +19,7 @@ import org.corespring.container.client.controllers.launcher.Implicits._
 
 trait CorespringJsClient {
 
+  def initTimeout: Int
   def builder: JsBuilder
   def fileNames: Seq[String]
   def bootstrap: String
@@ -26,7 +27,8 @@ trait CorespringJsClient {
   def queryParams: Map[String, String]
 
   def src(corespringUrl: String) = {
-    builder.buildJs(corespringUrl, fileNames, options, bootstrap, queryParams)
+    val finalOpts = options.deepMerge(obj("initTimeout" -> initTimeout))
+    builder.buildJs(corespringUrl, fileNames, finalOpts, bootstrap, queryParams)
   }
 
   def result(corespringUrl: String): SimpleResult = {
@@ -36,12 +38,12 @@ trait CorespringJsClient {
 }
 
 private[launcher] object Catalog extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): Catalog = {
-    Catalog(builder, params(rh))
+  def apply(config: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): Catalog = {
+    Catalog(config.launchTimeout, builder, params(rh))
   }
 }
 
-private[launcher] case class Catalog(val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class Catalog(initTimeout: Int, val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   override def fileNames: Seq[String] = Seq("catalog.js")
 
   override def bootstrap: String =
@@ -57,12 +59,12 @@ private[launcher] case class Catalog(val builder: JsBuilder, queryParams: Map[St
 }
 
 private[launcher] object Player extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs, builder: JsBuilder): Player = {
-    Player(builder, params(rh), playerJs)
+  def apply(config: V2PlayerConfig, rh: RequestHeader, playerJs: PlayerJs, builder: JsBuilder): Player = {
+    Player(config.launchTimeout, builder, params(rh), playerJs)
   }
 }
 
-private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
+private[launcher] case class Player(initTimeout: Int, builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
   override lazy val fileNames: Seq[String] = Seq("player.js")
 
   override lazy val bootstrap: String =
@@ -97,12 +99,12 @@ private[launcher] case class Player(builder: JsBuilder, queryParams: Map[String,
 
 private[launcher] object ItemEditors extends LaunchCompanionUtils {
 
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ItemEditors = {
-    ItemEditors(builder, params(rh))
+  def apply(config: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ItemEditors = {
+    ItemEditors(config.launchTimeout, builder, params(rh))
   }
 }
 
-private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ItemEditors(initTimeout: Int, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
   import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
   import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
 
@@ -133,12 +135,12 @@ private[launcher] case class ItemEditors(builder: JsBuilder, queryParams: Map[St
 }
 
 private[launcher] object ComponentEditor extends LaunchCompanionUtils {
-  def apply(playerConfig: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ComponentEditor = {
-    ComponentEditor(builder, params(rh))
+  def apply(config: V2PlayerConfig, rh: RequestHeader, builder: JsBuilder): ComponentEditor = {
+    ComponentEditor(config.launchTimeout, builder, params(rh))
   }
 }
 
-private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+private[launcher] case class ComponentEditor(initTimeout: Int, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
 
   override val fileNames = Seq("draft.js", "component-editor.js")
 
@@ -176,7 +178,7 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
           "loadEditor" -> r.itemEditor.componentEditor(":itemId"),
           "upload" -> r.itemEditor.uploadFile(":itemId", ":filename"),
           "saveComponents" -> r.item.saveSubset(":itemId", "components"),
-          "saveXhtmlAndComponents" -> r.item.saveXhtmlAndComponents(":itemId"))),
+          "saveConfigXhtmlAndComponents" -> r.item.saveConfigXhtmlAndComponents(":itemId"))),
       "draftEditor" -> obj(
         "singleComponent" -> obj(
           "createWithSingleComponent" -> r.draft.createWithSingleComponent(":componentType"),
@@ -185,6 +187,6 @@ private[launcher] case class ComponentEditor(builder: JsBuilder, queryParams: Ma
           "loadEditor" -> r.draftEditor.componentEditor(":draftId"),
           "upload" -> r.draftEditor.uploadFile(":draftId", ":filename"),
           "saveComponents" -> r.draft.saveSubset(":draftId", "components"),
-          "saveXhtmlAndComponents" -> r.draft.saveXhtmlAndComponents(":draftId")))))
+          "saveConfigXhtmlAndComponents" -> r.draft.saveConfigXhtmlAndComponents(":draftId")))))
 
 }

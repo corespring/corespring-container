@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg preserveAspectRatio="xMinYMin meet" class="" version="1.1"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 44 40"
+	 style="enable-background:new 0 0 44 40;" xml:space="preserve">
+	<g>
+		<g>
+			<g>
+				<g>
+					<g>
+						<path class="correct-background" d="M24.5,21.7c-1.6,1.8-3.9,2.9-6.3,2.9s-4.8-1.1-6.3-2.9l-3,1.7c2.2,2.9,5.6,4.6,9.4,4.6
+							c3.7,0,7.1-1.7,9.4-4.6L24.5,21.7z"/>
+						<rect x="20.6" y="12" class="correct-background" width="4" height="5"/>
+						<rect x="11.5" y="12" class="correct-background" width="4" height="5"/>
+
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

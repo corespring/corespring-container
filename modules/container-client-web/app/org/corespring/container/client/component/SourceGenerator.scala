@@ -5,7 +5,9 @@ import org.corespring.container.client.views.txt.js.{ ComponentServerWrapper, Co
 import org.corespring.container.components.model._
 import org.corespring.container.components.model.packaging.ClientSideDependency
 import org.corespring.container.components.services.ComponentTypeFilter
-import play.api.libs.json.JsObject
+import play.api.libs.json.{ JsObject, JsValue, Json }
+import org.apache.commons.io.IOUtils
+import org.corespring.container.client.controllers.apps.StaticPaths
 
 object SourceGenerator {
   object Keys {
@@ -22,16 +24,18 @@ trait SourceGenerator
   extends ComponentTypeFilter
   with NameHelper {
 
+  def assetPath: String
+
   def js(components: Seq[Component]): String
 
-  def css(components: Seq[Component]): String
-
-  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
-    ComponentWrapper(moduleName, directiveName, src).toString
-  }
+  def less(components: Seq[Component], customColors: JsObject = Json.obj()): String
 
   def layoutToJs(layout: LayoutComponent): String = {
     layout.client.map(wrapClientLibraryJs(moduleName(layout.org, layout.name))).mkString("\n")
+  }
+
+  protected def wrapComponent(moduleName: String, directiveName: String, src: String) = {
+    ComponentWrapper(moduleName, directiveName, src, assetPath).toString
   }
 
   protected def libraryToJs(l: Library): String
@@ -58,7 +62,7 @@ trait SourceGenerator
   protected def wrapClientLibraryJs(moduleName: String)(src: LibrarySource) = {
     s"""
       // ----------------- ${src.name} ---------------------
-      ${ComponentWrapper(moduleName, src.name, src.source)}
+      ${ComponentWrapper(moduleName, src.name, src.source, assetPath)}
       """
   }
 
@@ -110,21 +114,31 @@ abstract class BaseGenerator
     allPaths.flatMap(loadLibrarySource)
   }
 
-  override def css(components: Seq[Component]): String = {
+  override def less(components: Seq[Component], customColors: JsObject = Json.obj()): String = {
+    val inputStream = this.getClass().getResourceAsStream("/public/components-common.less")
+    val commonLessSource = IOUtils.toString(inputStream)
+    inputStream.close
+    val commonLess = commonLessSource.mkString
     val (libraries, uiComps, layoutComps, widgets) = splitComponents(components)
-    val uiCss = uiComps.map(_.client.css.getOrElse("")).mkString("\n")
-    val widgetCss = widgets.map(_.client.css.getOrElse("")).mkString("\n")
-    val layoutCss = layoutComps.map(_.css.getOrElse("")).mkString("\n")
-    val libraryCss = libraries.map(_.css.getOrElse("")).mkString("\n")
+    val uiLess = uiComps.map(_.client.less.getOrElse("")).mkString("\n")
+    val widgetLess = widgets.map(_.client.less.getOrElse("")).mkString("\n")
+    val layoutLess = layoutComps.map(_.less.getOrElse("")).mkString("\n")
+    val libraryLess = libraries.map(_.less.getOrElse("")).mkString("\n")
     val dependencies = getClientSideDependencies(components)
     val styles = getStyles(dependencies).mkString("\n")
+    val dynamicColors = customColors.asOpt[Map[String, String]] match {
+      case Some(cols) => cols.map { case (a, b) => s"@$a: $b;" }.mkString("\n")
+      case _ => ""
+    }
     s"""
-    |$uiCss
-    |$widgetCss
-    |$layoutCss
-    |$libraryCss
-    |$styles
-    """.stripMargin
+       |$commonLess
+       |$dynamicColors
+       |$uiLess
+       |$widgetLess
+       |$layoutLess
+       |$libraryLess
+       |$styles
+        """.stripMargin
   }
 
   override def js(components: Seq[Component]): String = {

@@ -133,7 +133,7 @@ class MongoService(val collection: MongoCollection) {
   def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
   def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo)).as[JsObject]
 
-  def save(id: String, data: JsValue): Option[JsValue] = withQuery(id) {
+  def save(id: String, data: JsValue, upsert: Boolean = true): Option[JsValue] = withQuery(id) {
     q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
@@ -142,9 +142,12 @@ class MongoService(val collection: MongoCollection) {
       setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, true, false, WriteConcern.Safe)
+      val result = collection.update(q, d, upsert, false, WriteConcern.Safe)
 
-      if (result.getLastError(WriteConcern.Safe).ok()) {
+      if (result.getN() == 0) {
+        logger.warn(s"No db record written for: $id")
+        None
+      } else if (result.getLastError(WriteConcern.Safe).ok()) {
         Some(data.as[JsObject])
       } else {
         logger.warn(s"Error saving: $id")

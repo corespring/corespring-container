@@ -10,6 +10,7 @@ import org.specs2.mutable.Specification
 import org.specs2.specification.Scope
 import org.specs2.time.NoTimeConversions
 import play.api.Configuration
+import play.api.libs.json.Json
 import play.api.libs.json.Json._
 
 import scala.concurrent.{ Await, Future }
@@ -48,7 +49,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
       itemPreProcessor,
       versionInfo)
 
-    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls))
+    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls, "check", Json.obj()))
     lazy val captor = capture[Map[String, Any]]
     there was one(jadeEngine).renderJade(any[String], captor)
   }

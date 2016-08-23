@@ -109,7 +109,14 @@ angular.module('corespring-editor.directives')
         });
 
 
-        $scope.$watch('componentModel', function(newValue, oldValue) {
+        function debounce(fn) {
+          return _.debounce(function() {
+            fn();
+            $scope.$digest();
+          }, 200, {leading: false, trailing: true});
+        }
+
+        function watchComponentModel(newValue, oldValue) {
           if (_.isEqual(newValue, oldValue)) {
             logger.debug($scope.id, 'skip update - data is the same');
             return;
@@ -117,7 +124,9 @@ angular.module('corespring-editor.directives')
 
           $scope.componentModel = newValue;
           setDataAndSession();
-        }, true);
+        }
+
+        $scope.$watch('componentModel', _.debounce(watchComponentModel, 1000), true);
 
         $scope.$watch('componentModel.clean', function(clean) {
           $scope.showIcon = $scope.componentModel.isTool || ($scope.config && $scope.config.icon && clean);

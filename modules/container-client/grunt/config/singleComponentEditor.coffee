@@ -6,7 +6,6 @@ _ = require 'lodash'
 baseName = "singleComponentEditor"
 
 editorSrcs = [
-  'bower_components/angular-animate/angular-animate(.min).js',
   'bower_components/angular-bootstrap/ui-bootstrap-tpls(.min).js',
   'bower_components/angular-debounce/dist/angular-debounce(.min).js',
   'bower_components/angular-ui-ace/ui-ace(.min).js',
