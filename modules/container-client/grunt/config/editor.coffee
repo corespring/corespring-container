@@ -17,7 +17,7 @@ editorSrcs = [
   'bower_components/select2/select2(.min).js',
   'bower_components/undo.js/undo.js',
   'bower_components/wiggi-wiz/dist/wiggi-wiz.js',
-  'bower_components/mathquill/build/mathquill.js'
+  'bower_components/mathquill-build/build/mathquill.js'
   'bower_components/corespring-math-input/dist/corespring-math-input.js',
   'js/catalog/**/*.js',
   'js/common/**/*.js',
@@ -51,7 +51,7 @@ exports.css =
     'bower_components/components-font-awesome/css/font-awesome.min.css',
     '//fonts.googleapis.com/css?family=Ubuntu:300,400,500,500italic,700',
     'bower_components/corespring-math-input/dist/corespring-math-input.css',
-    'bower_components/mathquill/build/mathquill.css'
+    'bower_components/mathquill-build/build/mathquill.css'
   ])
   report: 'editor-css-report.json'
 
