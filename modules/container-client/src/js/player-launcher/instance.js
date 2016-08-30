@@ -38,16 +38,16 @@ function TimeoutError(errorCallback, timeout){
  * @param {node|selector} element - a jquery style selector - aka $(element) will return a jQuery wrapped node.
  * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
-var Instance = function(launchOpts, 
-element, 
-errorCallback, 
-log, 
-autosizeEnabled, 
+var Instance = function(launchOpts,
+element,
+errorCallback,
+log,
+autosizeEnabled,
 iframeScrollingEnabled,
 timeoutError) {
 
   launchOpts = launchOpts || {};
-  
+
   timeoutError = timeoutError || new TimeoutError(errorCallback, launchOpts.initTimeout);
   timeoutError.reset();
 
@@ -66,16 +66,16 @@ timeoutError) {
     function addForm() {
 
       var formParams = [];
-      
+
       for(var x in data){
 
         if(data[x] !== undefined){
 
           var d = data[x];
-          
+
           if(typeof(d) === 'object'){
             d = JSON.stringify(d);
-          } 
+          }
 
           var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
           formParams.push(p);
@@ -117,6 +117,21 @@ timeoutError) {
   var channel;
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
   var errorCodes = require('error-codes');
+
+  var scrollingInterval;
+  var stopScrolling = function() {
+    clearInterval(scrollingInterval);
+    scrollingInterval = undefined;
+  };
+  var keepScrolling = function($scrollable, delta) {
+    if (scrollingInterval) {
+      stopScrolling();
+    }
+    scrollingInterval = setInterval(function() {
+      var scrollTop = $scrollable.scrollTop();
+      $scrollable.scrollTop(scrollTop + delta);
+    }, 10);
+  };
 
   function $iframe() {
     var $node = $('#' + iframeUid);
@@ -175,14 +190,14 @@ timeoutError) {
     var iframeClose = '></iframe>';
 
     $(e).html(iframeOpen + iframeClose);
-    
+
     if (call.method === 'GET') {
        $(e).find('iframe').attr('src', url);
      } else if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
-    
+
     timeoutError.arm();
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
@@ -201,32 +216,38 @@ timeoutError) {
     });
 
     channel.on('ready', function(){
-      timeoutError.disarm(); 
+      timeoutError.disarm();
       channel.send('initialise', data);
     });
 
+    channel.on('autoScrollStop', function() {
+       stopScrolling();
+    });
     /**
      * If you want the main window to scroll,
      * send message "autoScroll" with the clientX/Y position
      * of the dragged element.
      */
     channel.on('autoScroll', function(clientPos) {
+
       var scrollAmount = 5;
-      var sensitiveAreaHeight = 200;
+      var sensitiveAreaHeight = 50;
 
       var $scrollable = $('.item-iframe-container');
       if($scrollable.length === 0){
-
         $scrollable = $('body');
       }
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
-      var viewportBottom = $scrollable.height();
+      var viewportBottom = window.innerHeight;
       var y = clientPos.y - scrollTop;
+
       if (y < viewportTop + sensitiveAreaHeight) {
-        $scrollable.scrollTop(scrollTop - scrollAmount);
+        keepScrolling($scrollable, -scrollAmount)
       } else if (y > viewportBottom - sensitiveAreaHeight) {
-        $scrollable.scrollTop(scrollTop + scrollAmount);
+        keepScrolling($scrollable, scrollAmount)
+      } else {
+        stopScrolling();
       }
     });
 
