@@ -21,7 +21,7 @@ describe('catalog launcher', function () {
   }
 
   beforeEach(function () {
-    mockInstance = {};
+    mockInstance = {remove: jasmine.createSpy('remove')};
     mockLauncher = new MockLauncher();
     corespring.mock.modules['client-launcher'] = function(){
       return mockLauncher;
@@ -58,6 +58,15 @@ describe('catalog launcher', function () {
     it('should call mkInstance if there is itemId', function () {
       create({itemId: '1'});
       expect(mockLauncher.loadInstance).toHaveBeenCalledWith({method: 'GET', url: 'catalog/:itemId'},{});
+    });
+  });
+
+  describe('remove', function(){
+    it('should call instance.remove', function(){
+      var catalog = create({itemId: '1'});
+      expect(mockInstance.remove).not.toHaveBeenCalled();
+      catalog.remove();
+      expect(mockInstance.remove).toHaveBeenCalled();
     });
   });
 
