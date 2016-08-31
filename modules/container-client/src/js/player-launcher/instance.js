@@ -243,9 +243,9 @@ timeoutError) {
       var y = clientPos.y - scrollTop;
 
       if (y < viewportTop + sensitiveAreaHeight) {
-        keepScrolling($scrollable, -scrollAmount)
+        keepScrolling($scrollable, -scrollAmount);
       } else if (y > viewportBottom - sensitiveAreaHeight) {
-        keepScrolling($scrollable, scrollAmount)
+        keepScrolling($scrollable, scrollAmount);
       } else {
         stopScrolling();
       }
