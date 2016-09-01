@@ -6,15 +6,18 @@ function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
   return {
     link: link,
     scope: {
-      "dimensionPropagatorOnUpdate": "="
+      'dimensionPropagator': '=',
+      'dimensionPropagatorOnUpdate': '='
     }
   };
 
-  function link(scope, $element) {
+  function link(scope, $element, attr) {
 
-    var highFrequencyDelay = 10;
-    var lowFrequencyDelay = 100;
-    var frequencyChangesAt = 2000;
+    var config = _.assign({
+      highFrequencyDelay: 10,
+      lowFrequencyDelay: 100,
+      frequencyChangesAt: 2000
+    }, scope.$eval(attr.dimensionPropagator));
 
     var counter = 0;
     var timeoutHandle;
@@ -45,7 +48,7 @@ function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
           counter++;
         }
       }
-      var delay = (counter * highFrequencyDelay < frequencyChangesAt) ? highFrequencyDelay : lowFrequencyDelay;
+      var delay = (counter * config.highFrequencyDelay < config.frequencyChangesAt) ? config.highFrequencyDelay : config.lowFrequencyDelay;
       timeoutHandle = $timeout(checkDimensions, delay);
     }
 
@@ -58,7 +61,7 @@ function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
     }
 
     function calculateHeight() {
-      var visible = $("body :visible");
+      var visible = $('body :visible');
       var max = 0;
       visible.each(function() {
         var rect = this.getBoundingClientRect();
@@ -66,8 +69,5 @@ function DimensionPropagator($log, $timeout, DimensionCalculator, Msgr) {
       });
       return max;
     }
-
-
-
   }
 }
