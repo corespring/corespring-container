@@ -237,11 +237,12 @@ timeoutError) {
       if($scrollable.length === 0){
         $scrollable = $('body');
       }
+
+      var iframeTop = $iframe().offset().top;
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
       var viewportBottom = window.innerHeight;
-      var y = clientPos.y - scrollTop;
-
+      var y = clientPos.y - scrollTop + iframeTop;
       if (y < viewportTop + sensitiveAreaHeight) {
         keepScrolling($scrollable, -scrollAmount);
       } else if (y > viewportBottom - sensitiveAreaHeight) {
