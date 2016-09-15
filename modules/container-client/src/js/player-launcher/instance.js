@@ -1,32 +1,31 @@
-
 /**
  * A class that handles triggering the timeout error.
  * Uses a global array so that it can clear timeouts across player instances.
  */
-function TimeoutError(errorCallback, timeout){
+function TimeoutError(errorCallback, timeout) {
   var errorCodes = require('error-codes');
 
   window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
 
-  this.arm = function(){
+  this.arm = function() {
 
     this.reset();
 
-    if(!isNaN(timeout) && timeout > 0){
-      var id = setTimeout(function(){
+    if (!isNaN(timeout) && timeout > 0) {
+      var id = setTimeout(function() {
         errorCallback(errorCodes.INITIALISATION_FAILED);
       });
       window._playerTimeoutErrorIds.push(id);
     }
   };
 
-  this.disarm = function(){
+  this.disarm = function() {
     this.reset();
   };
 
-  this.reset = function(){
+  this.reset = function() {
     window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
-    window._playerTimeoutErrorIds.forEach(function(id){
+    window._playerTimeoutErrorIds.forEach(function(id) {
       clearTimeout(id);
     });
     window._playerTimeoutErrorIds = [];
@@ -39,12 +38,13 @@ function TimeoutError(errorCallback, timeout){
  * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
 var Instance = function(launchOpts,
-element,
-errorCallback,
-log,
-autosizeEnabled,
-iframeScrollingEnabled,
-timeoutError) {
+                        element,
+                        errorCallback,
+                        log,
+                        autosizeEnabled,
+                        iframeScrollingEnabled,
+                        timeoutError,
+                        scrollContainer) {
 
   launchOpts = launchOpts || {};
 
@@ -67,17 +67,17 @@ timeoutError) {
 
       var formParams = [];
 
-      for(var x in data){
+      for (var x in data) {
 
-        if(data[x] !== undefined){
+        if (data[x] !== undefined) {
 
           var d = data[x];
 
-          if(typeof(d) === 'object'){
+          if (typeof(d) === 'object') {
             d = JSON.stringify(d);
           }
 
-          var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
+          var p = "<input type='hidden' name=\'" + x + "\' value=\'" + d + "\'></input>";
           formParams.push(p);
         }
       }
@@ -192,8 +192,8 @@ timeoutError) {
     $(e).html(iframeOpen + iframeClose);
 
     if (call.method === 'GET') {
-       $(e).find('iframe').attr('src', url);
-     } else if (call.method === 'POST') {
+      $(e).find('iframe').attr('src', url);
+    } else if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
@@ -215,13 +215,13 @@ timeoutError) {
       $iframe().addClass("player-loaded");
     });
 
-    channel.on('ready', function(){
+    channel.on('ready', function() {
       timeoutError.disarm();
       channel.send('initialise', data);
     });
 
     channel.on('autoScrollStop', function() {
-       stopScrolling();
+      stopScrolling();
     });
     /**
      * If you want the main window to scroll,
@@ -229,20 +229,20 @@ timeoutError) {
      * of the dragged element.
      */
     channel.on('autoScroll', function(clientPos) {
-
       var scrollAmount = 5;
       var sensitiveAreaHeight = 50;
+      var iframeRelativeTop = scrollContainer ? 0 : $iframe().position().top;
 
-      var $scrollable = $('.item-iframe-container');
-      if($scrollable.length === 0){
-        $scrollable = $('body');
+      var sc = scrollContainer || 'body';
+      var $scrollable = $(sc);
+      if ($scrollable.length === 0) {
+        // no scroll container found
+        return;
       }
-
-      var iframeTop = $iframe().offset().top;
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
-      var viewportBottom = window.innerHeight;
-      var y = clientPos.y - scrollTop + iframeTop;
+      var viewportBottom = Math.min(window.innerHeight, $scrollable.height());
+      var y = clientPos.y - scrollTop + iframeRelativeTop;
       if (y < viewportTop + sensitiveAreaHeight) {
         keepScrolling($scrollable, -scrollAmount);
       } else if (y > viewportBottom - sensitiveAreaHeight) {
@@ -252,9 +252,9 @@ timeoutError) {
       }
     });
 
-    channel.on('getScrollPosition', function(err, callback){
+    channel.on('getScrollPosition', function(err, callback) {
       var $scrollable = $('.item-iframe-container');
-      if($scrollable.length === 0){
+      if ($scrollable.length === 0) {
         $scrollable = $('body');
       }
       var scrollTop = $scrollable.scrollTop();
