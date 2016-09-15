@@ -231,7 +231,7 @@ var Instance = function(launchOpts,
     channel.on('autoScroll', function(clientPos) {
       var scrollAmount = 5;
       var sensitiveAreaHeight = 50;
-      var iframeTop = scrollContainer ? undefined : $iframe().position().top;
+      var iframeRelativeTop = scrollContainer ? 0 : $iframe().position().top;
 
       var sc = scrollContainer || 'body';
       var $scrollable = $(sc);
@@ -239,12 +239,10 @@ var Instance = function(launchOpts,
         // no scroll container found
         return;
       }
-      iframeTop = iframeTop || $scrollable.position().top;
-
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
       var viewportBottom = Math.min(window.innerHeight, $scrollable.height());
-      var y = clientPos.y - scrollTop + iframeTop;
+      var y = clientPos.y - scrollTop + iframeRelativeTop;
       if (y < viewportTop + sensitiveAreaHeight) {
         keepScrolling($scrollable, -scrollAmount);
       } else if (y > viewportBottom - sensitiveAreaHeight) {
