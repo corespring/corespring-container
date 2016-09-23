@@ -12,6 +12,7 @@ angular.module('corespring-editor.controllers')
     'Msgr',
     'WIGGI_EVENTS',
     'WiggiDialogLauncher',
+    '$state',
     function(
       $scope,
       $timeout,
@@ -24,7 +25,8 @@ angular.module('corespring-editor.controllers')
       MetadataService,
       Msgr,
       WIGGI_EVENTS,
-      WiggiDialogLauncher
+      WiggiDialogLauncher,
+      $state
     ) {
 
       "use strict";
@@ -33,6 +35,12 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemLoadError = onItemLoadError;
       $scope.onItemLoadSuccess = onItemLoadSuccess;
+      $scope.isTabVisible = function(tab) {
+        if ($scope.tabs && !_.isUndefined($scope.tabs[tab])) {
+          return $scope.tabs[tab];
+        }
+        return true;
+      };
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
@@ -53,6 +61,17 @@ angular.module('corespring-editor.controllers')
         });
       }
 
+      function updateTabs() {
+        var isTabVisible = function(tabName) {
+          var maybeTab = ($scope.tabs || {})[tabName];
+          return _.isUndefined(maybeTab) ? true : maybeTab;
+        };
+        if (!isTabVisible($state.current.name)) {
+          var tabOrder = ['question', 'profile', 'supporting-materials', 'metadata'];
+          var firstNotHiddenTab = _.find(tabOrder, isTabVisible);
+          $state.go(firstNotHiddenTab);
+        }
+      }
       function init() {
         if (iFrameService.isInIFrame() && !iFrameService.bypassIframeLaunchMechanism()) {
           Msgr.on('initialise', onInitialise);
@@ -72,13 +91,17 @@ angular.module('corespring-editor.controllers')
         }
 
 
+
+
         function onInitialise(data) {
           logger.log('on initialise', data);
           ConfigurationService.setConfig(data);
+          $scope.tabs = data.tabs;
           ItemService.load($scope.onItemLoadSuccess, $scope.onItemLoadError);
           //We need to trigger an ng digest as this event is outside the app's scope.
           $scope.$digest();
           Msgr.send('rendered');
+          updateTabs();
         }
       }
 
@@ -126,6 +149,12 @@ angular.module('corespring-editor.controllers')
         MetadataService.get($scope.item.itemId).then(function(result) {
           $scope.metadataSets = result;
         });
+
+        if (item.apiVersion == 1) {
+          $scope.tabs = $scope.tabs || {};
+          $scope.tabs.question = !!$scope.tabs.question;
+          updateTabs();
+        }
       }
 
       function onItemLoadError(err) {
