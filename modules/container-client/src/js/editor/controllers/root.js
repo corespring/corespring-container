@@ -35,12 +35,7 @@ angular.module('corespring-editor.controllers')
 
       $scope.onItemLoadError = onItemLoadError;
       $scope.onItemLoadSuccess = onItemLoadSuccess;
-      $scope.isTabVisible = function(tab) {
-        if ($scope.tabs && !_.isUndefined($scope.tabs[tab])) {
-          return $scope.tabs[tab];
-        }
-        return true;
-      };
+      $scope.isTabVisible = isTabVisible;
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
@@ -48,6 +43,11 @@ angular.module('corespring-editor.controllers')
       init();
 
       //-------------------------------
+
+      function isTabVisible(tab) {
+        var maybeTab = ($scope.tabs || {})[tab];
+        return _.isUndefined(maybeTab) ? true : maybeTab;
+      }
 
       function saveAll(done){
         logger.debug('saveAll...');
@@ -62,10 +62,6 @@ angular.module('corespring-editor.controllers')
       }
 
       function updateTabs() {
-        var isTabVisible = function(tabName) {
-          var maybeTab = ($scope.tabs || {})[tabName];
-          return _.isUndefined(maybeTab) ? true : maybeTab;
-        };
         if (!isTabVisible($state.current.name)) {
           var tabOrder = ['question', 'profile', 'supporting-materials', 'metadata'];
           var firstNotHiddenTab = _.find(tabOrder, isTabVisible);
