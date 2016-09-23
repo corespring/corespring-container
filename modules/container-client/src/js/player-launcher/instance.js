@@ -231,9 +231,11 @@ var Instance = function(launchOpts,
     channel.on('autoScroll', function(clientPos) {
       var scrollAmount = 5;
       var sensitiveAreaHeight = 50;
-      var iframeRelativeTop = scrollContainer ? 0 : $iframe().position().top;
+      var scrollContainerElement = (scrollContainer || {}).element;
+      var scrollContainerTop = (scrollContainer || {}).top;
+      var iframeRelativeTop = scrollContainerTop || (scrollContainerElement ? 0 : $iframe().position().top);
 
-      var sc = scrollContainer || 'body';
+      var sc = scrollContainerElement || 'body';
       var $scrollable = $(sc);
       if ($scrollable.length === 0) {
         // no scroll container found
