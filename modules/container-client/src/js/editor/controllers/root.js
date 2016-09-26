@@ -146,7 +146,7 @@ angular.module('corespring-editor.controllers')
           $scope.metadataSets = result;
         });
 
-        if (item.apiVersion == 1) {
+        if (item.apiVersion === 1) {
           $scope.tabs = $scope.tabs || {};
           $scope.tabs.question = !!$scope.tabs.question;
           updateTabs();
