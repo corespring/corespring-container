@@ -3,7 +3,7 @@ mixin info_btn(name)
     block
 
 mixin tab(label, name)
-  li(ui-sref-active="active")
+  li(ui-sref-active="active",ng-show="isTabVisible('#{name}')")
     a(ui-sref="#{name}", role='tab')= label
 
 mixin help

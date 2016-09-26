@@ -74,6 +74,15 @@ describe('item-editor', function(){
       .toHaveBeenCalledWith({method: 'GET', url: 'itemEditor.editor'}, undefined, {}, jasmine.any(Function));
     });
 
+    it('tabs are passed in to the launcher as initialData', function(){
+      var editor = new Editor('element', {itemId: 'itemId', tabs: {question: true}}, onError);
+      expect(mockLauncher.loadInstance)
+        .toHaveBeenCalledWith({
+          method: 'GET',
+          url: 'itemEditor.editor'
+        }, undefined, {tabs: {question: true}}, jasmine.any(Function));
+    });
+
     it('calls launcher.loadInstance with hash set to profile', function(){
       var editor = new Editor('element', {selectedTab: 'profile', itemId: 'itemId'}, onError);
       expect(mockLauncher.loadInstance)
