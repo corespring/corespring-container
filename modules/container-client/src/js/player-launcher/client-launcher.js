@@ -174,7 +174,15 @@ function ClientLauncher(element, options, errorCallback){
       queryParams: queryParams, 
       data: initialData};
     
-    var instance = new InstanceDef(launchOpts, element, errorCallback, logger, options.autosizeEnabled, options.iframeScrollingEnabled);
+    var instance = new InstanceDef(
+      launchOpts,
+      element,
+      errorCallback,
+      logger,
+      options.autosizeEnabled,
+      options.iframeScrollingEnabled,
+      undefined,
+      {element: options.scrollContainer, top: options.scrollContainerTop});
 
     instance.on('launch-error', function (data) {
       var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
