@@ -5,7 +5,7 @@ import org.corespring.container.components.services.DependencyResolver
 import org.corespring.container.js.api.{JavascriptProcessingException, ComponentServerLogic => ApiComponentServerLogic, CustomScoringJs => ApiCustomScoring}
 import org.corespring.container.js.processing.PlayerItemPreProcessor
 import org.corespring.container.js.response.OutcomeProcessor
-import org.mozilla.javascript.{Context, Scriptable, UniqueTag, Function => RhinoFunction}
+import org.mozilla.javascript.{Context, NativeObject, Scriptable, Undefined, UniqueTag, Function => RhinoFunction}
 import play.api.Logger
 import play.api.libs.json.{JsObject, JsValue, Json}
 import org.corespring.container.logging.ContainerLogger
@@ -81,6 +81,17 @@ class RhinoServerLogic(componentType: String, scope: Scriptable)
     val server = corespring.get("server", corespring).asInstanceOf[Scriptable]
     val logic = server.get("logic", server).asInstanceOf[RhinoFunction]
     val serverLogic = logic.call(ctx, scope, logic, Array(Context.javaToJS(componentType, scope)))
+
+    try {
+      val keys = serverLogic.asInstanceOf[NativeObject].keySet().toArray
+
+      if (keys.length == 0) {
+        logger.error(s"Server logic for $componentType contains no methods")
+      }
+    } catch {
+      case t : Throwable => logger.error(s"failed to read ServerLogic keys from $componentType")
+    }
+
     serverLogic.asInstanceOf[Scriptable]
   }
 

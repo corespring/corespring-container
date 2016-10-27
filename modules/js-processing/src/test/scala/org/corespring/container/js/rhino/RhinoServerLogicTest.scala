@@ -54,9 +54,11 @@ class RhinoServerLogicTest extends Specification with ComponentMaker {
     "return true if isScoreable is defined in the js and returns true" in new scope(scoreable(true)){
       serverLogic.isScoreable(obj(), obj(), obj()) must_== true
     }
+
     "return true if isScoreable is not defined" in new scope(""){
       serverLogic.isScoreable(obj(), obj(), obj()) must_== true
     }
+
   }
 
 }
