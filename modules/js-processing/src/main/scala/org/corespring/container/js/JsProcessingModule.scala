@@ -4,8 +4,7 @@ import com.softwaremill.macwire.MacwireMacros.wire
 import org.corespring.container.components.model.Component
 import org.corespring.container.components.outcome.ScoreProcessorSequence
 import org.corespring.container.components.services.DependencyResolver
-import org.corespring.container.js.outcome.RhinoDefaultScoreProcessor
-import org.corespring.container.js.rhino.score.CustomScoreProcessor
+import org.corespring.container.js.rhino.score.{CustomScoreProcessor}
 import org.corespring.container.js.rhino.{RhinoOutcomeProcessor, RhinoPlayerItemPreProcessor, RhinoScopeBuilder, RhinoServerLogic}
 import org.corespring.container.{components => interface}
 import org.mozilla.javascript.Scriptable
@@ -34,7 +33,6 @@ trait JsProcessingModule {
     }
   }
 
-  lazy val rhinoServerLogic : RhinoServerLogic = wire[RhinoServerLogic]
   private lazy val mainScoreProcessor : RhinoDefaultScoreProcessor = wire[RhinoDefaultScoreProcessor]
   lazy val scoreProcessor: interface.outcome.ScoreProcessor = new ScoreProcessorSequence(mainScoreProcessor, CustomScoreProcessor)
   lazy val playerItemPreProcessor: interface.processing.PlayerItemPreProcessor = wire[RhinoPlayerItemPreProcessor]
