@@ -96,7 +96,7 @@ class DefaultScoreProcessorTest extends Specification {
       (item, responses) must GenerateOutcome(expected)
     }
 
-    "filters non scoreable components" in {
+    "scores null non scoreable components" in {
 
       val item = """{
              "components": {
@@ -113,7 +113,8 @@ class DefaultScoreProcessorTest extends Specification {
          {
            "summary" : { "maxPoints" : 1, "points" : 0.4, "percentage" : 40.0 },
            "components" : {
-             "1" : { "weight" : 1, "score" : 0.4, "weightedScore" : 0.4}
+             "1" : { "weight" : 1, "score" : 0.4, "weightedScore" : 0.4},
+             "2" : { "weight" : 0, "score" : null}
            }
          }"""
 
