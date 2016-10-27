@@ -54,12 +54,18 @@ describe('editor root', function() {
       get: function() {}
     };
 
+    $state = {
+      current: {name: 'question'},
+      go: jasmine.createSpy('go')
+    };
+
     LogFactory = new org.corespring.mocks.editor.LogFactory();
     editorDebounce = {
       flush: jasmine.createSpy('flush')
     };
 
     $provide.value('$timeout', function(fn){fn();});
+    $provide.value('$state', $state);
     $provide.value('ConfigurationService', ConfigurationService);
     $provide.value('ItemService', ItemService);
     $provide.value('MetadataService', MetadataService);

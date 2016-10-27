@@ -40,19 +40,13 @@ function EditorDefinition(element, options, errorCallback) {
 
     var initialData = {};
     options = options || {};
-
-    if (options.showSaveMessage) {
-      initialData.showSaveMessage = options.showSaveMessage;
+    var propsToCopy = ['showSaveMessage', 'hideSaveButton', 'profileConfig', 'tabs'];
+    for (var i = 0; i < propsToCopy.length; i++) {
+      var prop = propsToCopy[i];
+      if (options[prop]) {
+        initialData[prop] = options[prop];
+      }
     }
-
-    if (options.hideSaveButton) {
-      initialData.hideSaveButton = options.hideSaveButton;
-    }
-
-    if (options.profileConfig) {
-      initialData.profileConfig = options.profileConfig;
-    }
-
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
 
     if (typeof(options.onItemChanged) === 'function') {

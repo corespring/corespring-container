@@ -70,13 +70,12 @@ function EditorDefinition(element, options, errorCallback) {
     }
 
     var initialData = {};
-
-    if(options.showSaveMessage){
-      initialData.showSaveMessage = options.showSaveMessage;
-    }
-
-    if(options.profileConfig){
-      initialData.profileConfig = options.profileConfig;
+    var propsToCopy = ['showSaveMessage', 'profileConfig', 'tabs'];
+    for (var i = 0; i < propsToCopy.length; i++) {
+      var prop = propsToCopy[i];
+      if (options[prop]) {
+        initialData[prop] = options[prop];
+      }
     }
 
     function onReady(instance){

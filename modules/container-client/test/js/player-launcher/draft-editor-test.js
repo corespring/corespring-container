@@ -151,6 +151,18 @@ describe('draft-editor', function() {
               jasmine.any(Function));
           }));
 
+        it('tabs are passed in to the launcher as initialData', assertLoadInstance({
+            tabs: {question: true}
+          },
+          function(call) {
+            expect(mockLauncher.loadInstance).toHaveBeenCalledWith(
+              jasmine.any(Object),
+              undefined,
+              {tabs: {question: true}},
+              jasmine.any(Function));
+          }));
+
+
         it('calls loadInstance with queryParams', assertLoadInstance({
             queryParams: {
               a: 'a'

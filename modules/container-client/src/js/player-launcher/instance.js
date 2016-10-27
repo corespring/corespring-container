@@ -1,32 +1,31 @@
-
 /**
  * A class that handles triggering the timeout error.
  * Uses a global array so that it can clear timeouts across player instances.
  */
-function TimeoutError(errorCallback, timeout){
+function TimeoutError(errorCallback, timeout) {
   var errorCodes = require('error-codes');
 
   window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
 
-  this.arm = function(){
+  this.arm = function() {
 
     this.reset();
 
-    if(!isNaN(timeout) && timeout > 0){
-      var id = setTimeout(function(){
+    if (!isNaN(timeout) && timeout > 0) {
+      var id = setTimeout(function() {
         errorCallback(errorCodes.INITIALISATION_FAILED);
       });
       window._playerTimeoutErrorIds.push(id);
     }
   };
 
-  this.disarm = function(){
+  this.disarm = function() {
     this.reset();
   };
 
-  this.reset = function(){
+  this.reset = function() {
     window._playerTimeoutErrorIds = window._playerTimeoutErrorIds || [];
-    window._playerTimeoutErrorIds.forEach(function(id){
+    window._playerTimeoutErrorIds.forEach(function(id) {
       clearTimeout(id);
     });
     window._playerTimeoutErrorIds = [];
@@ -38,16 +37,17 @@ function TimeoutError(errorCallback, timeout){
  * @param {node|selector} element - a jquery style selector - aka $(element) will return a jQuery wrapped node.
  * @param {object}  call -  { url: '', method: '', params: {}, hash: ''}
  */
-var Instance = function(launchOpts, 
-element, 
-errorCallback, 
-log, 
-autosizeEnabled, 
-iframeScrollingEnabled,
-timeoutError) {
+var Instance = function(launchOpts,
+                        element,
+                        errorCallback,
+                        log,
+                        autosizeEnabled,
+                        iframeScrollingEnabled,
+                        timeoutError,
+                        scrollContainer) {
 
   launchOpts = launchOpts || {};
-  
+
   timeoutError = timeoutError || new TimeoutError(errorCallback, launchOpts.initTimeout);
   timeoutError.reset();
 
@@ -66,18 +66,18 @@ timeoutError) {
     function addForm() {
 
       var formParams = [];
-      
-      for(var x in data){
 
-        if(data[x] !== undefined){
+      for (var x in data) {
+
+        if (data[x] !== undefined) {
 
           var d = data[x];
-          
-          if(typeof(d) === 'object'){
-            d = JSON.stringify(d);
-          } 
 
-          var p = "<input type='hidden' name=\'"+x+"\' value=\'"+d+"\'></input>";
+          if (typeof(d) === 'object') {
+            d = JSON.stringify(d);
+          }
+
+          var p = "<input type='hidden' name=\'" + x + "\' value=\'" + d + "\'></input>";
           formParams.push(p);
         }
       }
@@ -117,6 +117,21 @@ timeoutError) {
   var channel;
   var iframeUid = 'corespring-iframe-' + msgr.utils.getUid();
   var errorCodes = require('error-codes');
+
+  var scrollingInterval;
+  var stopScrolling = function() {
+    clearInterval(scrollingInterval);
+    scrollingInterval = undefined;
+  };
+  var keepScrolling = function($scrollable, delta) {
+    if (scrollingInterval) {
+      stopScrolling();
+    }
+    scrollingInterval = setInterval(function() {
+      var scrollTop = $scrollable.scrollTop();
+      $scrollable.scrollTop(scrollTop + delta);
+    }, 10);
+  };
 
   function $iframe() {
     var $node = $('#' + iframeUid);
@@ -175,14 +190,14 @@ timeoutError) {
     var iframeClose = '></iframe>';
 
     $(e).html(iframeOpen + iframeClose);
-    
+
     if (call.method === 'GET') {
-       $(e).find('iframe').attr('src', url);
-     } else if (call.method === 'POST') {
+      $(e).find('iframe').attr('src', url);
+    } else if (call.method === 'POST') {
       var post = new PostForm(url);
       post.load();
     }
-    
+
     timeoutError.arm();
 
     channel = new msgr.Channel(window, $iframe()[0].contentWindow, {
@@ -200,11 +215,14 @@ timeoutError) {
       $iframe().addClass("player-loaded");
     });
 
-    channel.on('ready', function(){
-      timeoutError.disarm(); 
+    channel.on('ready', function() {
+      timeoutError.disarm();
       channel.send('initialise', data);
     });
 
+    channel.on('autoScrollStop', function() {
+      stopScrolling();
+    });
     /**
      * If you want the main window to scroll,
      * send message "autoScroll" with the clientX/Y position
@@ -212,27 +230,33 @@ timeoutError) {
      */
     channel.on('autoScroll', function(clientPos) {
       var scrollAmount = 5;
-      var sensitiveAreaHeight = 200;
+      var sensitiveAreaHeight = 50;
+      var scrollContainerElement = (scrollContainer || {}).element;
+      var scrollContainerTop = (scrollContainer || {}).top;
+      var iframeRelativeTop = scrollContainerTop || (scrollContainerElement ? 0 : $iframe().position().top);
 
-      var $scrollable = $('.item-iframe-container');
-      if($scrollable.length === 0){
-
-        $scrollable = $('body');
+      var sc = scrollContainerElement || 'body';
+      var $scrollable = $(sc);
+      if ($scrollable.length === 0) {
+        // no scroll container found
+        return;
       }
       var scrollTop = $scrollable.scrollTop();
       var viewportTop = 0;
-      var viewportBottom = $scrollable.height();
-      var y = clientPos.y - scrollTop;
+      var viewportBottom = Math.min(window.innerHeight, $scrollable.height());
+      var y = clientPos.y - scrollTop + iframeRelativeTop;
       if (y < viewportTop + sensitiveAreaHeight) {
-        $scrollable.scrollTop(scrollTop - scrollAmount);
+        keepScrolling($scrollable, -scrollAmount);
       } else if (y > viewportBottom - sensitiveAreaHeight) {
-        $scrollable.scrollTop(scrollTop + scrollAmount);
+        keepScrolling($scrollable, scrollAmount);
+      } else {
+        stopScrolling();
       }
     });
 
-    channel.on('getScrollPosition', function(err, callback){
+    channel.on('getScrollPosition', function(err, callback) {
       var $scrollable = $('.item-iframe-container');
-      if($scrollable.length === 0){
+      if ($scrollable.length === 0) {
         $scrollable = $('body');
       }
       var scrollTop = $scrollable.scrollTop();
