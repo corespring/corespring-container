@@ -182,7 +182,7 @@ function ClientLauncher(element, options, errorCallback){
       options.autosizeEnabled,
       options.iframeScrollingEnabled,
       undefined,
-      {element: options.scrollContainer, top: options.scrollContainerTop});
+      {element: options.scrollContainer, top: options.scrollContainerTop, headerHeight: options.scrollContainerHeaderHeight});
 
     instance.on('launch-error', function (data) {
       var error = errorCodes.EXTERNAL_ERROR(data.code + ': ' + data.detailedMessage);
