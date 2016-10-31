@@ -131,7 +131,7 @@ var Instance = function(launchOpts,
       var scrollTop = $scrollable.scrollTop();
       $scrollable.scrollTop(scrollTop + delta);
 
-      if (scrollTop == 0) {
+      if (scrollTop === 0) {
         stopScrolling();
       }
     }, 10);
