@@ -15,7 +15,7 @@ block header-scripts
     <!-- new relic disabled -->
 
 block content
-  .root(ng-controller="CatalogRoot", dimension-propagator='')
+  .root(ng-controller="CatalogRoot", dimension-propagator='{highFrequencyDelay: 300, lowFrequencyDelay: 1000}')
     div(question-information="", tabs="tabs", ng-model="item")
 
 block after-main-script
