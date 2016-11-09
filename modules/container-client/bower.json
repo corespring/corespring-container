@@ -93,6 +93,6 @@
     "angular-bootstrap": "~0.12.0",
     "bootstrap": "~3.2.0",
     "jquery": "1.11.0",
-    "mathquill-build": "0.10.0.a"
+    "mathquill-build": "v0.10.0.a"
   }
 }
