@@ -130,6 +130,10 @@ var Instance = function(launchOpts,
     scrollingInterval = setInterval(function() {
       var scrollTop = $scrollable.scrollTop();
       $scrollable.scrollTop(scrollTop + delta);
+
+      if (scrollTop === 0) {
+        stopScrolling();
+      }
     }, 10);
   };
 
@@ -233,17 +237,21 @@ var Instance = function(launchOpts,
       var sensitiveAreaHeight = 50;
       var scrollContainerElement = (scrollContainer || {}).element;
       var scrollContainerTop = (scrollContainer || {}).top;
-      var iframeRelativeTop = scrollContainerTop || (scrollContainerElement ? 0 : $iframe().position().top);
+      var iframeRelativeTop = scrollContainerTop || (scrollContainerElement ? 0 : $iframe().offset().top);
+      var headerHeight = (scrollContainer || {}).headerHeight || 0;
 
-      var sc = scrollContainerElement || 'body';
+      // Need to default the scrollable element to window instead of body because of Firefox scrolltop behavior in standards mode
+      var sc = scrollContainerElement || window;
       var $scrollable = $(sc);
-      if ($scrollable.length === 0) {
+
+      var bodyOrElement = $(scrollContainerElement || 'body');
+      if (bodyOrElement.length === 0) {
         // no scroll container found
         return;
       }
       var scrollTop = $scrollable.scrollTop();
-      var viewportTop = 0;
-      var viewportBottom = Math.min(window.innerHeight, $scrollable.height());
+      var viewportTop = headerHeight;
+      var viewportBottom = Math.min(window.innerHeight, bodyOrElement.height()) - headerHeight;
       var y = clientPos.y - scrollTop + iframeRelativeTop;
       if (y < viewportTop + sensitiveAreaHeight) {
         keepScrolling($scrollable, -scrollAmount);

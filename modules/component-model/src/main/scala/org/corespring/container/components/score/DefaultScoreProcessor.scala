@@ -2,7 +2,7 @@ package org.corespring.container.components.outcome
 
 import org.corespring.container.components.score.ScoringType
 import org.corespring.container.logging.ContainerLogger
-import play.api.libs.json.{ JsNumber, JsObject, JsValue, Json }
+import play.api.libs.json._
 
 trait DefaultScoreProcessor extends ScoreProcessor {
 
@@ -21,11 +21,9 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     val scoringType: String = (item \ "config" \ "scoringType").asOpt[String].getOrElse(ScoringType.WEIGHTED)
     logger.trace(s"scoringType: $scoringType")
 
-    lazy val scoreableComponents: Seq[(String, JsValue)] = (item \ "components").asOpt[JsObject].map { c =>
-
+    val scoreableComponents: Seq[(String, JsValue)] = (item \ "components").asOpt[JsObject].map { c =>
       c.fields.flatMap {
         case (key, json) =>
-
           require((json \ "componentType").asOpt[String].isDefined, "No component type specified")
 
           for {
@@ -41,15 +39,19 @@ trait DefaultScoreProcessor extends ScoreProcessor {
       throw new RuntimeException(s"Json has no components field: ${Json.stringify(item)}")
     }
 
+    val unscorableComponents: Seq[(String, JsValue)] = (item \ "components").asOpt[JsObject]
+      .getOrElse(throw new RuntimeException(s"Json has no components field: ${Json.stringify(item)}"))
+        .fields.filterNot { case (key, _) => scoreableComponents.map(_._1).contains(key) }
+
     logger.trace(s"scoreable components: ${Json.stringify(JsObject(scoreableComponents))}")
 
     val weights: Seq[(String, Int)] = scoreableComponents.map {
       case (key, json) =>
         logger.trace(s"model for: $key")
         (key, (json \ "weight").asOpt[Int].getOrElse(1))
-    }.toSeq
+    }
 
-    val componentScores = scoreableComponents.foldRight[JsObject](Json.obj()) {
+    val scoredScores = scoreableComponents.foldRight[JsObject](Json.obj()) {
       (tuple: (String, JsValue), acc: JsObject) =>
         val (key, _) = tuple
         val weight = weights.find(_._1 == key).map(_._2).getOrElse(-1)
@@ -64,8 +66,17 @@ trait DefaultScoreProcessor extends ScoreProcessor {
           "weightedScore" -> JsNumber(weightedScore)))
     }
 
+    val componentScores = unscorableComponents.foldRight(scoredScores) {
+      (tuple: (String, JsValue), acc: JsObject) =>
+        val (key, _) = tuple
+        acc ++ Json.obj(key -> Json.obj(
+          "weight" -> 0,
+          "score" -> JsNull
+        ))
+    }
+
     val maxPoints = weights.map(_._2).fold(0)(_ + _)
-    val points = getSumOfWeightedScores(componentScores)
+    val points = getSumOfWeightedScores(scoredScores)
     val rawPercentage: BigDecimal = if (maxPoints == 0) 0 else (points / maxPoints) * 100
     val percentage = decimalize(rawPercentage, 1)
 
@@ -91,8 +102,8 @@ trait DefaultScoreProcessor extends ScoreProcessor {
     Json.obj("summary" -> summary, "components" -> componentScores)
   }
 
-  def getSumOfWeightedScores(componentScores: JsObject) = {
-    componentScores.fields.map(fs => (fs._2 \ "weightedScore").as[BigDecimal]).foldRight[BigDecimal](0)(_ + _)
+  def getSumOfWeightedScores(scoredScores: JsObject) = {
+    scoredScores.fields.map(fs => (fs._2 \ "weightedScore").asOpt[BigDecimal]).flatten.foldRight[BigDecimal](0)(_ + _)
   }
 
 }
