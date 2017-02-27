@@ -206,6 +206,27 @@ describe('editor root', function() {
     });
   });
 
+  describe('Item error event', function() {
+    var errorMessage = 'Error message';
+    beforeEach(function() {
+      Msgr.send = jasmine.createSpy('send');
+      scope.$emit('itemError', errorMessage);
+    });
+    it('should be forwarded to the outside world via Msgr', function() {
+      expect(Msgr.send).toHaveBeenCalledWith('itemError', errorMessage);
+    });
+  });
+
+  describe('Clear item error event', function() {
+    beforeEach(function() {
+      Msgr.send = jasmine.createSpy('send');
+      scope.$emit('clearItemError');
+    });
+    it('should be forwarded to the outside world via Msgr', function() {
+      expect(Msgr.send).toHaveBeenCalledWith('clearItemError', undefined);
+    });
+  });
+
   describe('onItemLoadError', function() {
     var message = "hey there was an error";
 

@@ -261,6 +261,34 @@ describe('DevEditorRoot', function() {
           expect(Msgr.send).toHaveBeenCalledWith('itemChanged', {partChanged: 'components'});
         });
       });
+
+      describe('with id not in xhtml', function() {
+        var json = '{"1": {}}';
+        beforeEach(function() {
+          scope.components = JSON.parse(json);
+          scope.xhtml = "<div></div>";
+          scope.$digest();
+        });
+
+        it('should send an itemError event', function() {
+          expect(Msgr.send).toHaveBeenCalledWith('itemError', jasmine.any(String));
+        });
+
+      });
+
+      describe('with id in xhtml', function() {
+        var json = '{"1": {}}';
+        beforeEach(function() {
+          scope.components = JSON.parse(json);
+          scope.xhtml = "<div id='1'></div>";
+          scope.$digest();
+        });
+
+        it('should send an clearItemError event', function() {
+          expect(Msgr.send).toHaveBeenCalledWith('clearItemError', jasmine.any(Object));
+        });
+      });
+
     });
 
   });
@@ -294,6 +322,7 @@ describe('DevEditorRoot', function() {
       });
 
     });
+
   });
 
   describe('onItemLoadError', function() {
@@ -306,6 +335,8 @@ describe('DevEditorRoot', function() {
       expect(window.alert).toHaveBeenCalledWith(jasmine.any(String));
     });
   });
+
+
 
   describe('registerComponent event', function() {
     var id = 1234;
