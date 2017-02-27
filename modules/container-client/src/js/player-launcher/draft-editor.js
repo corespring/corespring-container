@@ -55,6 +55,18 @@ function EditorDefinition(element, options, errorCallback) {
       });
     }
 
+    if (typeof(options.onItemError) === 'function') {
+      instance.on('itemError', function(data) {
+        options.onItemError(data);
+      });
+    }
+
+    if (typeof(options.onClearItemError) === 'function') {
+      instance.on('clearItemError', function(data) {
+        options.onClearItemError(data);
+      })
+    }
+
     function onReady(instance) {
       if (options.devEditor) {
         instance.css('height', '100%');

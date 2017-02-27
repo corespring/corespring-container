@@ -77,7 +77,28 @@ angular.module('corespring-dev-editor.controllers')
         }
       }
 
+      function getOrphans() {
+        try {
+          var idsFromXhtml = _.reject($($scope.xhtml).map(function() {
+            return this.id;
+          }).get(), _.isEmpty);
+          return _($scope.components).keys().filter(function(id) {
+            return idsFromXhtml.indexOf(id) < 0;
+          }).value();
+        } catch (e) {
+          console.log(e);
+        }
+        return [];
+      }
+
       function updateItemChanged(){
+        var orphans = getOrphans();
+        if (_.isEmpty(orphans)) {
+          Msgr.send('clearItemError', {});
+        } else {
+          Msgr.send('itemError', "The following items in the JSON are missing ids in the xhtml: " + orphans.join(', '));
+        }
+
         var partsChanged = [];
         if (componentsHaveBeenChanged()) {
           partsChanged.push('components');
@@ -135,6 +156,7 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function saveXhtmlIfChanged() {
+        console.log('xhtml changed');
         if (xhtmlHasBeenChanged()) {
           $scope.item.xhtml = $scope.xhtml;
           ItemService.saveXhtml($scope.item.xhtml, function() {
