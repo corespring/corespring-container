@@ -82,8 +82,6 @@ angular.module('corespring-dev-editor.controllers')
           var idsFromXhtml = _.reject($($scope.xhtml).map(function() {
             return this.id;
           }).get(), _.isEmpty);
-          console.log('$scope.components', JSON.stringify($scope.components, null, 2));
-          console.log(_($scope.components).keys());
           return _($scope.components).keys().filter(function(id) {
             return idsFromXhtml.indexOf(id) < 0;
           }).value();
