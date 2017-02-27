@@ -87,8 +87,8 @@ angular.module('corespring-dev-editor.controllers')
           }).value();
         } catch (e) {
           console.log(e);
+          return [];
         }
-        return [];
       }
 
       function updateItemChanged(){
@@ -156,7 +156,6 @@ angular.module('corespring-dev-editor.controllers')
       }
 
       function saveXhtmlIfChanged() {
-        console.log('xhtml changed');
         if (xhtmlHasBeenChanged()) {
           $scope.item.xhtml = $scope.xhtml;
           ItemService.saveXhtml($scope.item.xhtml, function() {
