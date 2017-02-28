@@ -263,9 +263,9 @@ describe('DevEditorRoot', function() {
       });
 
       describe('with id not in xhtml', function() {
-        var json = '{"1": {}}';
+        var components = {"1": {}};
         beforeEach(function() {
-          scope.components = JSON.parse(json);
+          scope.components = components;
           scope.xhtml = "<div></div>";
           scope.$digest();
         });
@@ -277,9 +277,9 @@ describe('DevEditorRoot', function() {
       });
 
       describe('with id in xhtml', function() {
-        var json = '{"1": {}}';
+        var components = {"1": {}};
         beforeEach(function() {
-          scope.components = JSON.parse(json);
+          scope.components = components;
           scope.xhtml = "<div id='1'></div>";
           scope.$digest();
         });
