@@ -85,12 +85,10 @@ angular.module('corespring-dev-editor.controllers')
           try {
             var idsFromXhtml = _.reject($('<div>' + $scope.xhtml.toString() + '</div>').find('*').map(function(i, node) {
               return node.id; }).get(), _.isEmpty);
-            console.log('idsFromXhtml');
             return _($scope.components).keys().filter(function(id) {
               return idsFromXhtml.indexOf(id) < 0;
             }).value();
           } catch (e) {
-            console.log(e);
             return [];
           }
         }
