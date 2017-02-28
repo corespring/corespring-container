@@ -79,10 +79,13 @@ angular.module('corespring-dev-editor.controllers')
 
       function getError() {
         function getOrphans() {
+          if ($scope.xhtml === undefined) {
+            return undefined;
+          }
           try {
-            var idsFromXhtml = _.reject($($scope.xhtml).map(function() {
-              return this.id;
-            }).get(), _.isEmpty);
+            var idsFromXhtml = _.reject($('<div>' + $scope.xhtml.toString() + '</div>').find('*').map(function(i, node) {
+              return node.id; }).get(), _.isEmpty);
+            console.log('idsFromXhtml');
             return _($scope.components).keys().filter(function(id) {
               return idsFromXhtml.indexOf(id) < 0;
             }).value();
@@ -103,8 +106,10 @@ angular.module('corespring-dev-editor.controllers')
       function updateItemChanged(){
         var error = getError();
         if (_.isEmpty(error)) {
+          console.log('sending clear');
           Msgr.send('clearItemError', {});
         } else {
+          console.log('sending error');
           Msgr.send('itemError', error);
         }
 
