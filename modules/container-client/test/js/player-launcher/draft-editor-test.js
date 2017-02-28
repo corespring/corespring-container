@@ -10,6 +10,7 @@ describe('draft-editor', function() {
 
     console.log('new launcher and instance..');
     mockInstance = new org.corespring.mocks.launcher.MockInstance();
+    mockInstance.on = jasmine.createSpy('on');
     var MockLauncher = org.corespring.mocks.launcher.MockLauncher(mockInstance);
     mockLauncher = new MockLauncher();
 
@@ -270,11 +271,13 @@ describe('draft-editor', function() {
 
           opts = {
             onItemCreated: jasmine.createSpy('onItemCreated'),
+            onItemChanged: jasmine.createSpy('onItemChanged'),
             onDraftCreated: jasmine.createSpy('onDraftCreated'),
+            onItemError: jasmine.createSpy('onItemError'),
+            onClearItemError: jasmine.createSpy('onClearItemError'),
             iframe: {contentWindow: {}}
           };
-          var editor = new DraftEditor('element', opts, onError);
-          
+          new DraftEditor('element', opts, onError);
         });
 
         it('calls options.onItemCreated when $.ajax is successful',
@@ -287,6 +290,18 @@ describe('draft-editor', function() {
             expect(opts.onDraftCreated).toHaveBeenCalledWith('itemId',
               'draftName');
           });
+
+        it('registers options.onItemChanged with instance', function() {
+          expect(mockInstance.on).toHaveBeenCalledWith('itemChanged', opts.onItemChanged);
+        });
+
+        it('registers options.onItemError with instance', function() {
+          expect(mockInstance.on).toHaveBeenCalledWith('itemError', opts.onItemError);
+        });
+
+        it('registers options.onClearItemError with instance', function() {
+          expect(mockInstance.on).toHaveBeenCalledWith('clearItemError', opts.onClearItemError);
+        });
 
         it('calls launcher.loadCall', function() {
           expect(mockLauncher.loadCall).toHaveBeenCalledWith('draftEditor.editor',

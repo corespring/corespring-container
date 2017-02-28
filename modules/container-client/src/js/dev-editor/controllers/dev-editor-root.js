@@ -77,7 +77,37 @@ angular.module('corespring-dev-editor.controllers')
         }
       }
 
+      function getError() {
+        function getOrphans() {
+          try {
+            var idsFromXhtml = _.reject($($scope.xhtml).map(function() {
+              return this.id;
+            }).get(), _.isEmpty);
+            return _($scope.components).keys().filter(function(id) {
+              return idsFromXhtml.indexOf(id) < 0;
+            }).value();
+          } catch (e) {
+            console.log(e);
+            return [];
+          }
+        }
+        var orphans = getOrphans();
+        if (_.isEmpty(orphans)) {
+          return undefined;
+        } else {
+          return "The following items in the JSON are missing ids in the xhtml: " + orphans.join(', ');
+        }
+      }
+
+
       function updateItemChanged(){
+        var error = getError();
+        if (_.isEmpty(error)) {
+          Msgr.send('clearItemError', {});
+        } else {
+          Msgr.send('itemError', error);
+        }
+
         var partsChanged = [];
         if (componentsHaveBeenChanged()) {
           partsChanged.push('components');
