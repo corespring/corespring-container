@@ -50,9 +50,15 @@ function EditorDefinition(element, options, errorCallback) {
     instance = launcher.loadInstance(call, options.queryParams, initialData, onReady);
 
     if (typeof(options.onItemChanged) === 'function') {
-      instance.on('itemChanged', function(data) {
-        options.onItemChanged(data);
-      });
+      instance.on('itemChanged', options.onItemChanged);
+    }
+
+    if (typeof(options.onItemError) === 'function') {
+      instance.on('itemError', options.onItemError);
+    }
+
+    if (typeof(options.onClearItemError) === 'function') {
+      instance.on('clearItemError', options.onClearItemError);
     }
 
     function onReady(instance) {

@@ -5,6 +5,12 @@
       body {
         margin: 0;
       }
+      .alert-danger {
+        color: #a94442;
+        background-color: #f2dede;
+        border: 1px solid #ebccd1;
+        padding: 15px;
+      }
     </style>
   </head>
   <body>
@@ -14,6 +20,10 @@
      document.addEventListener('DOMContentLoaded', function(){
        var holder = document.querySelector('.holder');
        var opts = @{Html(play.api.libs.json.Json.stringify(opts))};
+
+       var commitBtn = document.querySelector('#commit');
+       var forceCommitBtn = document.querySelector('#force-commit');
+       var saveAllBtn = document.querySelector('#save-all');
 
        opts.onDraftCreated = function(){
          console.log('onDraftCreated', arguments);
@@ -32,15 +42,30 @@
          console.log('onItemChanged', arguments);
        };
 
+       opts.onItemError = function(error){
+         $('#error-message').html('<span class="alert alert-danger">' + error + '</span>');
+         $.each([commitBtn, forceCommitBtn, saveAllBtn], function(i, button) {
+           button.setAttribute('disabled', true);
+         });
+       };
+
+       opts.onClearItemError = function(){
+         $('#error-message').html('');
+         $.each([commitBtn, forceCommitBtn, saveAllBtn], function(i, button) {
+           button.removeAttribute('disabled');
+         });
+       };
+
        console.log('opts: ', opts);
 
        var editor = new org.corespring.players.DraftEditor(holder, opts, function(err){
           console.warn(err);
        });
 
-       var commitBtn = document.querySelector('#commit');
-       var forceCommitBtn = document.querySelector('#force-commit');
-       var saveAllBtn = document.querySelector('#save-all');
+
+       function setButtonsEnabled() {
+
+       }
 
        function commit(force) {
          editor.commitDraft(force, function(err){
@@ -66,6 +91,7 @@
     <button id="commit">Commit</button>
     <button id="force-commit">Force Commit</button>
     <button id="save-all">Save All</button>
+    <span id="error-message"></span>
     <div class="holder" style="height:100%; width: 100%;"></div>
   </body>
 </html>

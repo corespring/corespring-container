@@ -39,6 +39,8 @@ angular.module('corespring-editor.controllers')
 
       $scope.$on(WIGGI_EVENTS.LAUNCH_DIALOG, onLaunchDialog);
       $scope.$on('itemChanged', onItemChanged);
+      $scope.$on('itemError', onItemError);
+      $scope.$on('clearItemError', onClearItemError);
 
       init();
 
@@ -103,6 +105,14 @@ angular.module('corespring-editor.controllers')
 
       function onItemChanged(event, data) {
         Msgr.send('itemChanged', data);
+      }
+
+      function onItemError(event, data) {
+        Msgr.send('itemError', data);
+      }
+
+      function onClearItemError(event, data) {
+        Msgr.send('clearItemError', data);
       }
 
       function preprocessComponents(item) {
