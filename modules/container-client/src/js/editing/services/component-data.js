@@ -4,7 +4,7 @@ angular.module('corespring-editing.services')
     'LogFactory',
     'ComponentRegister',
     'MathJaxService',
-    function($timeout, LogFactory, ComponentRegister, MathJaxService) {
+    function ($timeout, LogFactory, ComponentRegister, MathJaxService) {
 
       var $log = LogFactory.getLogger('component-data');
 
@@ -39,29 +39,29 @@ angular.module('corespring-editing.services')
         }
 
         function setSingleDataAndSession(id, model, session) {
-          $timeout(function() {
+          $timeout(function () {
             ComponentRegister.setSingleDataAndSession(id, pruneItem(model), session);
           }, 10);
         }
 
-        this.getSessions = function() {
+        this.getSessions = function () {
           return ComponentRegister.getSessions();
         };
 
-        this.setMode = function(mode) {
+        this.setMode = function (mode) {
           ComponentRegister.setMode(mode);
         };
 
-        this.setEditable = function(isEditable) {
+        this.setEditable = function (isEditable) {
           ComponentRegister.setEditable(isEditable);
         };
 
-        this.reset = function() {
+        this.reset = function () {
           ComponentRegister.reset();
         };
 
-        this.updateComponent = function(id, model) {
-          _.forIn(mockSession[id], function(value, key) {
+        this.updateComponent = function (id, model) {
+          _.forIn(mockSession[id], function (value, key) {
             delete mockSession[id][key];
           });
 
@@ -76,35 +76,35 @@ angular.module('corespring-editing.services')
           }
         };
 
-        this.setOutcomes = function(outcomes) {
+        this.setOutcomes = function (outcomes) {
           ComponentRegister.setOutcomes(outcomes);
         };
 
-        this.setModel = function(model) {
+        this.setModel = function (model) {
           componentModels = model;
-          _.forIn(placeholders, function(p, id) {
+          _.forIn(placeholders, function (p, id) {
             p.setComponent(componentModels[id]);
           });
         };
 
-        this.registerPlaceholder = function(id, placeholder) {
+        this.registerPlaceholder = function (id, placeholder) {
           placeholders[id] = placeholder;
           placeholder.setComponent(componentModels[id]);
         };
 
-        this.registerComponent = function(id, bridge, element) {
+        this.registerComponent = function (id, bridge, element) {
           mockSession[id] = mockSession[id] || {};
           elements[id] = element;
           ComponentRegister.registerComponent(id, bridge);
           setSingleDataAndSession(id, componentModels[id], mockSession[id]);
         };
 
-        this.addComponent = function(d) {
+        this.addComponent = function (d) {
           console.warn('@deprecated use "addComponentModel" instead');
           return this.addComponentModel(d);
         };
 
-        this.addComponentModel = function(componentData) {
+        this.addComponentModel = function (componentData) {
           if (!componentModels) {
             throw new Error('components aren\'t defined yet.');
           }
@@ -121,23 +121,51 @@ angular.module('corespring-editing.services')
           return id;
         };
 
-        this.deleteComponent = function(id) {
+
+        /**
+         * Normalize the component data - remove any model that isnt in the id array.
+         * @param id - ids to keep - everything else can go.
+         */
+        this.normalize = function (ids) {
+
+          if (!ids) {
+            return;
+          }
+
+          ComponentRegister.normalize(ids);
+
+          for (var k in (componentModels || {})) {
+            if (!_.contains(ids, k)) {
+              delete componentModels[k];
+              delete elements[k];
+            }
+          }
+        }
+
+        this.deleteComponent = function (id, failIfMissing) {
+          failIfMissing = failIfMissing !== false;
+          console.log('deleteComponent: ', id);
+          ComponentRegister.deregisterComponent(id);
+
           if (!componentModels) {
             throw new Error('no components');
           }
 
           if (!componentModels[id]) {
-            throw new Error('no component with id', id);
+            if (failIfMissing) {
+              throw new Error('no component with id', id);
+            } else {
+              return;
+            }
           }
-
-          ComponentRegister.deregisterComponent(id);
 
           removedComponentModels[id] = _.cloneDeep(componentModels[id]);
           delete componentModels[id];
           delete elements[id];
+          console.log('deleteComponent: components', _.keys(componentModels));
         };
 
-        this.restoreComponent = function(id) {
+        this.restoreComponent = function (id) {
           if (!componentModels) {
             throw new Error('no components');
           }

@@ -1,182 +1,196 @@
 angular.module('corespring-player.services')
   .factory('ComponentRegisterDefinition', ['$log', '$rootScope',
-  function($log, $rootScope) {
+    function ($log, $rootScope) {
 
-    var log = $log.debug.bind($log, '[component-register]');
+      var log = $log.debug.bind($log, '[component-register]');
 
-    var NewRegister = function(){
+      var NewRegister = function () {
 
-      var bridges = {};
+        var bridges = {};
 
-      var pending = {};
+        var pending = {};
 
-      var answerChangedHandler = null;
+        var answerChangedHandler = null;
 
-      var isEditable = null;
+        var isEditable = null;
 
-      this.registerComponent = function(id, bridge) {
-        log("registerComponent", id, bridge);
+        this.registerComponent = function (id, bridge) {
+          log("registerComponent", id, bridge);
 
-        assertBridgeHasExpectedMethods(bridge);
+          assertBridgeHasExpectedMethods(bridge);
 
-        bridges[id] = bridge;
+          bridges[id] = bridge;
 
-        if (bridge.answerChangedHandler && answerChangedHandler) {
-          bridge.answerChangedHandler(answerChangedHandler);
-        }
+          if (bridge.answerChangedHandler && answerChangedHandler) {
+            bridge.answerChangedHandler(answerChangedHandler);
+          }
 
-        if (_.isBoolean(isEditable) && bridge.editable) {
-          bridge.editable(isEditable);
-        }
+          if (_.isBoolean(isEditable) && bridge.editable) {
+            bridge.editable(isEditable);
+          }
 
-        function assertBridgeHasExpectedMethods(bridge){
-          var missingMethods = _.filter([
-            'answerChangedHandler',
-            'editable',
-            'getSession',
-            'isAnswerEmpty',
-            'reset',
-            'setDataAndSession',
-            'setMode',
-            'setResponse'
-          ], function(methodName){
-            return !_.isFunction(bridge[methodName]);
+          function assertBridgeHasExpectedMethods(bridge) {
+            var missingMethods = _.filter([
+              'answerChangedHandler',
+              'editable',
+              'getSession',
+              'isAnswerEmpty',
+              'reset',
+              'setDataAndSession',
+              'setMode',
+              'setResponse'
+            ], function (methodName) {
+              return !_.isFunction(bridge[methodName]);
+            });
+            if (missingMethods.length > 0) {
+              throw "Bridge does not have expected methods: " + missingMethods;
+            }
+          }
+
+          if (pending[id]) {
+            bridges[id].setDataAndSession(pending[id]);
+            pending[id] = null;
+          }
+        };
+
+        this.setAnswerChangedHandler = function (cb) {
+          answerChangedHandler = cb;
+        };
+
+        this.setDataAndSession = function (allData) {
+          log("setDataAndSession", allData);
+          if (window.console && _.isFunction(window.console.warn)) {
+            console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
+          }
+
+          _.forIn(allData, function (ds, id) {
+            if (bridges[id]) {
+              bridges[id].setDataAndSession(ds);
+            } else {
+              pending[id] = ds;
+            }
           });
-          if(missingMethods.length > 0){
-            throw "Bridge does not have expected methods: " + missingMethods;
+        };
+
+        this.setDataAndSessions = function (data, session) {
+          log("setDataAndSessions", data, session);
+          _.forIn(bridges, function (b, key) {
+            b.setDataAndSession({ data: data[key], session: session[key] });
+          });
+        };
+
+        this.setSingleDataAndSession = function (id, data, session) {
+          if (bridges[id]) {
+            log("setSingleDataAndSession", id, data, session);
+            bridges[id].setDataAndSession({ data: data, session: session });
+          }
+        };
+
+        this.getComponentSessions = function () {
+          $log.warn('@deprecated - use "getSessions()" instead');
+          return this.getSessions();
+        };
+
+        this.getSessions = function () {
+          return _.mapValues(bridges, function (b) {
+            return b.getSession();
+          });
+        };
+
+        this.normalize = function (ids) {
+          if (!ids) {
+            return;
+          }
+
+          for (var k in bridges || {}) {
+            if (!_.contains(ids, k)) {
+              delete bridges[k];
+            }
           }
         }
 
-        if(pending[id]){
-          bridges[id].setDataAndSession(pending[id]);
-          pending[id] = null;
-        }
-      };
+        this.deregisterComponent = function (id) {
+          console.log('deregisterComponent: ', id);
+          bridges[id] = undefined;
+          delete bridges[id];
+          console.log('deregisterComponent: bridges', _.keys(bridges));
+        };
 
-      this.setAnswerChangedHandler = function(cb) {
-        answerChangedHandler = cb;
-      };
+        this.hasComponent = function (id) {
+          return !_.isUndefined(bridges[id]);
+        };
 
-      this.setDataAndSession = function(allData) {
-        log("setDataAndSession", allData);
-        if(window.console && _.isFunction(window.console.warn)){
-          console.warn('@deprecated: use "setDataAndSessions(data, sessions)" instead');
-        }
+        this.resetStash = function () {
+          $log.warn('@deprecated - soon to be removed');
+          _.forIn(bridges, fn('resetStash'));
+        };
 
-        _.forIn(allData, function(ds, id){
-          if(bridges[id]){
-            bridges[id].setDataAndSession(ds);
-          } else {
-            pending[id] = ds;
-          }
-        });
-      };
+        this.isAnswerEmpty = function (id) {
+          return !bridges[id] || bridges[id].isAnswerEmpty();
+        };
 
-      this.setDataAndSessions = function (data, session){
-        log("setDataAndSessions", data, session);
-        _.forIn(bridges, function(b, key){
-          b.setDataAndSession({data: data[key], session: session[key]});
-        });
-      };
+        this.hasEmptyAnswers = function () {
+          return this.interactionCount() > this.interactionsWithResponseCount();
+        };
 
-      this.setSingleDataAndSession = function(id, data, session){
-        if(bridges[id]){
-          log("setSingleDataAndSession", id, data, session);
-          bridges[id].setDataAndSession({data: data, session: session});
-        }
-      };
+        var fn = function (fnName, data) {
+          return function (bridge, id) {
+            if (bridge[fnName]) {
+              var d = data ? data[id] : undefined;
+              bridge[fnName](d);
+            }
+          };
+        };
 
-      this.getComponentSessions = function(){
-        $log.warn('@deprecated - use "getSessions()" instead');
-        return this.getSessions();
-      };
+        this.setOutcomes = function (outcomes) {
+          _.forIn(bridges, fn('setResponse', _.cloneDeep(outcomes)));
+        };
 
-      this.getSessions = function(){
-        return _.mapValues(bridges, function(b){
-          return b.getSession();
-        });
-      };
-      
-      this.deregisterComponent = function(id) {
-        bridges[id] = undefined;
-        delete bridges[id];
-      };
+        this.setPlayerSkin = function (playerSkin) {
+          _.forIn(bridges, function (b) {
+            if (b.setPlayerSkin) {
+              b.setPlayerSkin(playerSkin);
+            }
+          });
+        };
 
-      this.hasComponent = function(id) {
-        return !_.isUndefined(bridges[id]);
-      };
+        this.setInstructorData = function (data) {
+          _.forIn(bridges, fn('setInstructorData', data));
+        };
 
-      this.resetStash = function() {
-        $log.warn('@deprecated - soon to be removed');
-        _.forIn(bridges, fn('resetStash'));
-      };
+        this.reset = function () {
+          _.forIn(bridges, fn('reset'));
+        };
 
-      this.isAnswerEmpty = function(id) {
-        return !bridges[id] || bridges[id].isAnswerEmpty();
-      };
+        this.interactionCount = function () {
+          return _.keys(bridges).length;
+        };
 
-      this.hasEmptyAnswers = function() {
-        return this.interactionCount() > this.interactionsWithResponseCount();
-      };
+        this.interactionsWithResponseCount = function () {
+          var answered = _.filter(bridges, function (c) {
+            return !c.isAnswerEmpty();
+          });
+          return answered.length;
+        };
 
-      var fn = function(fnName, data){
-        return function(bridge, id){
-          if(bridge[fnName]){
-            var d = data ? data[id] : undefined; 
-            bridge[fnName](d);
-          }
+        this.setEditable = function (e) {
+          isEditable = e;
+          _.forIn(bridges, function (b) {
+            if (b.editable) {
+              b.editable(isEditable);
+            }
+          });
+        };
+
+        this.setMode = function (mode) {
+          _.forIn(bridges, function (b) {
+            if (b.setMode) {
+              b.setMode(mode);
+            }
+          });
         };
       };
 
-      this.setOutcomes = function(outcomes) {
-        _.forIn(bridges, fn('setResponse', _.cloneDeep(outcomes)));
-      };
-
-      this.setPlayerSkin = function(playerSkin) {
-        _.forIn(bridges, function(b){
-          if(b.setPlayerSkin){
-            b.setPlayerSkin(playerSkin);
-          }
-        });
-      };
-
-      this.setInstructorData = function(data) {
-        _.forIn(bridges, fn('setInstructorData', data));
-      };
-
-      this.reset = function() {
-        _.forIn(bridges, fn('reset'));
-      };
-
-      this.interactionCount = function() {
-        return _.keys(bridges).length;
-      };
-
-      this.interactionsWithResponseCount = function() {
-        var answered = _.filter(bridges, function(c) {
-          return !c.isAnswerEmpty();
-        });
-        return answered.length;
-      };
-
-      this.setEditable = function(e) {
-        isEditable = e;
-        _.forIn(bridges, function(b){
-          if(b.editable){
-            b.editable(isEditable);
-          }
-        });
-      };
-
-      this.setMode = function(mode) {
-        _.forIn(bridges, function(b){
-          if(b.setMode){
-            b.setMode(mode);
-          }
-        });
-      };
-    };
-
-    return NewRegister;
-  }
-]);
+      return NewRegister;
+    }
+  ]);
