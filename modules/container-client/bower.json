@@ -34,7 +34,7 @@
     "lodash": "~2.4.1",
     "mathjax": "https://github.com/mathjax/MathJax.git#2.6",
     "mathjs": "~0.18.0",
-    "mathquill-build": "git@github.com:corespring/mathquill#mathquill-build-0.11.1-draccoz",
+    "mathquill-build": "git@github.com:corespring/mathquill#277d6f571d1e84941fdd4f9a59a4a87bcb5c4f33",
     "msgr.js": "git@github.com:corespring/msgr.js.git#v0.0.11",
     "newrelic-rum-js-agent": "git@github.com:corespring/newrelic-rum-js-agent.git#v1.892.0",
     "saxjs": "https://github.com/corespring/sax-js.git#v0.6.0-corespring",
@@ -92,6 +92,7 @@
     "angular": "~1.2.29",
     "angular-bootstrap": "~0.12.0",
     "bootstrap": "~3.2.0",
-    "jquery": "1.11.0"
+    "jquery": "1.11.0",
+    "mathquill-build": "277d6f571d1e84941fdd4f9a59a4a87bcb5c4f33"
   }
 }

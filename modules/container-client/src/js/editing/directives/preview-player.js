@@ -1,12 +1,12 @@
-(function() {
+(function () {
   /**
    * Non optimized preview player for the editor
    */
   angular.module('corespring-editing.directives')
     .directive('previewPlayer', ['$log', 'ComponentRegister', 'ComponentData',
-      function($log, ComponentRegister, ComponentData) {
+      function ($log, ComponentRegister, ComponentData) {
 
-        var linkFn = function($scope) {
+        var linkFn = function ($scope) {
 
           var rendered = {};
 
@@ -39,7 +39,7 @@
               return;
             }
 
-            _.forIn($scope.components, function(model, id) {
+            _.forIn($scope.components, function (model, id) {
               if (_.isEqual(model, rendered.components ? rendered.components[id] : null)) {
               } else {
                 ComponentData.updateComponent(id, model);
@@ -49,7 +49,7 @@
             rendered.components = _.cloneDeep($scope.components);
           }
 
-          $scope.$watch('components', function(c, prev) {
+          $scope.$watch('components', function (c, prev) {
             if (!c || !prev) {
               return;
             }
@@ -58,11 +58,11 @@
           }, true);
 
 
-          var xhtmlChange = function(c, prev) {
+          var xhtmlChange = function (c, prev) {
             $scope.slowXhtml = c;
           };
 
-          $scope.$watch('xhtml', _.debounce(xhtmlChange, 200, {leading: false, trailing: true}));
+          $scope.$watch('xhtml', _.debounce(xhtmlChange, 200, { leading: false, trailing: true }));
 
         };
 

@@ -38,7 +38,7 @@ block content
         td.pane(ng-show="panes.html")
           .tex2jax_ignore.xhtml-pane(
               ng-model="xhtml",
-              ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceChanged }")
+              ui-ace="{mode: 'html', useWrapMode : true, onLoad: aceLoaded, onChange: aceMarkupChanged }")
         td.pane(ng-show="panes.json")
           .json-pane(
               ng-model="json",
