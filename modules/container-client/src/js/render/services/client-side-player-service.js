@@ -2,7 +2,7 @@
 angular.module('corespring-player.services')
   .factory('ClientSidePlayerService', [
     '$timeout',
-      function($timeout) {
+    function ($timeout) {
 
       function ClientSidePlayerService(getQuestionFor, getItem) {
 
@@ -50,7 +50,7 @@ angular.module('corespring-player.services')
 
           function addResponse(id, question, targetOutcome) {
             serverLogic = corespring.server.logic(question.componentType);
-            if(!serverLogic) {
+            if (!serverLogic) {
               console.warn('didn\'t find server logic for: ', question.componentType);
               return;
             }
@@ -63,19 +63,19 @@ angular.module('corespring-player.services')
             out[id].studentResponse = _.cloneDeep(answer);
           }
 
+
           for (id in components) {
             question = getQuestionFor(id);
-            if (!question.target) {
+            if (question && !question.target) {
               addResponse(id, angular.copy(question));
             }
           }
 
           for (id in components) {
             question = getQuestionFor(id);
-            if (question.target) {
+            if (question && question.target) {
               var targetId = question.target.id;
               var targetOutcome = out[targetId];
-
               addResponse(id, angular.copy(question), targetOutcome);
             }
           }
@@ -83,14 +83,14 @@ angular.module('corespring-player.services')
           return out;
         }
 
-        this.submitSession = function(session, onSuccess, onFailure) {
-          $timeout(function() {
+        this.submitSession = function (session, onSuccess, onFailure) {
+          $timeout(function () {
             var response = createResponse(session);
             onSuccess(response);
           });
         };
 
-        this.updateSessionSettings = function(s) {
+        this.updateSessionSettings = function (s) {
           settings = s;
         };
 
