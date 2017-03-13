@@ -3,15 +3,15 @@ angular.module('corespring-dev-editor.controllers')
     '$log',
     '$scope',
     '$timeout',
-    'ComponentData',
+    'ComponentRegister',
     'iFrameService',
     'ItemService',
     'Msgr',
-    function(
+    function (
       $log,
       $scope,
       $timeout,
-      ComponentData,
+      ComponentRegister,
       iFrameService,
       ItemService,
       Msgr
@@ -19,33 +19,60 @@ angular.module('corespring-dev-editor.controllers')
 
       $scope.panes = {
         html: true,
-        json: false,
+        json: true,
         scoring: false,
         files: false,
         player: true
       };
 
-      $scope.aceJsonChanged = aceJsonChanged;
       $scope.onItemLoaded = onItemLoaded;
       $scope.onItemLoadError = onItemLoadError;
       $scope.save = save;
       $scope.saveAll = saveAll;
 
+      //PE-527 - implement optional method for client side preview.
+      $scope.questionForComponentId = function (id) {
+        $log.debug('[questionForComponentId] id: ', id);
+        return $scope.components ? $scope.components[id] : null;
+      };
+
+      //PE-527 - implement optional method for client side preview.
+      $scope.getItemForScoring = function () {
+        return _.extend($scope.item, {
+          components: $scope.components,
+          customScoring: $scope.customScoringJs,
+          xhtml: $scope.xhtml
+        });
+      };
+
+      $scope.aceMarkupChanged = function () {
+        ComponentRegister.flush();
+        $scope.$broadcast('client-side-preview.reset-player');
+      };
+
+      $scope.aceJsonChanged = function aceJsonChanged() {
+        try {
+          var update = JSON.parse($scope.json);
+          $scope.components = update;
+          $scope.$broadcast('client-side-preview.reset-player');
+        } catch (e) {
+          $log.error('There was a problem parsing $scope.json', e);
+        }
+      };
+
       $scope.$watch('components', updateItemChanged);
       $scope.$watch('customScoringJs', updateItemChanged);
       $scope.$watch('xhtml', updateItemChanged);
 
-      $scope.$on('registerComponent', registerComponent);
-
-      $scope.$on('assetUploadCompleted', function() {
-        Msgr.send('itemChanged', {partChanged: 'item'});
-        ItemService.load(function(item) {
+      $scope.$on('assetUploadCompleted', function () {
+        Msgr.send('itemChanged', { partChanged: 'item' });
+        ItemService.load(function (item) {
           $scope.item.files = item.files;
         }, $scope.onItemLoadError, true);
       });
 
-      $scope.$on('assetDeleteCompleted', function() {
-        Msgr.send('itemChanged', {partChanged: 'item'});
+      $scope.$on('assetDeleteCompleted', function () {
+        Msgr.send('itemChanged', { partChanged: 'item' });
       });
 
       init();
@@ -64,9 +91,9 @@ angular.module('corespring-dev-editor.controllers')
           ItemService.load($scope.onItemLoaded, $scope.onItemLoadError);
         }
 
-        Msgr.on('saveAll', function(data, done){
+        Msgr.on('saveAll', function (data, done) {
           $log.debug('received \'saveAll\' event');
-          saveAll(done || function(){});
+          saveAll(done || function () { });
         });
 
         function onInitialise(data) {
@@ -83,9 +110,10 @@ angular.module('corespring-dev-editor.controllers')
             return undefined;
           }
           try {
-            var idsFromXhtml = _.reject($('<div>' + $scope.xhtml.toString() + '</div>').find('*').map(function(i, node) {
-              return node.id; }).get(), _.isEmpty);
-            return _($scope.components).keys().filter(function(id) {
+            var idsFromXhtml = _.reject($('<div>' + $scope.xhtml.toString() + '</div>').find('*').map(function (i, node) {
+              return node.id;
+            }).get(), _.isEmpty);
+            return _($scope.components).keys().filter(function (id) {
               return idsFromXhtml.indexOf(id) < 0;
             }).value();
           } catch (e) {
@@ -100,8 +128,7 @@ angular.module('corespring-dev-editor.controllers')
         }
       }
 
-
-      function updateItemChanged(){
+      function updateItemChanged() {
         var error = getError();
         if (_.isEmpty(error)) {
           console.log('sending clear');
@@ -121,8 +148,8 @@ angular.module('corespring-dev-editor.controllers')
         if (xhtmlHasBeenChanged()) {
           partsChanged.push('xhtml');
         }
-        if(partsChanged.length) {
-          Msgr.send('itemChanged', {partsChanged: partsChanged});
+        if (partsChanged.length) {
+          Msgr.send('itemChanged', { partsChanged: partsChanged });
         }
       }
 
@@ -132,15 +159,13 @@ angular.module('corespring-dev-editor.controllers')
         $scope.json = JSON.stringify(item.components, undefined, 2);
         $scope.customScoringJs = item.customScoring;
         $scope.components = _.cloneDeep(item.components);
-        ComponentData.setModel($scope.components);
-        ComponentData.setEditable(true);
       }
 
       function onItemLoadError(err) {
         window.alert("There was an error. Please try later. Thanks!");
       }
 
-      function saveAll(done){
+      function saveAll(done) {
         $log.debug('saveAll...');
         if (componentsHaveBeenChanged()) {
           $scope.item.components = $scope.components;
@@ -151,9 +176,9 @@ angular.module('corespring-dev-editor.controllers')
         if (xhtmlHasBeenChanged()) {
           $scope.item.xhtml = $scope.xhtml;
         }
-        ItemService.saveAll($scope.item, function() {
+        ItemService.saveAll($scope.item, function () {
           $log.debug('call \'saveAll\' callback...');
-          done(null, {saved: true});
+          done(null, { saved: true });
         });
       }
 
@@ -163,59 +188,46 @@ angular.module('corespring-dev-editor.controllers')
         saveCustomScoringIfChanged();
       }
 
-      function xhtmlHasBeenChanged(){
+      function xhtmlHasBeenChanged() {
         return $scope.item && $scope.xhtml !== $scope.item.xhtml;
       }
 
       function saveXhtmlIfChanged() {
         if (xhtmlHasBeenChanged()) {
           $scope.item.xhtml = $scope.xhtml;
-          ItemService.saveXhtml($scope.item.xhtml, function() {
+          ItemService.saveXhtml($scope.item.xhtml, function () {
             $log.info('xhtml saved');
           });
-          Msgr.send('itemChanged', {partChanged: 'xhtml'});
+          Msgr.send('itemChanged', { partChanged: 'xhtml' });
         }
       }
 
-      function componentsHaveBeenChanged(){
+      function componentsHaveBeenChanged() {
         return $scope.item && !_.isUndefined($scope.components) && !_.isEqual($scope.item.components, $scope.components);
       }
 
       function saveComponentsIfChanged() {
         if (componentsHaveBeenChanged()) {
           $scope.item.components = $scope.components;
-          ItemService.saveComponents($scope.item.components, function() {
+          ItemService.saveComponents($scope.item.components, function () {
             $log.info('components saved');
           });
-          Msgr.send('itemChanged', {partChanged: 'components'});
+          Msgr.send('itemChanged', { partChanged: 'components' });
         }
       }
 
-      function customScoringHasBeenChanged(){
+      function customScoringHasBeenChanged() {
         return $scope.item && $scope.item.customScoring !== $scope.customScoringJs;
       }
 
       function saveCustomScoringIfChanged() {
-        if (customScoringHasBeenChanged()){
+        if (customScoringHasBeenChanged()) {
           $scope.item.customScoring = $scope.customScoringJs;
-          ItemService.saveCustomScoring($scope.item.customScoring, function() {
+          ItemService.saveCustomScoring($scope.item.customScoring, function () {
             $log.info('custom scoring saved');
           });
-          Msgr.send('itemChanged', {partChanged: 'customScoring'});
+          Msgr.send('itemChanged', { partChanged: 'customScoring' });
         }
-      }
-
-      function aceJsonChanged() {
-        try {
-          var update = JSON.parse($scope.json);
-          $scope.components = update;
-        } catch (e) {
-          $log.error('There was a problem parsing $scope.json', e);
-        }
-      }
-
-      function registerComponent(event, id, componentBridge, componentElement) {
-        ComponentData.registerComponent(id, componentBridge, componentElement);
       }
     }
   ]);
