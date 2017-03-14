@@ -55,7 +55,7 @@
   e.ComponentRegister = function () {
     return {
       flush: jasmine.createSpy('flush')
-    }
+    };
   };
 
   e.QueryParamUtils = function () {

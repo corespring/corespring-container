@@ -6,7 +6,7 @@ describe('ClientSidePreview', function () {
 
   var playerService = {
     submitSession: mockSubmitSession
-  }
+  };
 
   ClientSidePlayerService = jasmine.createSpy('ClientSidePlayerService')
     .and.returnValue(playerService);
