@@ -459,11 +459,11 @@ describe('DevEditorRoot', function () {
         '1': {
           label: 'hi'
         }
-      }
+      };
     });
 
     it('returns the data from components', function () {
-      expect(scope.questionForComponentId('1')).toEqual(scope.components['1'])
+      expect(scope.questionForComponentId('1')).toEqual(scope.components['1']);
     });
   });
 });
