@@ -5,7 +5,7 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
   '$log',
   '$timeout',
 
-  function(MathJaxService, MathFormatUtils, $rootScope, $log, $timeout) {
+  function (MathJaxService, MathFormatUtils, $rootScope, $log, $timeout) {
     function MathInputWiggiFeatureDef() {
       this.name = 'mathjax';
       this.attributeName = 'mathjax';
@@ -14,14 +14,14 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
       this.addToEditor = '<div mathinput-holder-init></div>';
       this.compile = true;
       this.draggable = true;
-      this.initialise = function($node, replaceWith) {
+      this.initialise = function ($node, replaceWith) {
         var preContent = $node.html();
         var content = preContent;
         if (!/<math.*?>/gi.test(preContent)) {
           content = $node.text();
         }
         var isNew = $node[0].outerHTML.indexOf('mathinput-holder-init') >= 0;
-        content = content.replace(/\\\(/gi,'').replace(/\\\)/gi, '');
+        content = content.replace(/\\\(/gi, '').replace(/\\\)/gi, '');
         var encodedContent = btoa(content);
         var newNode = $([
           '<div mathinput-holder="" show-remove-button="true" class="mathinput-holder">',
@@ -33,10 +33,10 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
         return replaceWith(newNode);
       };
 
-      this.registerChangeNotifier = function(notifyEditorOfChange, node) {
+      this.registerChangeNotifier = function (notifyEditorOfChange, node) {
         var scope = node.scope() && node.scope().$$childHead;
         if (scope) {
-          var updateFn = function(a, b) {
+          var updateFn = function (a, b) {
             if (a && b && a !== b) {
               notifyEditorOfChange();
             }
@@ -46,14 +46,14 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
         }
       };
 
-      this.onClick = function($node, $nodeScope, editor) {
+      this.onClick = function ($node, $nodeScope, editor) {
         $node.find('.mq').find('textarea').blur();
-        $timeout(function() {
+        $timeout(function () {
           $node.find('.mq').find('textarea').focus();
         }, 1);
       };
 
-      this.getMarkUp = function($node, $scope) {
+      this.getMarkUp = function ($node, $scope) {
         var expr;
         if ($scope.code) {
           expr = $scope.code;

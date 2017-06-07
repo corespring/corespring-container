@@ -1,16 +1,19 @@
 package org.corespring.container.client.controllers
 
-import org.corespring.container.client.component.{ ComponentsConfig, SourceGenerator }
-import org.corespring.container.components.model.{ Component, Id, Library }
+import java.util.concurrent.TimeUnit
+
+import akka.util.Timeout
+import org.corespring.container.client.component.{ComponentsConfig, SourceGenerator}
+import org.corespring.container.components.model.{Component, Id, Library}
 import org.corespring.container.components.model.dependencies.ComponentMaker
 import org.corespring.container.components.services.DependencyResolver
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import play.api.GlobalSettings
-import play.api.libs.json.{ JsObject, Json }
-import play.api.mvc.{ Action, EssentialAction, SimpleResult }
+import play.api.libs.json.{JsObject, Json}
+import play.api.mvc.{Action, EssentialAction, SimpleResult}
 import play.api.test.Helpers._
-import play.api.test.{ FakeApplication, FakeRequest }
+import play.api.test.{FakeApplication, FakeRequest}
 
 import scala.concurrent.Future
 
@@ -79,7 +82,7 @@ class ComponentSetsTest extends Specification with ComponentMaker with Mockito {
 
     "compile less resources" in running(FakeApplication(withGlobal = Some(mockGlobal))) {
       val result: Future[SimpleResult] = sets.resource("player", "org[all]", "less")(FakeRequest("", "")).run
-      contentAsString(result) must contain("color: 3")
+      contentAsString(result)(Timeout(30, TimeUnit.SECONDS)) must contain("color: 3")
     }
 
     "return js urls" in {
