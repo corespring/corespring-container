@@ -21,7 +21,7 @@
     "components-font-awesome": "4.3.0",
     "console-polyfill": "~0.1.0",
     "corespring-checkbox": "https://github.com/corespring/checkbox.git#v0.0.6",
-    "corespring-math-input": "git@github.com:corespring/corespring-math-input.git#v0.0.13",
+    "corespring-math-input": "git@github.com:corespring/corespring-math-input.git#v0.0.14",
     "corespring-ng-components": "https://github.com/corespring/corespring-ng-components.git#v0.0.19",
     "corespring-radio": "https://github.com/corespring/radio.git#v0.0.6",
     "es5-shim": "~2.3.0",
