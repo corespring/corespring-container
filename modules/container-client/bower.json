@@ -32,7 +32,7 @@
     "jquery-ui": "1.11.0",
     "jquery.browser": "~0.0.6",
     "lodash": "~2.4.1",
-    "mathjax": "https://github.com/mathjax/MathJax.git#2.6",
+    "mathjax": "https://github.com/mathjax/MathJax.git#2.7.1",
     "mathjs": "~0.18.0",
     "mathquill-build": "git@github.com:corespring/mathquill#277d6f571d1e84941fdd4f9a59a4a87bcb5c4f33",
     "msgr.js": "git@github.com:corespring/msgr.js.git#v0.0.11",
