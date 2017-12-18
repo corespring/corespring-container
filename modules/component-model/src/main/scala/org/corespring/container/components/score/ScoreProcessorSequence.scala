@@ -15,6 +15,7 @@ class ScoreProcessorSequence(processors: ScoreProcessor*) extends ScoreProcessor
 
     val scores = processors.map { _.score(item, session, outcomes) }
 
+    logger.trace(s"scores: $scores")
     scores.foldLeft(JsObject(Seq.empty)) { (acc: JsObject, o: JsValue) =>
       o match {
         case obj: JsObject => {

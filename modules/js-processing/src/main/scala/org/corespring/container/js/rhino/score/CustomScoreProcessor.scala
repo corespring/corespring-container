@@ -20,7 +20,7 @@ object CustomScoreProcessor extends ScoreProcessor {
         }
         try {
           val result = jsModuleWrapper.process(item, session, outcomes)
-          logger.trace(Json.stringify(result))
+          logger.trace(s"result: ${Json.stringify(result)}")
           result
         } catch {
           case e: Throwable => {
