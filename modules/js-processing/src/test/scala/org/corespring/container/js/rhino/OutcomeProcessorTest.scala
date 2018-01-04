@@ -80,6 +80,7 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
       val service = mkService(component, feedback)
       val processor = getProcessor(service)
       val result = processor.createOutcome(item, session, obj())
+      logger.info(s"result: ${Json.prettyPrint(result)}")
       (result \ "1" \ "correctness").as[String] === "incorrect"
       (result \ "2" \ "targetOutcome" \ "correctness").as[String] === "incorrect"
     }
@@ -248,6 +249,6 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
           "msg" -> "pong",
           "studentResponse" -> "a"))
     }
-  }
 
+  }
 }

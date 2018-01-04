@@ -26,12 +26,12 @@ trait OutcomeProcessor
 
   def createOutcome(item: JsValue, itemSession: JsValue, settings: JsValue): JsValue = {
 
-    def createOutcomeForComponent(id: String, targetOutcome: JsValue): (String, JsValue) = {
+    def createOutcomeForComponent(id: String, targetOutcome: JsValue, maybeAnswer: Option[JsValue]): (String, JsValue) = {
       val componentQuestions = (item \ "components").as[JsObject]
       val question = (componentQuestions \ id).as[JsObject]
       val componentType = (question \ "componentType").as[String]
 
-      getAnswer(itemSession, id).map{ answer =>
+      maybeAnswer.map{ answer =>
         try {
           val serverComponent = serverLogic(componentType)
 
@@ -67,7 +67,8 @@ trait OutcomeProcessor
 
     val outcomes: Seq[(String, JsValue)] = normalQuestions.map { (kv) =>
       val (key, _) = kv
-      createOutcomeForComponent(key, obj())
+      val maybeAnswer = getAnswer(itemSession, key)
+      createOutcomeForComponent(key, obj(), maybeAnswer)
     }
 
     val outcomesWithTarget: Seq[(String, JsValue)] = questionsThatNeedOutcomes.map { (kv) =>
@@ -81,7 +82,13 @@ trait OutcomeProcessor
         }
         require(id.isDefined, "targetId must be defined")
         val existingOutcome = outcomes.find(_._1 == id.get).map(_._2).getOrElse(JsObject(Seq.empty))
-        createOutcomeForComponent(key, existingOutcome)
+
+        /**
+          * Note: we are implying that a component that needs an outcome from another component
+          * does not need to retrieve an answer from the itemSession.
+          * Currently this is the case, but it may need to change in future.
+          */
+        createOutcomeForComponent(key, existingOutcome, Some(JsNull))
 
       }.getOrElse(throw new RuntimeException(s"Can't find a question with key: $key"))
 

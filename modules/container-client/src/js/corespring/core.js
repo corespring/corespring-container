@@ -1,10 +1,12 @@
 /*global head:false */
 
-(function(root) {
+(function (root) {
 
-  var ComponentDefinition = function(angular, compName, moduleName, assetsPath) {
+  var ComponentDefinition = function (angular, compName, moduleName, assetsPath) {
 
-    var loadAngularModule = function(moduleName) {
+    assetsPath = assetsPath || '';
+
+    var loadAngularModule = function (moduleName) {
       try {
         return angular.module(moduleName);
       } catch (e) {
@@ -25,7 +27,7 @@
      * Initialize the component
      * @private
      */
-    this.initializeComponent = function() {
+    this.initializeComponent = function () {
       var ngModule = loadAngularModule(moduleName);
       var isIE8 = (typeof head !== 'undefined' && head.browser.ie && head.browser.version < 9);
 
@@ -78,17 +80,17 @@
     };
   };
 
-  var Client = function(angular) {
+  var Client = function (angular) {
     var definitions = {};
 
-    this.component = function(directiveName, moduleName, assetsPath) {
+    this.component = function (directiveName, moduleName, assetsPath) {
       var fullyQualifiedName = moduleName + "-" + directiveName;
       definitions[fullyQualifiedName] = definitions[fullyQualifiedName] || new ComponentDefinition(angular, directiveName, moduleName, assetsPath);
       return definitions[fullyQualifiedName];
     };
   };
 
-  var Server = function() {
+  var Server = function () {
 
     var serverLogic = {};
 
@@ -100,22 +102,22 @@
      (function(exports, require){
       })(corespring.server.logic(compType), corespring.require)
      */
-    this.logic = function(componentType) {
+    this.logic = function (componentType) {
       serverLogic[componentType] = serverLogic[componentType] || {};
       return serverLogic[componentType];
     };
 
-    this.customScoring = function() {
+    this.customScoring = function () {
       return scoring;
     };
   };
 
-  var Corespring = function() {
+  var Corespring = function () {
     this.server = new Server();
     this.client = new Client(root.angular);
 
     //Override angular if you need to here.
-    this.bootstrap = function(angular) {
+    this.bootstrap = function (angular) {
       this.client = new Client(angular);
     };
   };
