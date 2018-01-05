@@ -49,9 +49,7 @@ class OutcomeProcessorTest extends Specification with ComponentMaker {
     "components" -> obj(
       "1" -> obj(
         "answers" -> obj("value" -> "2"),
-        "stash" -> obj()),
-      "2" -> obj(
-        "answers" -> obj())))
+        "stash" -> obj())))
 
   def interaction(name: String = "name", serverJs: String, libraries: Seq[Id] = Seq.empty) =
     uiComp(name, libraries).copy(server = Server(serverJs))
