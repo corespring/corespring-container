@@ -170,9 +170,10 @@ var Instance = function(launchOpts,
 
     var iframeStyles = [
       '',
-      '.player-loading{visibility: hidden; position: absolute;}',
-      '.player-loaded{visibility: visible; position: initial;}'
+      '.player-loading{visibility: visible; opacity: 0.01; position: absolute;}',
+      '.player-loaded{visibility: visible; opacity: 1; position: initial;}'
     ].join('\n');
+
 
     // This is a workaround for IE* because $(iframe).css("absolute","initial") is not working
     (function injectPlayerStyles() {
