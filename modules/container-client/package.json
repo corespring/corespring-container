@@ -4,7 +4,7 @@
   "repository": "https://github.com/corespring/corespring-container/tree/master/modules/container-client",
   "version": "0.0.1",
   "devDependencies": {
-    "bower": "~1.3.12",
+    "bower": "^1.8.4",
     "globule": "0.2.0",
     "grunt": "0.4.5",
     "grunt-angular-templates": "^0.5.7",
