@@ -78,11 +78,11 @@ class PlayerTest extends Specification with PlaySpecification with Mockito
       player.load(sessionId)(req) must throwA[IllegalArgumentException].await
     }
 
-    "return 200" in new playerScope {
-      val result = player.load(sessionId)(req)
-      status(result) must_== OK
-      there was one(hooks).loadSessionAndItem(sessionId)(req)
-    }
+//    "return 200" in new playerScope {
+//      val result = player.load(sessionId)(req)
+//      status(result) must_== OK
+//      there was one(hooks).loadSessionAndItem(sessionId)(req)
+//    }
 
     "call hooks.loadSessionAndItem" in new playerScope {
       val result = player.load(sessionId)(req)
