@@ -139,7 +139,7 @@ var Instance = function(launchOpts,
 
   function $iframe() {
     var $node = $('#' + iframeUid);
-    if ($node.size() !== 1) {
+    if ($node.length !== 1) {
       var err = errorCodes.CANT_FIND_IFRAME(iframeUid);
       errorCallback(err);
     }
