@@ -89,7 +89,10 @@ abstract class BaseGenerator
   with JsStringBuilder {
 
   protected def get3rdPartyScripts(dependencies: Seq[ClientSideDependency]): Seq[String] = {
-    val paths: Seq[String] = dependencies.map(d => d.jsFiles.map { name => s"${d.name}/$name" }).flatten.distinct
+    val paths: Seq[String] = dependencies.map(d => {
+      val dir = d.dirOverride.getOrElse(d.name)
+      d.jsFiles.map { name => s"${dir}/$name" }
+    }).flatten.distinct
     paths.flatMap(resource)
   }
 
