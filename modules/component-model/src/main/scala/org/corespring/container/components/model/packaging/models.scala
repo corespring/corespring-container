@@ -2,7 +2,7 @@ package org.corespring.container.components.model.packaging
 
 import play.api.libs.json.{ Json, JsObject, JsValue }
 
-case class ClientSideDependency(name: String, files: Seq[String], angularModule: Option[String]) {
+case class ClientSideDependency(name: String, files: Seq[String], angularModule: Option[String], dirOverride: Option[String] = None) {
 
   def jsFiles = files.filter(_.endsWith(".js"))
   def cssFiles = files.filter(_.endsWith(".css"))
@@ -16,7 +16,8 @@ object ClientSideDependency {
       (json \ key).asOpt[String] ++ (json \ key).asOpt[Seq[String]].getOrElse(Seq.empty)
     ).flatten
     val ngModule = (json \ "angular-module").asOpt[String]
-    ClientSideDependency(name, files, ngModule)
+    val dirOverride = (json \ "dir").asOpt[String]
+   ClientSideDependency(name, files, ngModule, dirOverride )
   }
 }
 
