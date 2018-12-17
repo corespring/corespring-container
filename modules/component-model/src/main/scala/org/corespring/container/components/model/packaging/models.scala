@@ -17,9 +17,7 @@ object ClientSideDependency {
     ).flatten
     val ngModule = (json \ "angular-module").asOpt[String]
     val dirOverride = (json \ "dir").asOpt[String]
-    println(s"------------------------------ >>>>>>>>>NME $name")
-    println(s">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> OVERRIDE: $dirOverride")
-    ClientSideDependency(name, files, ngModule, dirOverride )
+   ClientSideDependency(name, files, ngModule, dirOverride )
   }
 }
 
