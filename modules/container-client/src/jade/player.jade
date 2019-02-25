@@ -4,6 +4,23 @@ extends layout
 
 block header-scripts
 
+
+  if serviceWorker
+    script(type="text/javascript").
+      console.log("foo!", '!{serviceWorker}');
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('!{serviceWorker}').then(function(registration) {
+            // Registration was successful
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          }, function(err) {
+            // registration failed :(
+            console.log('ServiceWorker registration failed: ', err);
+          });
+        });
+      }
+
   if newRelicRumEnabled
     script(type="text/javascript", src="!{newRelicRumScriptPath}")
     script(type="text/javascript").

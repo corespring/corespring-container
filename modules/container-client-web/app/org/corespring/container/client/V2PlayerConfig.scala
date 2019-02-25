@@ -8,7 +8,8 @@ package org.corespring.container.client
 case class V2PlayerConfig(
   rootUrl: Option[String],
   newRelicRumConfig: Option[NewRelicRumConfig],
-  launchTimeout: Int = 0) {
+  launchTimeout: Int = 0,
+  serviceWorker: Option[String] = None) {
   val useNewRelic = newRelicRumConfig.isDefined
 }
 

@@ -96,6 +96,7 @@ class PlayerRenderer(
       "js" -> jsWithControls.toArray,
       "css" -> css.toArray,
       "showControls" -> javaBoolean(showControls),
+      "serviceWorker" -> playerConfig.serviceWorker.getOrElse(null),
       "newRelicRumEnabled" -> javaBoolean(playerConfig.useNewRelic),
       "newRelicRumScriptPath" -> newRelicRumScriptPath,
       "newRelicRumConfig" -> Json.stringify(newRelicRumConfig),
