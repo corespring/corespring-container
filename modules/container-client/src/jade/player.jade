@@ -7,18 +7,24 @@ block header-scripts
 
   if serviceWorker
     script(type="text/javascript").
-      console.log("foo!", '!{serviceWorker}');
+      console.log("loading service worker: ", '!{serviceWorker}');
 
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-          navigator.serviceWorker.register('!{serviceWorker}').then(function(registration) {
-            // Registration was successful
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          }, function(err) {
-            // registration failed :(
-            console.log('ServiceWorker registration failed: ', err);
-          });
+
+        window.addEventListener("load", function() {
+          navigator.serviceWorker
+            .register("!{serviceWorker}")
+            .then(function(){ return navigator.serviceWorker.ready;})
+            .then(function(register){
+              register.active.postMessage(
+                JSON.stringify({ itemId: "!{itemId}" })
+              );
+            })
+            .catch(function(e) {
+              console.error("Error loading service worker: ", e);
+            });
         });
+
       }
 
   if newRelicRumEnabled
