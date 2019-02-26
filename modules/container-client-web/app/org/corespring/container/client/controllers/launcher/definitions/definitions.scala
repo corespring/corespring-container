@@ -25,10 +25,11 @@ trait CorespringJsClient {
   def bootstrap: String
   def options: JsObject
   def queryParams: Map[String, String]
+  def customJs : String
 
   def src(corespringUrl: String) = {
     val finalOpts = options.deepMerge(obj("initTimeout" -> initTimeout))
-    builder.buildJs(corespringUrl, fileNames, finalOpts, bootstrap, queryParams)
+    builder.buildJs(corespringUrl, fileNames, finalOpts, bootstrap, queryParams, customJs)
   }
 
   def result(corespringUrl: String): SimpleResult = {
@@ -44,6 +45,7 @@ private[launcher] object Catalog extends LaunchCompanionUtils {
 }
 
 private[launcher] case class Catalog(initTimeout: Int, val builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
+  val customJs = ""
   override def fileNames: Seq[String] = Seq("catalog.js")
 
   override def bootstrap: String =
@@ -65,6 +67,9 @@ private[launcher] object Player extends LaunchCompanionUtils {
 }
 
 private[launcher] case class Player(initTimeout: Int, builder: JsBuilder, queryParams: Map[String, String], playerJs: PlayerJs) extends CorespringJsClient {
+
+  lazy val customJs = playerJs.customJs
+
   override lazy val fileNames: Seq[String] = Seq("player.js")
 
   override lazy val bootstrap: String =
@@ -108,6 +113,8 @@ private[launcher] case class ItemEditors(initTimeout: Int, builder: JsBuilder, q
   import org.corespring.container.client.controllers.apps.routes.{ DraftDevEditor => DraftDevEditorRoutes, DraftEditor => DraftEditorRoutes, ItemDevEditor => ItemDevEditorRoutes, ItemEditor => ItemEditorRoutes }
   import org.corespring.container.client.controllers.resources.routes.{ Item => ItemRoutes, ItemDraft => ItemDraftRoutes }
 
+  val customJs = ""
+
   val paths: JsObject = obj(
     "itemEditor" -> obj(
       "editor" -> ItemEditorRoutes.load(":itemId"),
@@ -142,6 +149,7 @@ private[launcher] object ComponentEditor extends LaunchCompanionUtils {
 
 private[launcher] case class ComponentEditor(initTimeout: Int, builder: JsBuilder, queryParams: Map[String, String]) extends CorespringJsClient {
 
+  val customJs = ""
   override val fileNames = Seq("draft.js", "component-editor.js")
 
   override val bootstrap =

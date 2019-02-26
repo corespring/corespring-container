@@ -1,15 +1,5 @@
 package org.corespring.container.client
 
-import play.api.libs.json.{Json}
-
-
-case class ServiceWorkerConfig(path:Option[String], cdn:Option[String], saveSession: Option[String] = None){
-
-  def toJson =  {
-    Json.writes[ServiceWorkerConfig].writes(this)
-  }
-}
-
 /**
  * @param rootUrl
  * @param newRelicRumConfig
@@ -18,8 +8,7 @@ case class ServiceWorkerConfig(path:Option[String], cdn:Option[String], saveSess
 case class V2PlayerConfig(
   rootUrl: Option[String],
   newRelicRumConfig: Option[NewRelicRumConfig],
-  launchTimeout: Int = 0,
-  serviceWorker: Option[ServiceWorkerConfig] = None) {
+  launchTimeout: Int = 0) {
   val useNewRelic = newRelicRumConfig.isDefined
 }
 

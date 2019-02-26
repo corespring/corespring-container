@@ -35,7 +35,12 @@ private[corespring] class JsBuilder(val resourcePath : ResourcePath) extends JsR
       """
   }
 
-  def buildJs(corespringUrl: String, files: Seq[String], options: JsObject, bootstrapLine: String, queryParams: Map[String, String]): String = {
+  def buildJs(corespringUrl: String,
+              files: Seq[String],
+              options: JsObject,
+              bootstrapLine: String,
+              queryParams: Map[String, String],
+              customJs:String): String = {
 
     val additionalJsNameAndSrc = files.map(lib(_)).map(pathToNameAndContents)
 
@@ -51,7 +56,10 @@ private[corespring] class JsBuilder(val resourcePath : ResourcePath) extends JsR
     s"""
        $coreJs
        ${wrappedContents.mkString("\n")}
-       $bootstrapLine"""
+       $bootstrapLine
+       // custom js
+       $customJs
+      """
   }
 
 }

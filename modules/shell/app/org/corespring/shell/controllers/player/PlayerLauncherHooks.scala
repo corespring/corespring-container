@@ -26,7 +26,15 @@ trait LoadJs {
       header.session - SessionKeys.failLoadPlayer
     }
 
-    PlayerJs(isSecure, updatedSession, errors)
+    val testSW =
+      """
+        |
+        | if( 'serviceWorker' in navigator ) {
+        |  // ...
+        |
+        | }
+      """.stripMargin
+    PlayerJs(isSecure, updatedSession, errors, customJs = "//foo")
   }
 }
 
