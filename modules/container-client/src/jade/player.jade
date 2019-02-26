@@ -7,17 +7,23 @@ block header-scripts
 
   if serviceWorker
     script(type="text/javascript").
-      console.log("loading service worker: ", '!{serviceWorker}');
 
-      if ('serviceWorker' in navigator) {
+      //console.log('serviceWorker:', !{serviceWorker});
+      //console.log("loading service worker: ", '!{serviceWorker.path}');
+
+
+      if ('serviceWorker' in navigator ) {
+
+        var config = !{serviceWorker};
 
         window.addEventListener("load", function() {
           navigator.serviceWorker
-            .register("!{serviceWorker}")
+            .register(config.path)
             .then(function(){ return navigator.serviceWorker.ready;})
             .then(function(register){
+              config.itemId = '!{itemId}';
               register.active.postMessage(
-                JSON.stringify({ itemId: "!{itemId}" })
+                JSON.stringify(config)
               );
             })
             .catch(function(e) {

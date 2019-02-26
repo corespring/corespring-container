@@ -108,7 +108,11 @@ class ContainerClientImplementation(
     editorDebounceInMillis = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000),
     components = ComponentsConfig.fromConfig(mode, resolveDomain(StaticPaths.assetUrl), configuration.getConfig("components").getOrElse(Configuration.empty)),
     player = V2PlayerConfig(
-      serviceWorker = configuration.getString("serviceWorker"),
+      serviceWorker = Some(ServiceWorkerConfig(
+        path = configuration.getString("serviceWorker.path"),
+        cdn = configuration.getString("serviceWorker.cdn"))),
+
+
       rootUrl = configuration.getString("rootUrl"),
       newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) }),
     uploadAudioMaxSizeKb = configuration.getLong("editor.upload.audio.maxSizeKb").getOrElse(8 * 1024),
