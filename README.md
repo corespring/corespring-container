@@ -1,6 +1,11 @@
 # Corespring Container
 
 
+
+* session.save to the browser directly point to a different server.
+* load images -> session/index -> player/index -> player/foo.png -> SEE_OTHER
+means that we'd have to load the session/item twice should cache somehow?
+
 Contains the container libraries, and a shell module so you can run the application with some dummy data.
 
 This will allow integration points into the main corespring-api project.

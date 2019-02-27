@@ -8,7 +8,7 @@ import org.bson.types.ObjectId
 import org.corespring.amazon.s3.{ConcreteS3Service, S3Service}
 import org.corespring.container.client._
 import org.corespring.container.client.component.{ComponentSetExecutionContext, ComponentsConfig}
-import org.corespring.container.client.controllers.apps.StaticPaths
+import org.corespring.container.client.controllers.apps.{CdnConfig, StaticPaths}
 import org.corespring.container.client.hooks._
 import org.corespring.container.client.integration.{ContainerConfig, ContainerExecutionContext, DefaultIntegration}
 import org.corespring.container.components.model.Component
@@ -102,14 +102,19 @@ class ContainerClientImplementation(
 
   private val mode = Play.current.mode
 
-  override val containerConfig: ContainerConfig = ContainerConfig(
-    mode,
-    showNonReleasedComponents = configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev),
-    editorDebounceInMillis = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000),
-    components = ComponentsConfig.fromConfig(mode, resolveDomain(StaticPaths.assetUrl), configuration.getConfig("components").getOrElse(Configuration.empty)),
-    player = V2PlayerConfig(
-      rootUrl = configuration.getString("rootUrl"),
-      newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) }),
-    uploadAudioMaxSizeKb = configuration.getLong("editor.upload.audio.maxSizeKb").getOrElse(8 * 1024),
-    uploadImageMaxSizeKb = configuration.getLong("editor.upload.image.maxSizeKb").getOrElse(500))
+  override val containerConfig: ContainerConfig = {
+    val cdn = configuration.getString("cdn.domain").map(h => CdnConfig(h))
+
+    ContainerConfig(
+      mode,
+      showNonReleasedComponents = configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev),
+      editorDebounceInMillis = configuration.getLong("editor.autosave.debounceInMillis").getOrElse(5000),
+      components = ComponentsConfig.fromConfig(mode, resolveDomain(StaticPaths.assetUrl), configuration.getConfig("components").getOrElse(Configuration.empty)),
+      player = V2PlayerConfig(
+        rootUrl = configuration.getString("rootUrl"),
+        newRelicRumConfig = configuration.getConfig("newrelic.rum.applications.player").flatMap { c => NewRelicRumConfig.fromConfig(c) },
+        cdn = cdn),
+      uploadAudioMaxSizeKb = configuration.getLong("editor.upload.audio.maxSizeKb").getOrElse(8 * 1024),
+      uploadImageMaxSizeKb = configuration.getLong("editor.upload.image.maxSizeKb").getOrElse(500))
+  }
 }

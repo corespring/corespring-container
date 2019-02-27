@@ -18,9 +18,9 @@ GET           /component-single/:context/:componentType.:suffix          @org.co
 
 # Hooks for the player: config,  components
 
-GET           /player/session/:sessionId/index.html                      @org.corespring.container.client.controllers.apps.Player.load(sessionId: String)
-GET           /player/session/:sessionId/*file                           @org.corespring.container.client.controllers.apps.Player.getFile(sessionId, file)
+GET           /player/session/:sessionId/index.html                      @org.corespring.container.client.controllers.apps.Player.loadBySession(sessionId)
 POST          /player/item/:itemId/index.html                            @org.corespring.container.client.controllers.apps.Player.createSessionForItem(itemId: String)
+GET           /player/item/:itemId/index.html                           @org.corespring.container.client.controllers.apps.Player.load(itemId: String, sessionId: Option[String])
 GET           /player/item/:itemId/*file                                 @org.corespring.container.client.controllers.apps.Player.getFileByItemId(itemId: String, file:String)
 
 # Session

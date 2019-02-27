@@ -46,6 +46,7 @@ object Build extends sbt.Build {
     val lessCss = "org.lesscss" % "lesscss" % "1.7.0.1.1"
     val rhinoJs = "org.mozilla" % "rhino" % "1.7.6"
     val playS3 = "org.corespring" %% "s3-play-plugin" % "1.2.0"
+    val playCache = "com.typesafe.play" %% "play-cache" % "2.2.6" //exclude("org.scala-stm", "scala-stm_2.10.0")
     val scalaz = "org.scalaz" %% "scalaz-core" % "7.0.6"
     val specs2 = "org.specs2" %% "specs2" % "2.2.2" % "test"
     val yuiCompressor = "com.yahoo.platform.yui" % "yuicompressor" % "2.4.7"
@@ -216,7 +217,8 @@ object Build extends sbt.Build {
         commonsIo,
         aws,
         jsoup,
-        macWireMacro),
+        macWireMacro,
+        playCache),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
       componentModel % "compile->compile;test->test",
@@ -244,7 +246,7 @@ object Build extends sbt.Build {
 
   val shell = builder.playApp("shell")
     .settings(
-      libraryDependencies ++= Seq(macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
+      libraryDependencies ++= Seq(playCache, macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
     .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
     .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, componentServices, utils, jsProcessing, mongoJsonService, docs, logging)
 

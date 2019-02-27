@@ -28,6 +28,21 @@ object StrippableParams {
 trait QueryStringHelper {
 
 
+  def toMap(s:String) : Map[String,String] = {
+
+    val arr = s.split("\\&")
+    val out : Map[String,String] = arr.foldRight(Map.empty[String,String])( (s, acc) => {
+      val a = s.split("\\=")
+      if(a.length == 2){
+        val Array(key, value) = a
+        acc + (key -> value)
+      } else {
+        acc
+      }
+    })
+    out
+  }
+
   def paramsToStrip : Seq[String] = StrippableParams.params
 
   def mapToParamString(m: Map[String, String]): String = m.toSeq.map { t =>

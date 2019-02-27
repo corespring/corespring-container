@@ -132,17 +132,21 @@ sessionService: MongoService)
     implicit request =>
 
       logger.debug("create session....")
-      val result = for {
+
+      val result : Option[(String,ObjectId)] = for {
         json <- request.body.asJson
+        itemId <- (json \ "itemId").asOpt[String]
         saved <- sessionService.create(json)
       } yield {
         logger.debug(Json.stringify(json))
-        saved
+        (itemId, saved)
       }
 
       result.map {
-        oid =>
-          val call = org.corespring.container.client.controllers.apps.routes.Player.load(oid.toString)
+        (t) =>
+          val (itemId, oid) = t
+          import org.corespring.container.client.controllers.apps.routes.Player
+          val call = Player.load(itemId, Some(oid.toString))
           logger.debug(s"url ${call.url}")
           val url = s"${call.url}?${request.rawQueryString}"
           Ok(Json.obj("url" -> url))

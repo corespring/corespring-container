@@ -78,7 +78,8 @@ private[launcher] case class Player(initTimeout: Int, builder: JsBuilder, queryP
 
     import org.corespring.container.client.controllers.apps.routes.{ Player => Routes }
 
-    val loadSession = Routes.load(":sessionId")
+    val loadSession = Routes.loadBySession(":sessionId" )
+
     val paths = obj("paths" -> obj(
       "createSession" -> Routes.createSessionForItem(":id"),
       "gather" -> loadSession,
