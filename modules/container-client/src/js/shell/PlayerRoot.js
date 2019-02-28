@@ -49,6 +49,18 @@ $(document).ready(function() {
         opts.customVariables.colors[colors[i]] = v;
       }
     }
+//    opts.debounce = {
+//      onInputReceived: 300,
+//      saveResponses: 100
+//    }
+
+    opts.onInputReceived = function(){
+      //console.log('input received...', arguments);
+      player.saveResponses(false, function(){
+        console.log('saved');
+      });
+    };
+
     opts.customVariables.iconSet = $('input[name=iconset]:checked').val() || 'check';
     player = new org.corespring.players.ItemPlayer(holder, opts, function(err) {
       console.warn(err);

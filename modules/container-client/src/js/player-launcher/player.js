@@ -27,7 +27,31 @@ exports.define = function(isSecure) {
   }
   /* jshint ignore:end */
 
+  function buildFn(fn, wait) {
+    if(fn) {
+      if(Number.isFinite(wait)){
+        var w = Math.max(0, Math.min(1500, wait));
+        return _.debounce(fn, w, {leading: false, trailing: true});
+      }
+    }
+  }
+
   var PlayerDefinition = function(element, options, errorCallback) {
+
+    var debounceOpts = Object.assign({
+      saveResponses: 400,
+      onInputReceived: 300
+    }, options.debounce);
+
+    console.log('debounce  opts: ', debounceOpts);
+
+    options.onInputReceived = buildFn(options.onInputReceived, debounceOpts.onInputReceived);
+//     ?
+//      _.debounce(
+//        options.onInputReceived,
+//        options.debounce.onInputReceived || 0,
+//        {leading: false, trailing: true})
+//        : undefined;
 
     var Launcher = require('client-launcher');
     var launcher = new Launcher(element, options, errorCallback);
@@ -203,11 +227,11 @@ exports.define = function(isSecure) {
       }
     };
 
-    this.saveResponses = function(isAttempt, callback) {
+    this.saveResponses = buildFn(function(isAttempt, callback) {
       instance.send('saveResponses', {isAttempt: isAttempt}, function(err, session){
         callback({error: err, session: session});
       });
-    };
+    }, debounceOpts.saveResponses);
 
     this.completeResponse = function(callback) {
       instance.send('completeResponse', callback);

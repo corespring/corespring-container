@@ -1,16 +1,17 @@
 package org.corespring.shell.controllers.player
 
+import com.mongodb.WriteConcern
 import org.corespring.container.client.hooks.Hooks.StatusMessage
-import org.corespring.container.client.hooks.{ SessionHooks => ContainerSessionHooks, FullSession, SaveSession, SessionOutcome }
+import org.corespring.container.client.hooks.{FullSession, SaveSession, SessionOutcome, SessionHooks => ContainerSessionHooks}
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.mongo.json.services.MongoService
 import org.corespring.shell.services.{ItemService, SessionService}
 import play.api.Logger
 import play.api.http.Status._
-import play.api.libs.json.{ Json, JsValue }
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc._
 
-import scala.concurrent.{ Future }
+import scala.concurrent.Future
 
 class SessionHooks(
 sessionService: SessionService,
@@ -70,7 +71,7 @@ itemService: ItemService,
     val result = for {
       session <- sessionService.load(id)
     } yield {
-      SaveSession(session, isSecure(header), isComplete(session), sessionService.save(_, _))
+      SaveSession(session, isSecure(header), isComplete(session), sessionService.save(_, _, false, WriteConcern.NORMAL, false))
     }
     result.map(Right(_)).getOrElse(Left(BAD_REQUEST -> ""))
   }

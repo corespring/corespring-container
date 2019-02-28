@@ -111,7 +111,7 @@ class MongoService(val collection: MongoCollection) {
     collection.findAndRemove(q).map(toJson)
   }
 
-  def fineGrainedSave(id: String, data: JsValue): Option[JsObject] = withQuery(id) {
+  def fineGrainedSave(id: String, data: JsValue, wc : WriteConcern = WriteConcern.Safe): Option[JsObject] = withQuery(id) {
     q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
@@ -120,9 +120,9 @@ class MongoService(val collection: MongoCollection) {
       setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, false, false, WriteConcern.Safe)
+      val result = collection.update(q, d, false, false, wc)
 
-      if (result.getLastError(WriteConcern.Safe).ok()) {
+      if (result.getLastError(wc).ok()) {
         Some(data.as[JsObject])
       } else {
         logger.warn(s"Error saving: $id")
@@ -133,7 +133,12 @@ class MongoService(val collection: MongoCollection) {
   def toDbo(json: JsValue): DBObject = MongoJson.parse(PlayJson.stringify(json)).asInstanceOf[DBObject]
   def toJson(dbo: DBObject) = PlayJson.parse(MongoJson.serialize(dbo)).as[JsObject]
 
-  def save(id: String, data: JsValue, upsert: Boolean = true): Option[JsValue] = withQuery(id) {
+  def save(
+            id: String,
+            data: JsValue,
+            upsert: Boolean = true,
+            wc : WriteConcern = WriteConcern.Safe,
+            checkResult: Boolean = true): Option[JsValue] = withQuery(id) {
     q =>
       logger.debug(s"[save]: $id")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
@@ -142,16 +147,19 @@ class MongoService(val collection: MongoCollection) {
       setDbo.removeField("_id")
       logger.trace(s"set dbo: $setDbo")
       val d = MongoDBObject("$set" -> setDbo)
-      val result = collection.update(q, d, upsert, false, WriteConcern.Safe)
+      val result = collection.update(q, d, upsert, false, wc) //WriteConcern.Safe)
 
       if (result.getN() == 0) {
         logger.warn(s"No db record written for: $id")
         None
-      } else if (result.getLastError(WriteConcern.Safe).ok()) {
-        Some(data.as[JsObject])
+      } else if (checkResult) {
+        if(result.getLastError(wc).ok()) {
+          Some(data.as[JsObject])
+        } else {
+          None
+        }
       } else {
-        logger.warn(s"Error saving: $id")
-        None
+        Some(data.as[JsObject])
       }
   }
 
