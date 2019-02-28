@@ -198,6 +198,7 @@ function debounce(func, wait, options) {
   }
 
   var PlayerDefinition = function(element, options, errorCallback) {
+    options = options || {};
 
     var debounceOpts = Object.assign({
       saveResponses: 500,
