@@ -23,4 +23,3 @@ GET         /assets/*file        controllers.Assets.at(path="/container-client",
 ->          /client              v2Player.Routes
 ->          /editor  			 v2Editor.Routes
 
-->          /docs                docs.Routes

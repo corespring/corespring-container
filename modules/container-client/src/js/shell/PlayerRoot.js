@@ -49,13 +49,9 @@ $(document).ready(function() {
         opts.customVariables.colors[colors[i]] = v;
       }
     }
-//    opts.debounce = {
-//      onInputReceived: 300,
-//      saveResponses: 100
-//    }
 
     opts.onInputReceived = function(){
-      //console.log('input received...', arguments);
+      console.log('[onInputReceived]', arguments);
       player.saveResponses(false, function(){
         console.log('saved');
       });
