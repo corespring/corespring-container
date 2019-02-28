@@ -1,4 +1,0 @@
-@(componentType: String, definition:String)
-(function(exports, require){
-  @definition;
-})(corespring.server.logic("@componentType"), corespring.require);
