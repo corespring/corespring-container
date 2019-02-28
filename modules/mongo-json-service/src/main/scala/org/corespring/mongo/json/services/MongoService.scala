@@ -140,7 +140,7 @@ class MongoService(val collection: MongoCollection) {
             wc : WriteConcern = WriteConcern.Safe,
             checkResult: Boolean = true): Option[JsValue] = withQuery(id) {
     q =>
-      logger.debug(s"[save]: $id")
+      logger.debug(s"[save]: $id, wc: $wc")
       logger.trace(s"[save]: ${PlayJson.stringify(data)}")
 
       val setDbo = toDbo(data)
@@ -149,7 +149,9 @@ class MongoService(val collection: MongoCollection) {
       val d = MongoDBObject("$set" -> setDbo)
       val result = collection.update(q, d, upsert, false, wc) //WriteConcern.Safe)
 
-      if (result.getN() == 0) {
+      val n = result.getN()
+      logger.trace(s"[save] result.getN: ${n}")
+      if (n == 0) {
         logger.warn(s"No db record written for: $id")
         None
       } else if (checkResult) {

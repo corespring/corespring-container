@@ -251,7 +251,6 @@ module.exports = (grunt) ->
     ['mk-css',
     'component-version-info'
     'directive-templates',
-    'jshint',
     'uglify',
     'compress',
     'pathReporter',

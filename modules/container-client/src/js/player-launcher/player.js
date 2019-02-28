@@ -204,8 +204,6 @@ function debounce(func, wait, options) {
       onInputReceived: 500
     }, options.debounce);
 
-    console.log('debounce  opts: ', debounceOpts);
-
     options.onInputReceived = buildFn(options.onInputReceived, debounceOpts.onInputReceived);
 
     var Launcher = require('client-launcher');
