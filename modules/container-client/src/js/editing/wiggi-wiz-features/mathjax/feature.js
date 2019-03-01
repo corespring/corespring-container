@@ -41,8 +41,9 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
               notifyEditorOfChange();
             }
           };
-          let modelWatch = scope.$watch('ngModel', updateFn);
-          let codeWatch = scope.$watch('code', updateFn);
+
+          var modelWatch = scope.$watch('ngModel', updateFn);
+          var codeWatch = scope.$watch('code', updateFn);
 
           scope.$on('$destroy', function() {
             modelWatch();
