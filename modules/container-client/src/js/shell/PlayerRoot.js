@@ -51,10 +51,14 @@ $(document).ready(function() {
     }
 
     opts.onInputReceived = function(){
-      console.log('[onInputReceived]', arguments);
-      player.saveResponses(false, function(){
-        console.log('saved');
-      });
+
+      var autoSave = $('#auto-save-enabled')[0].checked;
+      console.log('auto save?', autoSave);
+      if(autoSave){
+        player.saveResponses(false, function(){
+          console.log('saved');
+        });
+      }
     };
 
     opts.customVariables.iconSet = $('input[name=iconset]:checked').val() || 'check';
