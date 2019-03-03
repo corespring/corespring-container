@@ -1,6 +1,167 @@
 exports.define = function(isSecure) {
 
 
+
+/////////////// Lifted from lodash //
+function isObject(value) {
+  const type = typeof value
+  return value != null && (type == 'object' || type == 'function')
+}
+
+function debounce(func, wait, options) {
+  var lastArgs,
+    lastThis,
+    maxWait,
+    result,
+    timerId,
+    lastCallTime
+
+  var lastInvokeTime = 0
+  var leading = false
+  var maxing = false
+  var trailing = true
+
+  var root = window;
+
+  // Bypass `requestAnimationFrame` by explicitly setting `wait=0`.
+  var useRAF = (!wait && wait !== 0 && typeof root.requestAnimationFrame === 'function')
+
+  if (typeof func !== 'function') {
+    throw new TypeError('Expected a function')
+  }
+
+  wait = +wait || 0
+  //!! isObject
+  if (isObject(options)) {
+    leading = !!options.leading
+    maxing = 'maxWait' in options
+    maxWait = maxing ? Math.max(+options.maxWait || 0, wait) : maxWait
+    trailing = 'trailing' in options ? !!options.trailing : trailing
+  }
+
+  function invokeFunc(time) {
+    var args = lastArgs
+    var thisArg = lastThis
+
+    lastArgs = lastThis = undefined
+    lastInvokeTime = time
+    result = func.apply(thisArg, args)
+    return result
+  }
+
+  function startTimer(pendingFunc, wait) {
+    if (useRAF) {
+      root.cancelAnimationFrame(timerId);
+      return root.requestAnimationFrame(pendingFunc)
+    }
+    return setTimeout(pendingFunc, wait)
+  }
+
+  function cancelTimer(id) {
+    if (useRAF) {
+      return root.cancelAnimationFrame(id)
+    }
+    clearTimeout(id)
+  }
+
+  function leadingEdge(time) {
+    // Reset any `maxWait` timer.
+    lastInvokeTime = time
+    // Start the timer for the trailing edge.
+    timerId = startTimer(timerExpired, wait)
+    // Invoke the leading edge.
+    return leading ? invokeFunc(time) : result
+  }
+
+  function remainingWait(time) {
+    const timeSinceLastCall = time - lastCallTime
+    const timeSinceLastInvoke = time - lastInvokeTime
+    const timeWaiting = wait - timeSinceLastCall
+
+    return maxing
+      ? Math.min(timeWaiting, maxWait - timeSinceLastInvoke)
+      : timeWaiting
+  }
+
+  function shouldInvoke(time) {
+    const timeSinceLastCall = time - lastCallTime
+    const timeSinceLastInvoke = time - lastInvokeTime
+
+    // Either this is the first call, activity has stopped and we're at the
+    // trailing edge, the system time has gone backwards and we're treating
+    // it as the trailing edge, or we've hit the `maxWait` limit.
+    return (lastCallTime === undefined || (timeSinceLastCall >= wait) ||
+      (timeSinceLastCall < 0) || (maxing && timeSinceLastInvoke >= maxWait))
+  }
+
+  function timerExpired() {
+    const time = Date.now()
+    if (shouldInvoke(time)) {
+      return trailingEdge(time)
+    }
+    // Restart the timer.
+    timerId = startTimer(timerExpired, remainingWait(time))
+  }
+
+  function trailingEdge(time) {
+    timerId = undefined
+
+    // Only invoke if we have `lastArgs` which means `func` has been
+    // debounced at least once.
+    if (trailing && lastArgs) {
+      return invokeFunc(time)
+    }
+    lastArgs = lastThis = undefined
+    return result
+  }
+
+  function cancel() {
+    if (timerId !== undefined) {
+      cancelTimer(timerId)
+    }
+    lastInvokeTime = 0
+    lastArgs = lastCallTime = lastThis = timerId = undefined
+  }
+
+  function flush() {
+    return timerId === undefined ? result : trailingEdge(Date.now())
+  }
+
+  function pending() {
+    return timerId !== undefined
+  }
+
+  function debounced(...args) {
+    var time = Date.now()
+    var isInvoking = shouldInvoke(time)
+
+    lastArgs = args
+    lastThis = this
+    lastCallTime = time
+
+    if (isInvoking) {
+      if (timerId === undefined) {
+        return leadingEdge(lastCallTime)
+      }
+      if (maxing) {
+        // Handle invocations in a tight loop.
+        timerId = startTimer(timerExpired, wait)
+        return invokeFunc(lastCallTime)
+      }
+    }
+    if (timerId === undefined) {
+      timerId = startTimer(timerExpired, wait)
+    }
+    return result
+  }
+  debounced.cancel = cancel
+  debounced.flush = flush
+  debounced.pending = pending
+  return debounced
+}
+
+////////////////
+
   /** IE8 Support */
   /* jshint ignore:start */
   if (!Array.prototype.indexOf)
@@ -27,7 +188,24 @@ exports.define = function(isSecure) {
   }
   /* jshint ignore:end */
 
+  function buildFn(fn, wait) {
+    if(fn) {
+      if(Number.isFinite(wait)){
+        var w = Math.max(0, Math.min(1500, wait));
+        return debounce(fn, w, {leading: false, trailing: true});
+      }
+    }
+  }
+
   var PlayerDefinition = function(element, options, errorCallback) {
+    options = options || {};
+
+    var debounceOpts = Object.assign({
+      saveResponses: 500,
+      onInputReceived: 500
+    }, options.debounce);
+
+    options.onInputReceived = buildFn(options.onInputReceived, debounceOpts.onInputReceived);
 
     var Launcher = require('client-launcher');
     var launcher = new Launcher(element, options, errorCallback);
@@ -203,11 +381,11 @@ exports.define = function(isSecure) {
       }
     };
 
-    this.saveResponses = function(isAttempt, callback) {
+    this.saveResponses = buildFn(function(isAttempt, callback) {
       instance.send('saveResponses', {isAttempt: isAttempt}, function(err, session){
         callback({error: err, session: session});
       });
-    };
+    }, debounceOpts.saveResponses);
 
     this.completeResponse = function(callback) {
       instance.send('completeResponse', callback);

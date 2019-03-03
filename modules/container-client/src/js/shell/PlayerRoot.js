@@ -49,6 +49,18 @@ $(document).ready(function() {
         opts.customVariables.colors[colors[i]] = v;
       }
     }
+
+    opts.onInputReceived = function(){
+
+      var autoSave = $('#auto-save-enabled')[0].checked;
+      console.log('auto save?', autoSave);
+      if(autoSave){
+        player.saveResponses(false, function(){
+          console.log('saved');
+        });
+      }
+    };
+
     opts.customVariables.iconSet = $('input[name=iconset]:checked').val() || 'check';
     player = new org.corespring.players.ItemPlayer(holder, opts, function(err) {
       console.warn(err);

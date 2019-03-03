@@ -41,8 +41,14 @@ angular.module('corespring-editing.wiggi-wiz-features.mathjax').factory('WiggiMa
               notifyEditorOfChange();
             }
           };
-          scope.$watch('ngModel', updateFn);
-          scope.$watch('code', updateFn);
+
+          var modelWatch = scope.$watch('ngModel', updateFn);
+          var codeWatch = scope.$watch('code', updateFn);
+
+          scope.$on('$destroy', function() {
+            modelWatch();
+            codeWatch();
+          });
         }
       };
 

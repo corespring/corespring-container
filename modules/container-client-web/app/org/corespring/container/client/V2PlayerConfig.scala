@@ -1,6 +1,5 @@
 package org.corespring.container.client
 
-import org.corespring.container.client.controllers.apps.CdnConfig
 
 /**
  * @param rootUrl
@@ -10,8 +9,7 @@ import org.corespring.container.client.controllers.apps.CdnConfig
 case class V2PlayerConfig(
   rootUrl: Option[String],
   newRelicRumConfig: Option[NewRelicRumConfig],
-  launchTimeout: Int = 0,
-  cdn: Option[CdnConfig]) {
+  launchTimeout: Int = 0) {
   val useNewRelic = newRelicRumConfig.isDefined
 }
 

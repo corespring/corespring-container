@@ -117,11 +117,11 @@ object Build extends sbt.Build {
         (npmCmd, "install"),
 
         /**
-         * Note: Adding a bower cache clean to workaround this issue:
-         * https://github.com/bower/bower/issues/991
-         * Once this is fixed we can remove this
-         * (bowerCmd, "cache clean"),
-         */
+          * Note: Adding a bower cache clean to workaround this issue:
+          * https://github.com/bower/bower/issues/991
+          * Once this is fixed we can remove this
+          * (bowerCmd, "cache clean"),
+          */
         (bowerCmd, "install"),
         (gruntCmd, "loadComponentDependencies"),
         (gruntCmd, "stage"))
@@ -179,20 +179,21 @@ object Build extends sbt.Build {
   //Note: As above...
   lazy val componentModel = builder.playApp("component-model")
     .settings(playAppToSbtLibSettings: _*)
-    .dependsOn(logging, utils % "test->compile;compile->compile")
+    .dependsOn(logging, utils) // % "test->compile;compile->compile")
 
   lazy val componentServices = builder.playApp("component-services")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(dependencyUtils))
-    .dependsOn(componentModel % "compile->compile;test->test", logging, utils % "test->compile;compile->compile")
+    //.dependsOn(componentModel % "compile->compile;test->test", logging, utils % "test->compile;compile->compile")
+    .dependsOn(componentModel,logging, utils ) ///% "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(rhinoJs, grizzledLog, macWireMacro))
-    .dependsOn(logging, containerClient, componentServices, componentModel % "test->test;compile->compile")
+    .dependsOn(logging, containerClient, componentServices, componentModel) // % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
@@ -221,8 +222,8 @@ object Build extends sbt.Build {
         playCache),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
-      componentModel % "compile->compile;test->test",
-      componentServices % "compile->compile;test->test",
+      componentModel, // % "compile->compile;test->test",
+      componentServices, // % "compile->compile;test->test",
       containerClient,
       utils,
       logging,
@@ -233,22 +234,11 @@ object Build extends sbt.Build {
     .settings(libraryDependencies ++= Seq(casbah, mockito))
     .dependsOn(logging)
 
-  val docs = builder.playApp("docs")
-    .settings(LaikaPlugin.defaults: _*)
-    .settings(
-      unmanagedResourceDirectories in Compile += target.value / "docs",
-      compile in Compile := {
-        import laika.sbt.LaikaSbtPlugin.LaikaKeys._
-        (site in Laika).value
-        (compile in Compile).value
-      } //(compile in Compile).dependsOn(laika.sbt.LaikaSbtPlugin.LaikaKeys.site)
-      )
-
   val shell = builder.playApp("shell")
     .settings(
       libraryDependencies ++= Seq(playCache, macWireMacro, logbackClassic, casbah, playS3, scalaz, play.Keys.cache, yuiCompressor, closureCompiler, commonsIo))
-    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, docs, logging)
-    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, componentServices, utils, jsProcessing, mongoJsonService, docs, logging)
+    .dependsOn(containerClientWeb, componentLoader, mongoJsonService, logging)
+    .aggregate(containerClientWeb, componentLoader, containerClient, componentModel, componentServices, utils, jsProcessing, mongoJsonService, logging)
 
   val root = builder.playApp("root", Some("."))
     .settings(
@@ -304,3 +294,4 @@ object Build extends sbt.Build {
   }
 
 }
+
