@@ -25,11 +25,11 @@ import play.api.{Configuration, Logger, Mode, Play}
 import scala.concurrent.ExecutionContext
 
 class ContainerClientImplementation(
-  val itemService: ItemService,
-  val sessionService: SessionService,
-  val draftItemService: ItemDraftService,
-  componentsIn: => Seq[Component],
-  configuration: Configuration) extends DefaultIntegration {
+                                     val itemService: ItemService,
+                                     val sessionService: SessionService,
+                                     val draftItemService: ItemDraftService,
+                                     componentsIn: => Seq[Component],
+                                     configuration: Configuration) extends DefaultIntegration {
 
   override def resolveDomain(path: String): String = {
     val separator = if (path.startsWith("/")) "" else "/"
@@ -102,6 +102,13 @@ class ContainerClientImplementation(
 
   private val mode = Play.current.mode
 
+  override val endpointConfig: EndpointConfig = {
+    val c = configuration
+    val saveSession = c.getString("saveSession").map(u => {
+      Endpoint(c.getString("saveSessionMethod").getOrElse("POST"), u)
+    })
+    EndpointConfig(saveSession)
+  }
   override val containerConfig: ContainerConfig = ContainerConfig(
     mode,
     showNonReleasedComponents = configuration.getBoolean("components.showNonReleasedComponents").getOrElse(mode == Mode.Dev),

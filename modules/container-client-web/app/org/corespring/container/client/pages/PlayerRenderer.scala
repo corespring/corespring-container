@@ -2,9 +2,9 @@ package org.corespring.container.client.pages
 
 import java.lang.Boolean
 
-import org.corespring.container.client.{ V2PlayerConfig, VersionInfo }
-import org.corespring.container.client.component.{ ComponentJson, ComponentsScriptBundle }
-import org.corespring.container.client.controllers.apps.{ NgSourcePaths, PageSourceService, PlayerEndpoints, SourcePaths }
+import org.corespring.container.client.{EndpointConfig, V2PlayerConfig, VersionInfo}
+import org.corespring.container.client.component.{ComponentJson, ComponentsScriptBundle}
+import org.corespring.container.client.controllers.apps.{NgSourcePaths, PageSourceService, PlayerEndpoints, SourcePaths}
 import org.corespring.container.client.controllers.helpers.PlayerXhtml
 import org.corespring.container.client.integration.ContainerExecutionContext
 import org.corespring.container.client.pages.engine.JadeEngine
@@ -16,10 +16,11 @@ import play.api.libs.json.Json.JsValueWrapper
 import play.api.libs.json._
 import play.api.templates.Html
 
-import scala.concurrent.{ ExecutionContext, Future }
+import scala.concurrent.{ExecutionContext, Future}
 
 class PlayerRenderer(
-  playerConfig: V2PlayerConfig,
+                    playerConfig: V2PlayerConfig,
+  endpointConfig: EndpointConfig,
   containerContext: ContainerExecutionContext,
   jadeEngine: JadeEngine,
   val pageSourceService: PageSourceService,
@@ -67,7 +68,7 @@ class PlayerRenderer(
     logger.info(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
-    val endpoints = PlayerEndpoints.session(sessionId)
+    val endpoints = PlayerEndpoints.session(sessionId, endpointConfig)
     val queryParamsJson = Json.toJson(queryParams)
 
     val (controlsJs, controlsNgModules): (Seq[String], Seq[String]) = (showControls, prodMode) match {

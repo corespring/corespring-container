@@ -1,8 +1,9 @@
 package org.corespring.container.client.controllers.apps
 
+import org.corespring.container.client.EndpointConfig
 import org.corespring.container.client.controllers.resources.routes._
-import org.corespring.container.client.controllers.resources.{ routes => resourceRoutes }
-import org.corespring.container.client.views.models.{ MainEndpoints, SessionEndpoints, SupportingMaterialsEndpoints }
+import org.corespring.container.client.controllers.resources.{routes => resourceRoutes}
+import org.corespring.container.client.views.models.{MainEndpoints, SessionEndpoints, SupportingMaterialsEndpoints}
 
 trait Endpoints {
   def main(id: String): MainEndpoints
@@ -11,7 +12,7 @@ trait Endpoints {
 
 object PlayerEndpoints {
 
-  def session(sessionId: String) = SessionEndpoints(
+  def session(sessionId: String, endpointConfig: EndpointConfig) = SessionEndpoints(
     complete = Session.completeSession(sessionId),
     getScore = Session.getScore(sessionId),
     loadInstructorData = Session.loadInstructorData(sessionId),
@@ -19,7 +20,7 @@ object PlayerEndpoints {
     loadOutcome = Session.loadOutcome(sessionId),
     reopen = Session.reopenSession(sessionId),
     reset = Session.resetSession(sessionId),
-    save = Session.saveSession(sessionId))
+    save = endpointConfig.saveSession.map(c => c.toCall()).getOrElse(Session.saveSession(sessionId)))
 }
 
 object ItemEditorEndpoints extends Endpoints {

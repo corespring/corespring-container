@@ -1,5 +1,7 @@
 package org.corespring.container.client
 
+import play.api.mvc.Call
+
 /**
  * @param rootUrl
  * @param newRelicRumConfig
@@ -11,4 +13,11 @@ case class V2PlayerConfig(
   launchTimeout: Int = 0) {
   val useNewRelic = newRelicRumConfig.isDefined
 }
+
+case class Endpoint(method:String, url: String) {
+  def toCall() : Call = {
+    Call(this.method, this.url)
+  }
+}
+case class EndpointConfig(saveSession: Option[Endpoint])
 
