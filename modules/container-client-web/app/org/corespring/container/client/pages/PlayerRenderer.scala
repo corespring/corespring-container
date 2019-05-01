@@ -65,8 +65,9 @@ class PlayerRenderer(
     showControls: scala.Boolean,
     iconSet: String,
     colors: JsObject): Future[Html] = Future {
-    logger.info(s"function=render, bundle=$bundle")
-
+    println("!!!!!!!!!!!!!")
+    logger.info(s">> function=render, bundle=$bundle")
+    logger.info(s"endpointConfig: $endpointConfig")
     val (js, css) = prepareJsCss(prodMode, bundle)
     val endpoints = PlayerEndpoints.session(sessionId, endpointConfig)
     val queryParamsJson = Json.toJson(queryParams)

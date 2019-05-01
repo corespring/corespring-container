@@ -15,8 +15,12 @@ case class V2PlayerConfig(
 }
 
 case class Endpoint(method:String, url: String) {
-  def toCall() : Call = {
-    Call(this.method, this.url)
+  def toCall(kv: (String,String)*) : Call = {
+    val preppedUrl = kv.foldLeft(this.url)( (u, t) => {
+      val (k,v) = t
+      u.replace(k,v)
+    })
+    Call(this.method, preppedUrl)
   }
 }
 case class EndpointConfig(saveSession: Option[Endpoint])

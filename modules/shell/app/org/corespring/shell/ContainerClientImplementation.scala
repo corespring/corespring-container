@@ -107,6 +107,7 @@ class ContainerClientImplementation(
     val saveSession = c.getString("saveSession").map(u => {
       Endpoint(c.getString("saveSessionMethod").getOrElse("POST"), u)
     })
+    logger.info(s"saveSession: $saveSession")
     EndpointConfig(saveSession)
   }
   override val containerConfig: ContainerConfig = ContainerConfig(

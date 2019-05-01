@@ -20,7 +20,7 @@ object PlayerEndpoints {
     loadOutcome = Session.loadOutcome(sessionId),
     reopen = Session.reopenSession(sessionId),
     reset = Session.resetSession(sessionId),
-    save = endpointConfig.saveSession.map(c => c.toCall()).getOrElse(Session.saveSession(sessionId)))
+    save = endpointConfig.saveSession.map(c => c.toCall(":sessionId" -> sessionId)).getOrElse(Session.saveSession(sessionId)))
 }
 
 object ItemEditorEndpoints extends Endpoints {
