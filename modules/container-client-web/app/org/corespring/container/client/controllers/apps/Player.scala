@@ -183,6 +183,7 @@ class Player(mode: Mode,
       }
     }
   }
+
   def getFileByItemId(itemId: String, file: String) = Action.async {
     implicit request =>
       Future {
@@ -190,22 +191,4 @@ class Player(mode: Mode,
       }
   }
 
-//  def getFileByItemId(itemId: String, file: String) = Action.async {
-//    implicit request => {
-//
-//      playerConfig.cdn match {
-//        case Some(c) => {
-//          val download = request.queryString.get("dl").map(_.head == "true").getOrElse(false)
-//          if(download){
-//            Future(hooks.loadItemFile(itemId, file)(request))
-//          } else {
-//            val call = PlayerRoutes.getFileByItemId(itemId, file)
-//            val url = s"${call.url}?dl=true"
-//            Future.successful(SeeOther(s"${c.host}${url}"))
-//          }
-//        }
-//        case _ => Future(hooks.loadItemFile(itemId, file))
-//      }
-//    }
-//  }
 }
