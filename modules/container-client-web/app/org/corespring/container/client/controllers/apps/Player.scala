@@ -74,7 +74,6 @@ class Player(mode: Mode,
     val key = s"loadSessionAndItem_$sessionId"
     val v: Option[JsObject] = Cache.get(key).map(_.asInstanceOf[JsObject])
 
-    println(s"[loadSessionAndItem] $key - cached? ${v.isDefined}" )
 
     v match {
       case Some(obj) => Future.successful(
@@ -91,7 +90,6 @@ class Player(mode: Mode,
             case Left(e) => Left(e)
             case Right(d) => {
               val (session, item, defaults) = d
-              println(s"set cache: $key")
               Cache.set(key, Json.obj(
                 "session" -> session,
                 "item" -> item,
