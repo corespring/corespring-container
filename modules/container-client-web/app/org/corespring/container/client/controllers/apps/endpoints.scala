@@ -11,15 +11,15 @@ trait Endpoints {
 
 object PlayerEndpoints {
 
-  def session(sessionId: String) = SessionEndpoints(
-    complete = Session.completeSession(sessionId),
-    getScore = Session.getScore(sessionId),
-    loadInstructorData = Session.loadInstructorData(sessionId),
-    loadItemAndSession = Session.loadItemAndSession(sessionId),
-    loadOutcome = Session.loadOutcome(sessionId),
-    reopen = Session.reopenSession(sessionId),
-    reset = Session.resetSession(sessionId),
-    save = Session.saveSession(sessionId))
+  def session(itemId: String, sessionId: String) = SessionEndpoints(
+    complete = Session.completeSession(itemId, sessionId),
+    getScore = Session.getScore(itemId, sessionId),
+    loadInstructorData = Session.loadInstructorData(itemId, sessionId),
+    loadItemAndSession = Session.loadItemAndSession(itemId, sessionId),
+    loadOutcome = Session.loadOutcome(itemId, sessionId),
+    reopen = Session.reopenSession(itemId, sessionId),
+    reset = Session.resetSession(itemId, sessionId),
+    save = Session.saveSession(itemId, sessionId))
 }
 
 object ItemEditorEndpoints extends Endpoints {

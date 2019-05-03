@@ -49,7 +49,7 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
       itemPreProcessor,
       versionInfo)
 
-    waitFor(renderer.render("sessionId", obj("session" -> true), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls, "check", Json.obj()))
+    waitFor(renderer.render("sessionId", obj("session" -> true, "itemId" -> "itemId"), obj("item" -> true, "xhtml" -> "<div/>"), bundle, Seq("warning"), Map("query" -> "param"), prodMode, showControls, "check", Json.obj()))
     lazy val captor = capture[Map[String, Any]]
     there was one(jadeEngine).renderJade(any[String], captor)
   }
@@ -99,11 +99,11 @@ class PlayerRendererTest extends Specification with Mockito with NoTimeConversio
     }
 
     "set sessionJson" in new scope {
-      captor.value.get("sessionJson").get must_== stringify(obj("session" -> obj("session" -> true), "item" -> obj("item" -> true, "xhtml" -> "<div/>")))
+      captor.value.get("sessionJson").get must_== stringify(obj("session" -> obj("session" -> true, "itemId" -> "itemId"), "item" -> obj("item" -> true, "xhtml" -> "<div/>")))
     }
 
     "set queryParams" in new scope {
-      captor.value.get("ngServiceLogic").get must_== PlayerServices("player-injected", PlayerEndpoints.session("sessionId"), obj("query" -> "param")).toString
+      captor.value.get("ngServiceLogic").get must_== PlayerServices("player-injected", PlayerEndpoints.session("itemId", "sessionId"), obj("query" -> "param")).toString
     }
   }
 }

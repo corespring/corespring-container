@@ -86,7 +86,7 @@ class SessionTest extends Specification with Mockito {
           Future.successful(Right(saveSession(false)))
         }
 
-        val result = session.saveSession("id")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
+        val result = session.saveSession("itemId", "sessionId")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
         status(result) === OK
       }
 
@@ -95,7 +95,7 @@ class SessionTest extends Specification with Mockito {
           Future.successful(Right(saveSession(true)))
         }
 
-        val result = session.saveSession("id")(req)
+        val result = session.saveSession("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
         (contentAsJson(result) \ "error").as[String] === Session.Errors.cantSaveWhenComplete
       }
@@ -107,7 +107,7 @@ class SessionTest extends Specification with Mockito {
         hooks.loadOutcome(any[String])(any[RequestHeader]) returns {
           Right(outcome(isComplete = true))
         }
-        val result = session.loadOutcome("id")(req)
+        val result = session.loadOutcome("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
       }
 
@@ -118,7 +118,7 @@ class SessionTest extends Specification with Mockito {
             outcome(itemSession = Json.obj("components" -> Json.obj()), isComplete = true))
         }
 
-        val result = session.loadOutcome("id")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
+        val result = session.loadOutcome("itemId", "sessionId")(FakeRequest("", "", FakeHeaders(), AnyContentAsJson(Json.obj())))
         status(result) === OK
       }
 
@@ -127,7 +127,7 @@ class SessionTest extends Specification with Mockito {
           Right(
             outcome(isComplete = false))
         }
-        val result = session.loadOutcome("id")(req)
+        val result = session.loadOutcome("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
       }
     }
@@ -138,7 +138,7 @@ class SessionTest extends Specification with Mockito {
         hooks.getScore(any[String])(any[RequestHeader]) returns {
           Right(outcome(isComplete = true))
         }
-        val result = session.getScore("id")(req)
+        val result = session.getScore("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
       }
 
@@ -146,7 +146,7 @@ class SessionTest extends Specification with Mockito {
         hooks.getScore(any[String])(any[RequestHeader]) returns {
           Right(outcome(itemSession = Json.obj("components" -> Json.obj()), isComplete = true))
         }
-        val result = session.getScore("id")(req)
+        val result = session.getScore("itemId", "sessionId")(req)
         status(result) === OK
       }
 
@@ -154,7 +154,7 @@ class SessionTest extends Specification with Mockito {
         hooks.getScore(any[String])(any[RequestHeader]) returns {
           Right(outcome(isComplete = false))
         }
-        val result = session.getScore("id")(req)
+        val result = session.getScore("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
       }
     }
@@ -168,13 +168,13 @@ class SessionTest extends Specification with Mockito {
       }
 
       "return when session hooks returned failure" in new LoadItemAndSessionResponding {
-        val result = session.loadItemAndSession("id")(req)
+        val result = session.loadItemAndSession("itemId", "sessionId")(req)
         status(result) === BAD_REQUEST
       }
 
       "return session when session hooks succeeded" in new LoadItemAndSessionResponding {
         hooks.loadItemAndSession(any[String])(any[RequestHeader]) returns fullSessionAndItem
-        val result = session.loadItemAndSession("id")(req)
+        val result = session.loadItemAndSession("itemId", "sessionId")(req)
         val asJson = contentAsJson(result)
         (asJson \ "item") === Json.obj()
         (asJson \ "session") === Json.obj()
@@ -184,13 +184,13 @@ class SessionTest extends Specification with Mockito {
 
     "not allow to reset session" in new scope {
       hooks.save(any[String])(any[RequestHeader]) returns Future.successful(Right(saveSession(true)))
-      val result = session.resetSession("id")(req)
+      val result = session.resetSession("itemId", "sessionId")(req)
       status(result) === BAD_REQUEST
     }
 
     "not allow to reopen session" in new scope {
       hooks.save(any[String])(any[RequestHeader]) returns Future.successful(Right(saveSession(true)))
-      val result = session.reopenSession("id")(req)
+      val result = session.reopenSession("itemId", "sessionId")(req)
       status(result) === BAD_REQUEST
     }
 
@@ -212,7 +212,7 @@ class SessionTest extends Specification with Mockito {
     }
 
     "allow to reset session" in new insecureSaveSession {
-      val result = session.resetSession("id")(req)
+      val result = session.resetSession("itemId", "sessionId")(req)
       status(result) === OK
       val resettedSession = contentAsJson(result)
       (resettedSession \ "isComplete").as[Boolean] === false
@@ -221,7 +221,7 @@ class SessionTest extends Specification with Mockito {
     }
 
     "allow to reopen session" in new insecureSaveSession {
-      val result = session.reopenSession("id")(req)
+      val result = session.reopenSession("itemId", "sessionId")(req)
       status(result) === OK
       val reopenedSession = contentAsJson(result)
       (reopenedSession \ "isComplete").as[Boolean] === false

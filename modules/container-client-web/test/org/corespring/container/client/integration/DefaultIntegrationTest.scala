@@ -146,7 +146,7 @@ class DefaultIntegrationTest extends Specification with Mockito with PlaySpecifi
 
       val di = mkDefaultIntegration(mockJson)
 
-      val result = di.session.loadItemAndSession("id")(FakeRequest("", ""))
+      val result = di.session.loadItemAndSession("itemId", "sessionId")(FakeRequest("", ""))
 
       val json = contentAsJson(result)
 

@@ -63,8 +63,8 @@ class Session(
     })
   }
 
-  def resetSession(id: String) = Action.async { implicit request =>
-    hooks.save(id).map(basicHandler { ss =>
+  def resetSession(itemId:String, sessionId: String) = Action.async { implicit request =>
+    hooks.save(sessionId).map(basicHandler { ss =>
       if (ss.isSecure)
         BadRequest(Json.obj("error" -> JsString(Errors.cantResetSecureSession)))
       else {
@@ -75,7 +75,7 @@ class Session(
             Json.obj("attempts" -> 0)
         }
 
-        ss.saveSession(id, resetSession(ss.existingSession)).map {
+        ss.saveSession(sessionId, resetSession(ss.existingSession)).map {
           savedSession =>
             updatesLogger.trace(s"reset - session has been saved as: $savedSession")
             Ok(savedSession)
@@ -84,8 +84,8 @@ class Session(
     })
   }
 
-  def reopenSession(id: String) = Action.async { implicit request =>
-    hooks.save(id).map(basicHandler { ss =>
+  def reopenSession(itemId: String, sessionId: String) = Action.async { implicit request =>
+    hooks.save(sessionId).map(basicHandler { ss =>
       if (ss.isSecure)
         BadRequest(Json.obj("error" -> JsString(Errors.cantReopenSecureSession)))
       else {
@@ -95,7 +95,7 @@ class Session(
             Json.obj("attempts" -> 0)
         }
 
-        ss.saveSession(id, reopenSession(ss.existingSession)).map {
+        ss.saveSession(sessionId, reopenSession(ss.existingSession)).map {
           savedSession =>
             updatesLogger.trace(s"reopen - session has been saved as: $savedSession")
             Ok(savedSession)
@@ -104,7 +104,7 @@ class Session(
     })
   }
 
-  def loadItemAndSession(sessionId: String) = Action.async {
+  def loadItemAndSession(itemId: String, sessionId: String) = Action.async {
     implicit request =>
       Future {
         val response = hooks.loadItemAndSession(sessionId)
@@ -128,10 +128,10 @@ class Session(
       }
   }
 
-  def saveSession(id: String) = Action.async { implicit request =>
-    hooks.save(id).map(basicHandler { ss =>
+  def saveSession(itemId:String, sessionId: String) = Action.async { implicit request =>
+    hooks.save(sessionId).map(basicHandler { ss =>
 
-      logger.trace(s"[saveSession] : $id")
+      logger.trace(s"[saveSession] : $sessionId")
 
       if (ss.isSecure && ss.isComplete)
         BadRequest(Json.obj("error" -> JsString(Errors.cantSaveWhenComplete)))
@@ -153,7 +153,7 @@ class Session(
               Json.obj("components" -> requestJson \ "components") ++
               attemptUpdate ++ completeUpdate
 
-            ss.saveSession(id, update).map {
+            ss.saveSession(sessionId, update).map {
               savedSession =>
                 updatesLogger.trace(s"session has been saved as: $savedSession")
                 Ok(savedSession)
@@ -166,19 +166,21 @@ class Session(
   /**
    * Load outcome for a session.
    *
-   * @param id
+   * @param itemId
+   * @param sessionId
+   *
    * request body : json - a set of evaluation options to be passed in to the outcome processors
    * @return
    */
-  def loadOutcome(id: String) = Action.async {
+  def loadOutcome(itemId: String, sessionId: String) = Action.async {
     implicit request =>
       Future {
-        val reponse = hooks.loadOutcome(id)
+        val reponse = hooks.loadOutcome(sessionId)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
           case Right(so) => {
-            logger.trace(s"[loadOutcome]: $id : ${Json.stringify(so.itemSession)}")
+            logger.trace(s"[loadOutcome]: $sessionId : ${Json.stringify(so.itemSession)}")
 
             def hasAnswers = (so.itemSession \ "components").asOpt[JsObject].isDefined
 
@@ -205,18 +207,18 @@ class Session(
   /**
    * Load instructor data for a session.
    *
-   * @param id
+   * @param sessionId
    * @return
    */
-  def loadInstructorData(id: String) = Action {
+  def loadInstructorData(itemId:String, sessionId: String) = Action {
     implicit request =>
       {
-        val reponse = hooks.loadOutcome(id)
+        val reponse = hooks.loadOutcome(sessionId)
 
         reponse match {
           case Left(err) => InternalServerError(err._2)
           case Right(so) => {
-            logger.trace(s"[loadAnswerKey]: $id : ${Json.stringify(so.item)} : ${Json.stringify(so.itemSession)}")
+            logger.trace(s"[loadAnswerKey]: $sessionId : ${Json.stringify(so.item)} : ${Json.stringify(so.itemSession)}")
 
             if (so.isSecure && !so.isComplete) {
               BadRequest(Json.obj("error" -> JsString("secure mode: can't load instructor data - session isn't complete")))
@@ -234,13 +236,14 @@ class Session(
    * When secure=false these answers are used to calculate the result
    * When secure=true the answers are ignored and the answers from the session are used instead.
    *
-   * @param id
+   * @param itemId
+   * @param sessionId
    * @return
    */
-  def getScore(id: String) = Action.async {
+  def getScore(itemId:String, sessionId: String) = Action.async {
     implicit request =>
       Future {
-        val response = hooks.getScore(id)
+        val response = hooks.getScore(sessionId)
 
         response match {
           case Left(err) => InternalServerError(err._2)
@@ -276,13 +279,13 @@ class Session(
       }(sessionContext.heavyLoad)
   }
 
-  def completeSession(id: String) = Action.async { implicit request =>
-    hooks.save(id).map(basicHandler({ (ss: SaveSession) =>
+  def completeSession(itemId:String, sessionId: String) = Action.async { implicit request =>
+    hooks.save(sessionId).map(basicHandler({ (ss: SaveSession) =>
       val sessionJson = ss.existingSession.as[JsObject] ++ Json.obj("isComplete" -> JsBoolean(true))
-      ss.saveSession(id, sessionJson).map {
+      ss.saveSession(sessionId, sessionJson).map {
         savedSession =>
           {
-            updatesLogger.trace(s"[completeSession]: $id : $savedSession")
+            updatesLogger.trace(s"[completeSession]: $sessionId : $savedSession")
             Ok(savedSession)
           }
       }.getOrElse(BadRequest("Error completing"))

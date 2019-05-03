@@ -24,14 +24,14 @@ GET           /player/item/:itemId/index.html                           @org.cor
 GET           /player/item/:itemId/*file                                 @org.corespring.container.client.controllers.apps.Player.getFileByItemId(itemId: String, file:String)
 
 # Session
-GET           /session/item-and-session/:id.json                         @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(id)
-GET           /session/reopen/:id.json                                   @org.corespring.container.client.controllers.resources.Session.reopenSession(id)
-GET           /session/reset/:id.json                                    @org.corespring.container.client.controllers.resources.Session.resetSession(id)
-PUT           /session/save/:id.json                                     @org.corespring.container.client.controllers.resources.Session.saveSession(id)
-PUT           /session/complete/:id.json                                 @org.corespring.container.client.controllers.resources.Session.completeSession(id)
-PUT           /session/load-outcome/:id.json                             @org.corespring.container.client.controllers.resources.Session.loadOutcome(id)
-GET           /session/load-instructor-data/:id.json                     @org.corespring.container.client.controllers.resources.Session.loadInstructorData(id)
-PUT           /session/:id/score.json                                    @org.corespring.container.client.controllers.resources.Session.getScore(id)
+GET           /session/item-and-session/:itemId/:sessionId.json                         @org.corespring.container.client.controllers.resources.Session.loadItemAndSession(itemId, sessionId)
+GET           /session/reopen/:itemId/:sessionId.json                                   @org.corespring.container.client.controllers.resources.Session.reopenSession(itemId, sessionId)
+GET           /session/reset/:itemId/:sessionId.json                                    @org.corespring.container.client.controllers.resources.Session.resetSession(itemId, sessionId)
+PUT           /session/save/:itemId/:sessionId.json                                     @org.corespring.container.client.controllers.resources.Session.saveSession(itemId, sessionId)
+PUT           /session/complete/:itemId/:sessionId.json                                 @org.corespring.container.client.controllers.resources.Session.completeSession(itemId, sessionId)
+PUT           /session/load-outcome/:itemId/:sessionId.json                             @org.corespring.container.client.controllers.resources.Session.loadOutcome(itemId, sessionId)
+GET           /session/load-instructor-data/:itemId/:sessionId.json                     @org.corespring.container.client.controllers.resources.Session.loadInstructorData(itemId, sessionId)
+PUT           /session/:itemId/:sessionId/score.json                                    @org.corespring.container.client.controllers.resources.Session.getScore(itemId, sessionId)
 
 # Collection
 GET           /collection                                                @org.corespring.container.client.controllers.resources.Collection.list()

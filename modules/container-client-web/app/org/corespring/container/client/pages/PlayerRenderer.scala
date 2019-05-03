@@ -67,7 +67,8 @@ class PlayerRenderer(
     logger.trace(s"function=render, bundle=$bundle")
 
     val (js, css) = prepareJsCss(prodMode, bundle)
-    val endpoints = PlayerEndpoints.session(sessionId)
+    val itemId = (session \ "itemId").as[String]
+    val endpoints = PlayerEndpoints.session(itemId, sessionId)
     val queryParamsJson = Json.toJson(queryParams)
 
     val (controlsJs, controlsNgModules): (Seq[String], Seq[String]) = (showControls, prodMode) match {

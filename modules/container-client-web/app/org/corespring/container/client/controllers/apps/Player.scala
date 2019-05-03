@@ -18,6 +18,7 @@ import play.api.cache.Cache
 import org.corespring.container.client.controllers.apps.routes.{Player => PlayerRoutes}
 
 import scala.concurrent.Future
+import scala.util.Try
 
 
 class Player(mode: Mode,
@@ -72,7 +73,8 @@ class Player(mode: Mode,
   private def loadSessionAndItem(sessionId: String)(implicit rh: RequestHeader): Future[Either[(Int, String), (JsValue, JsValue, JsValue)]] = {
     import play.api.Play.current
     val key = s"loadSessionAndItem_$sessionId"
-    val v: Option[JsObject] = Cache.get(key).map(_.asInstanceOf[JsObject])
+
+    val v: Option[JsObject] = Try(Cache.get(key).map(_.asInstanceOf[JsObject])).toOption.flatten
 
 
     v match {
@@ -90,11 +92,11 @@ class Player(mode: Mode,
             case Left(e) => Left(e)
             case Right(d) => {
               val (session, item, defaults) = d
-              Cache.set(key, Json.obj(
+              Try(Cache.set(key, Json.obj(
                 "session" -> session,
                 "item" -> item,
                 "defaults" -> defaults
-              ), 5)
+              ), 5))
               Right(d)
             }
           }

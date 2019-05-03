@@ -186,14 +186,14 @@ object Build extends sbt.Build {
     .settings(
       libraryDependencies ++= Seq(dependencyUtils))
     //.dependsOn(componentModel % "compile->compile;test->test", logging, utils % "test->compile;compile->compile")
-    .dependsOn(componentModel,logging, utils ) ///% "test->compile;compile->compile")
+    .dependsOn(componentModel % "compile->compile;test->test",logging, utils ) ///% "test->compile;compile->compile")
 
   //Note: this is a play app for now until we move to play 2.2.0
   lazy val jsProcessing = builder.playApp("js-processing")
     .settings(playAppToSbtLibSettings: _*)
     .settings(
       libraryDependencies ++= Seq(rhinoJs, grizzledLog, macWireMacro))
-    .dependsOn(logging, containerClient, componentServices, componentModel) // % "test->test;compile->compile")
+    .dependsOn(logging, containerClient, componentServices, componentModel % "test->test;compile->compile")
 
   lazy val componentLoader = builder.lib("component-loader")
     .settings(
@@ -222,7 +222,7 @@ object Build extends sbt.Build {
         playCache),
       templatesImport ++= Seq("play.api.libs.json.JsValue", "play.api.libs.json.Json"))
     .dependsOn(
-      componentModel, // % "compile->compile;test->test",
+      componentModel  % "compile->compile;test->test",
       componentServices, // % "compile->compile;test->test",
       containerClient,
       utils,
